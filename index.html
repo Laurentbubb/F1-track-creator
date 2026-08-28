@@ -1,62 +1,128 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0,
+                   maximum-scale=1.0, user-scalable=no">
+
     <title>F1 Track Creator</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header>
-    <div>
+
+    <div class="title">
         <h1>🏎️ F1 Track Creator</h1>
-        <span>Crée ton circuit • Choisis ta F1 • Fais le meilleur temps</span>
+        <p>Crée ton circuit et conduis dessus !</p>
     </div>
 
     <div class="top-buttons">
         <button id="createBtn">🖌️ Créer</button>
         <button id="raceBtn">🏁 Course</button>
-        <button id="saveBtn">💾 Sauvegarder</button>
-        <button id="newBtn">🗑️ Nouveau</button>
+        <button id="saveBtn">💾 Sauver</button>
+        <button id="newBtn">🗑️ Effacer</button>
     </div>
+
 </header>
+
 
 <div class="layout">
 
     <main>
         <canvas id="gameCanvas"></canvas>
+
+        <!-- CONTROLES IPAD -->
+
+        <div id="touchControls" class="touch-controls">
+
+            <div class="steering">
+
+                <button
+                    class="touch-button"
+                    id="leftButton">
+                    ◀
+                </button>
+
+                <button
+                    class="touch-button"
+                    id="rightButton">
+                    ▶
+                </button>
+
+            </div>
+
+            <div class="pedals">
+
+                <button
+                    class="touch-button brake"
+                    id="brakeButton">
+                    ▼
+                </button>
+
+                <button
+                    class="touch-button accelerate"
+                    id="accelerateButton">
+                    ▲
+                </button>
+
+            </div>
+
+        </div>
+
     </main>
+
 
     <aside>
 
         <section>
+
             <h2>🚗 Voiture</h2>
 
-            <button class="car-button selected" data-car="red">
+            <button
+                class="car-button selected"
+                data-car="red">
+
                 <span class="car-color red"></span>
                 F1 Rouge
+
             </button>
 
-            <button class="car-button" data-car="blue">
+            <button
+                class="car-button"
+                data-car="blue">
+
                 <span class="car-color blue"></span>
                 F1 Bleue
+
             </button>
 
-            <button class="car-button" data-car="yellow">
+            <button
+                class="car-button"
+                data-car="yellow">
+
                 <span class="car-color yellow"></span>
                 F1 Jaune
+
             </button>
 
-            <button class="car-button" data-car="black">
+            <button
+                class="car-button"
+                data-car="black">
+
                 <span class="car-color black"></span>
                 F1 Noire
+
             </button>
+
         </section>
 
+
         <section class="stats">
+
             <h2>🏆 Course</h2>
 
             <div class="stat">
@@ -78,40 +144,53 @@
                 <span>Vitesse</span>
                 <strong id="speedText">0 km/h</strong>
             </div>
+
         </section>
 
+
         <section>
-            <h2>🎮 Commandes</h2>
 
-            <div class="controls">
-                <div>⬆️</div>
-                <span>Accélérer</span>
+            <h2>🎮 PC</h2>
 
-                <div>⬇️</div>
-                <span>Freiner / Reculer</span>
+            <p>⬆️ Accélérer</p>
+            <p>⬇️ Freiner</p>
+            <p>⬅️ Tourner à gauche</p>
+            <p>➡️ Tourner à droite</p>
 
-                <div>⬅️</div>
-                <span>Tourner à gauche</span>
-
-                <div>➡️</div>
-                <span>Tourner à droite</span>
-
-                <div>R</div>
-                <span>Recommencer</span>
-            </div>
         </section>
 
+
         <section>
+
+            <h2>📱 iPad</h2>
+
+            <p>Utilise les boutons à l'écran pour conduire.</p>
+
+        </section>
+
+
+        <section>
+
             <h2>ℹ️ État</h2>
-            <p id="status">Dessine ton circuit avec la souris.</p>
+
+            <p id="status">
+                🖌️ Maintiens le doigt ou la souris
+                pour dessiner.
+            </p>
+
         </section>
 
     </aside>
 
 </div>
 
+
+<!-- COMPTE A REBOURS -->
+
 <div id="startOverlay" class="overlay hidden">
+
     <div class="overlay-box">
+
         <div class="lights">
             <span></span>
             <span></span>
@@ -119,23 +198,40 @@
         </div>
 
         <h2 id="countdown">3</h2>
+
         <p>Prépare-toi...</p>
+
     </div>
+
 </div>
+
+
+<!-- FIN DE COURSE -->
 
 <div id="finishOverlay" class="overlay hidden">
+
     <div class="overlay-box">
+
         <h2>🏆 Course terminée !</h2>
 
-        <p id="finalTime">Temps : --:--.---</p>
-        <p id="finalBest">Meilleur temps : --:--.---</p>
+        <p id="finalTime">
+            Temps : --:--.---
+        </p>
 
-        <button id="restartBtn">🔄 Recommencer</button>
+        <p id="finalBest">
+            Meilleur temps : --:--.---
+        </p>
+
+        <button id="restartBtn">
+            🔄 Recommencer
+        </button>
+
     </div>
+
 </div>
+
 
 <script src="game.js"></script>
 
 </body>
 </html>
-```
