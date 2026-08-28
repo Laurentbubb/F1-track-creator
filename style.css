@@ -11,10 +11,8 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   background: #101827;
   color: white;
-}
-
-body {
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 button,
@@ -40,10 +38,39 @@ button {
 .screen {
   width: 100%;
   min-height: 100vh;
+  height: auto;
   padding: 20px;
   overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: visible;
+}
+
+#avatarScreen,
+#menuScreen,
+#garageScreen,
+#resultsScreen,
+#duelIntroScreen,
+#duelResultScreen {
+  min-height: 100vh;
+  height: auto;
+}
+
+#resultsScreen {
+  display: block;
+  overflow: visible;
+}
+
+#resultsScreen .panel {
+  width: min(950px, 100%);
+  margin: 0 auto 40px;
+  max-height: none;
+}
+
+#continueBtn {
+  display: block;
+  width: 100%;
+  min-height: 55px;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 /* =========================
@@ -52,12 +79,16 @@ button {
 
 .panel {
   width: min(950px, 100%);
-  margin: 0 auto;
+  margin: auto;
   padding: 25px;
   border-radius: 25px;
   background: #182235;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
 }
+
+/* =========================
+   TITRES
+========================= */
 
 h1 {
   text-align: center;
@@ -76,7 +107,6 @@ h2 {
 .primary-btn,
 .secondary-btn,
 .danger-btn {
-  display: block;
   width: 100%;
   padding: 16px 20px;
   margin-top: 12px;
@@ -106,18 +136,25 @@ h2 {
   transform: scale(0.98);
 }
 
-/* =========================
-   CRÉATION AVATAR
-========================= */
-
 #createAvatarBtn {
+  display: block !important;
   position: relative;
-  z-index: 20;
-  display: block;
+  z-index: 9999;
   width: 100%;
+  padding: 16px 20px;
   margin-top: 20px;
   margin-bottom: 20px;
+  border-radius: 14px;
+  background: #18c96e;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
 }
+
+/* =========================
+   AVATAR
+========================= */
 
 .avatar-preview {
   height: 240px;
@@ -410,17 +447,8 @@ h2 {
    RÉSULTATS
 ========================= */
 
-#resultsScreen {
-  display: block;
-  min-height: 100vh;
-  overflow-y: auto;
-  padding-bottom: 40px;
-}
-
 .results-panel {
   text-align: center;
-  margin: 0 auto;
-  max-height: none;
 }
 
 .results-animation {
@@ -452,18 +480,6 @@ h2 {
   border-radius: 15px;
   background: #263753;
   font-size: 20px;
-}
-
-#continueBtn {
-  display: block;
-  position: relative;
-  z-index: 100;
-  width: 100%;
-  min-height: 55px;
-  margin-top: 20px;
-  margin-bottom: 30px;
-  background: #18c96e;
-  color: white;
 }
 
 /* =========================
@@ -509,15 +525,6 @@ h2 {
 ========================= */
 
 @media (max-width: 700px) {
-
-  .screen {
-    padding: 12px;
-  }
-
-  .panel {
-    padding: 18px;
-  }
-
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -551,8 +558,8 @@ h2 {
     height: 72px;
   }
 
-  .results-animation {
-    min-height: 90px;
-    font-size: 60px;
+  .panel {
+    padding: 18px;
+    border-radius: 18px;
   }
 }
