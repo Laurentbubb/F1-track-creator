@@ -1,3 +1,4 @@
+```javascript
 "use strict";
 
 /* =========================================================
@@ -26,54 +27,30 @@ const defaultSave = {
 
 let save = loadSave();
 
-function cloneDefaultSave() {
-  return JSON.parse(JSON.stringify(defaultSave));
-}
-
 function loadSave() {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
 
     if (!raw) {
-      return cloneDefaultSave();
+      return structuredClone(defaultSave);
     }
 
-    const parsed = JSON.parse(raw);
-
     return {
-      ...cloneDefaultSave(),
-      ...parsed,
-      unlockedItems: Array.isArray(parsed.unlockedItems)
-        ? parsed.unlockedItems
-        : [],
-      ownedCars: Array.isArray(parsed.ownedCars)
-        ? parsed.ownedCars
-        : ["starter"],
-      duelAttempts:
-        parsed.duelAttempts &&
-        typeof parsed.duelAttempts === "object"
-          ? parsed.duelAttempts
-          : {}
+      ...structuredClone(defaultSave),
+      ...JSON.parse(raw)
     };
 
   } catch (error) {
-    console.error("Erreur de sauvegarde :", error);
-    return cloneDefaultSave();
+    console.error("Erreur sauvegarde :", error);
+    return structuredClone(defaultSave);
   }
 }
 
 function saveGame() {
-  try {
-    localStorage.setItem(
-      SAVE_KEY,
-      JSON.stringify(save)
-    );
-  } catch (error) {
-    console.error(
-      "Impossible de sauvegarder :",
-      error
-    );
-  }
+  localStorage.setItem(
+    SAVE_KEY,
+    JSON.stringify(save)
+  );
 }
 
 
@@ -96,23 +73,6 @@ function clamp(value, min, max) {
 function shuffle(array) {
   return [...array].sort(
     () => Math.random() - 0.5
-  );
-}
-
-function on(id, event, callback) {
-
-  const element = $(id);
-
-  if (!element) {
-    console.warn(
-      `Élément #${id} introuvable.`
-    );
-    return;
-  }
-
-  element.addEventListener(
-    event,
-    callback
   );
 }
 
@@ -159,315 +119,164 @@ function getAvatarFromForm() {
 
   return {
     name:
-      $("avatarName")?.value.trim() ||
+      $("avatarName").value.trim() ||
       "Pilote",
 
     gender:
-      $("avatarGender")?.value ||
-      "A",
+      $("avatarGender").value,
 
     age:
-      $("avatarAge")?.value ||
-      "teen",
+      $("avatarAge").value,
 
     height:
-      $("avatarHeight")?.value ||
-      "medium",
+      $("avatarHeight").value,
 
     hair:
-      $("avatarHair")?.value ||
-      "short",
+      $("avatarHair").value,
 
     hairColor:
-      $("avatarHairColor")?.value ||
-      "#24170f",
+      $("avatarHairColor").value,
 
     glasses:
-      $("avatarGlasses")?.value ||
-      "none",
+      $("avatarGlasses").value,
 
     helmet:
-      $("avatarHelmet")?.value ||
-      "none",
+      $("avatarHelmet").value,
 
     mask:
-      $("avatarMask")?.value ||
-      "none",
+      $("avatarMask").value,
 
     outfit:
-      save.avatar?.outfit ||
       "neutral"
   };
 }
 
-
-/* =========================================================
-   COULEURS
-========================================================= */
-
-const helmetColors = {
-  none: "transparent",
-  white: "#eeeeee",
-  red: "#d84040",
-  blue: "#397bd1",
-  black: "#151515",
-  gold: "#d4af37"
-};
-
-const maskColors = {
-  none: "transparent",
-  white: "#eeeeee",
-  black: "#151515",
-  blue: "#397bd1",
-  red: "#d84040"
-};
-
-const outfitColors = {
-  neutral: "#eeeeee",
-  outfit_blue: "#397bd1",
-  outfit_red: "#d84040",
-  outfit_black: "#151515",
-  outfit_gold: "#d4af37"
-};
-
-
-/* =========================================================
-   APPLICATION VISUELLE AVATAR
-========================================================= */
-
-function applyAvatarVisual(container, avatar) {
-
-  if (!container || !avatar) {
-    return;
-  }
-
-  /*
-    On reconstruit le personnage pour que toutes
-    les modifications soient réellement visibles.
-  */
-
-  container.innerHTML = `
-    <div class="hair"></div>
-    <div class="face">
-      <div class="glasses"></div>
-      <div class="mask"></div>
-    </div>
-    <div class="helmet"></div>
-    <div class="body"></div>
-  `;
-
-  const hair =
-    container.querySelector(".hair");
-
-  const face =
-    container.querySelector(".face");
-
-  const glasses =
-    container.querySelector(".glasses");
-
-  const helmet =
-    container.querySelector(".helmet");
-
-  const body =
-    container.querySelector(".body");
-
-  /*
-    CHEVEUX
-  */
-
-  hair.style.background =
-    avatar.hairColor;
-
-  hair.className =
-    `hair ${avatar.hair || "short"}`;
-
-
-  /*
-    APPARENCE / GENRE
-  */
-
-  if (avatar.gender === "B") {
-
-    face.style.background =
-      "#e6b68f";
-
-  } else {
-
-    face.style.background =
-      "#f0c19b";
-  }
-
-
-  /*
-    TAILLE
-  */
-
-  const scaleMap = {
-    small: 0.85,
-    medium: 1,
-    tall: 1.15
-  };
-
-  const scale =
-    scaleMap[avatar.height] || 1;
-
-  container.style.transform =
-    `scale(${scale})`;
-
-
-  /*
-    LUNETTES
-  */
-
-  if (avatar.glasses === "none") {
-
-    glasses.style.display =
-      "none";
-
-  } else {
-
-    glasses.style.display =
-      "block";
-
-    if (avatar.glasses === "round") {
-
-      glasses.style.borderRadius =
-        "50%";
-
-    } else if (
-      avatar.glasses === "sport"
-    ) {
-
-      glasses.style.borderRadius =
-        "4px";
-
-      glasses.style.width =
-        "65px";
-
-    } else {
-
-      glasses.style.borderRadius =
-        "2px";
-    }
-  }
-
-
-  /*
-    CASQUE
-  */
-
-  if (
-    avatar.helmet &&
-    avatar.helmet !== "none"
-  ) {
-
-    helmet.style.display =
-      "block";
-
-    helmet.style.background =
-      helmetColors[avatar.helmet] ||
-      "#eeeeee";
-
-  } else {
-
-    helmet.style.display =
-      "none";
-  }
-
-
-  /*
-    TENUE
-  */
-
-  body.style.background =
-    outfitColors[avatar.outfit] ||
-    outfitColors.neutral;
-
-
-  /*
-    MASQUE
-  */
-
-  let mask =
-    face.querySelector(".mask");
-
-  if (!mask) {
-
-    mask =
-      document.createElement("div");
-
-    mask.className =
-      "mask";
-
-    face.appendChild(mask);
-  }
-
-  if (
-    avatar.mask &&
-    avatar.mask !== "none"
-  ) {
-
-    mask.style.display =
-      "block";
-
-    mask.style.position =
-      "absolute";
-
-    mask.style.left =
-      "8px";
-
-    mask.style.top =
-      "48px";
-
-    mask.style.width =
-      "54px";
-
-    mask.style.height =
-      "20px";
-
-    mask.style.borderRadius =
-      "8px";
-
-    mask.style.background =
-      maskColors[avatar.mask] ||
-      "#151515";
-
-    mask.style.zIndex =
-      "10";
-
-  } else {
-
-    mask.style.display =
-      "none";
-  }
-}
-
-
-/* =========================================================
-   APERÇU AVATAR
-========================================================= */
 
 function updateAvatarPreview() {
 
   const avatar =
     getAvatarFromForm();
 
-  const container =
-    $("previewAvatar");
+  const hair =
+    $("previewHair");
 
-  if (!container) {
-    return;
+  const glasses =
+    $("previewGlasses");
+
+  const helmet =
+    $("previewHelmet");
+
+  const body =
+    $("previewBody");
+
+  const face =
+    $("previewFace");
+
+
+  /* =========================
+     CHEVEUX
+  ========================= */
+
+  hair.style.background =
+    avatar.hairColor;
+
+  hair.className =
+    "hair " + avatar.hair;
+
+
+  /* =========================
+     LUNETTES
+  ========================= */
+
+  glasses.style.display =
+    avatar.glasses === "none"
+      ? "none"
+      : "block";
+
+  glasses.style.borderRadius = "8px";
+
+  if (avatar.glasses === "round") {
+    glasses.style.borderRadius = "50%";
   }
 
-  applyAvatarVisual(
-    container,
-    avatar
-  );
+  if (avatar.glasses === "sport") {
+    glasses.style.borderRadius = "4px";
+  }
+
+  if (avatar.glasses === "square") {
+    glasses.style.borderRadius = "2px";
+  }
+
+
+  /* =========================
+     CASQUE
+  ========================= */
+
+  const helmetColors = {
+
+    none: "transparent",
+    white: "#eeeeee",
+    red: "#d84040",
+    blue: "#397bd1",
+    black: "#151515",
+    gold: "#d4af37"
+
+  };
+
+  helmet.style.background =
+    helmetColors[avatar.helmet] ||
+    "transparent";
+
+  helmet.style.display =
+    avatar.helmet === "none"
+      ? "none"
+      : "block";
+
+
+  /* =========================
+     TAILLE
+  ========================= */
+
+  const heights = {
+
+    small: 0.9,
+    medium: 1,
+    tall: 1.1
+
+  };
+
+  const scale =
+    heights[avatar.height] || 1;
+
+  $("previewAvatar").style.transform =
+    `scale(${scale})`;
+
+
+  /* =========================
+     APPARENCE
+  ========================= */
+
+  if (avatar.gender === "A") {
+
+    face.style.background =
+      "#f0c19b";
+
+    body.style.background =
+      "#ffffff";
+
+  } else {
+
+    face.style.background =
+      "#e8b28d";
+
+    body.style.background =
+      "#e9e9ff";
+  }
 }
 
 
 /* =========================================================
-   CHANGEMENTS DU FORMULAIRE
+   ÉCOUTEURS AVATAR
 ========================================================= */
 
 [
@@ -485,10 +294,6 @@ function updateAvatarPreview() {
   const element = $(id);
 
   if (!element) {
-    console.warn(
-      "Champ avatar introuvable :",
-      id
-    );
     return;
   }
 
@@ -506,11 +311,10 @@ function updateAvatarPreview() {
 
 
 /* =========================================================
-   CRÉATION / SAUVEGARDE AVATAR
+   CRÉATION / MODIFICATION AVATAR
 ========================================================= */
 
-on(
-  "createAvatarBtn",
+$("createAvatarBtn").addEventListener(
   "click",
   () => {
 
@@ -518,14 +322,9 @@ on(
       getAvatarFromForm();
 
     /*
-      Nouvelle création :
-      on conserve les achats éventuels
-      mais on initialise le pilote.
+      On ne remet PAS les points à zéro
+      lorsqu'on modifie un avatar existant.
     */
-
-    if (!save.points) {
-      save.points = 0;
-    }
 
     if (!save.course) {
       save.course = 1;
@@ -535,9 +334,8 @@ on(
 
     updateMenu();
 
-    showScreen(
-      "menuScreen"
-    );
+    showScreen("menuScreen");
+
   }
 );
 
@@ -552,61 +350,27 @@ function updateMenu() {
     return;
   }
 
-  const welcome =
-    $("welcomeText");
+  $("welcomeText").textContent =
+    `Bienvenue, ${save.avatar.name} !`;
 
-  if (welcome) {
-    welcome.textContent =
-      `Bienvenue, ${save.avatar.name} !`;
-  }
+  $("menuPoints").textContent =
+    save.points;
 
-  const menuPoints =
-    $("menuPoints");
+  $("courseNumber").textContent =
+    save.course;
 
-  if (menuPoints) {
-    menuPoints.textContent =
-      save.points;
-  }
+  $("bestPosition").textContent =
+    save.bestPosition || "-";
 
-  const courseNumber =
-    $("courseNumber");
+  $("garagePoints").textContent =
+    save.points;
 
-  if (courseNumber) {
-    courseNumber.textContent =
-      save.course;
-  }
-
-  const bestPosition =
-    $("bestPosition");
-
-  if (bestPosition) {
-    bestPosition.textContent =
-      save.bestPosition || "-";
-  }
-
-  const garagePoints =
-    $("garagePoints");
-
-  if (garagePoints) {
-    garagePoints.textContent =
-      save.points;
-  }
-
-  const hudPoints =
-    $("hudPoints");
-
-  if (hudPoints) {
-    hudPoints.textContent =
-      save.points;
-  }
+  $("hudPoints").textContent =
+    save.points;
 
   renderMenuAvatar();
 }
 
-
-/* =========================================================
-   AVATAR DU MENU
-========================================================= */
 
 function renderMenuAvatar() {
 
@@ -617,19 +381,128 @@ function renderMenuAvatar() {
     return;
   }
 
-  applyAvatarVisual(
-    container,
-    save.avatar
-  );
+  container.innerHTML = `
 
-  /*
-    On remet la classe large-avatar.
-  */
+    <div class="hair"></div>
 
-  container.classList.add(
-    "avatar",
-    "large-avatar"
-  );
+    <div class="face"></div>
+
+    <div class="body"></div>
+
+    <div class="helmet"></div>
+
+    <div class="glasses"></div>
+
+  `;
+
+
+  const hair =
+    container.querySelector(".hair");
+
+  const face =
+    container.querySelector(".face");
+
+  const body =
+    container.querySelector(".body");
+
+  const helmet =
+    container.querySelector(".helmet");
+
+  const glasses =
+    container.querySelector(".glasses");
+
+
+  /* Cheveux */
+
+  hair.style.background =
+    save.avatar.hairColor;
+
+
+  hair.className =
+    "hair " + save.avatar.hair;
+
+
+  /* Lunettes */
+
+  if (
+    save.avatar.glasses &&
+    save.avatar.glasses !== "none"
+  ) {
+
+    glasses.style.display =
+      "block";
+
+    if (
+      save.avatar.glasses ===
+      "round"
+    ) {
+
+      glasses.style.borderRadius =
+        "50%";
+
+    } else if (
+      save.avatar.glasses ===
+      "sport"
+    ) {
+
+      glasses.style.borderRadius =
+        "4px";
+
+    } else {
+
+      glasses.style.borderRadius =
+        "2px";
+    }
+
+  } else {
+
+    glasses.style.display =
+      "none";
+  }
+
+
+  /* Casque */
+
+  const helmetColors = {
+
+    none: "transparent",
+    white: "#eeeeee",
+    red: "#d84040",
+    blue: "#397bd1",
+    black: "#151515",
+    gold: "#d4af37"
+
+  };
+
+  helmet.style.background =
+    helmetColors[
+      save.avatar.helmet
+    ] || "transparent";
+
+  helmet.style.display =
+    save.avatar.helmet === "none"
+      ? "none"
+      : "block";
+
+
+  /* Apparence */
+
+  if (save.avatar.gender === "A") {
+
+    face.style.background =
+      "#f0c19b";
+
+    body.style.background =
+      "#ffffff";
+
+  } else {
+
+    face.style.background =
+      "#e8b28d";
+
+    body.style.background =
+      "#e9e9ff";
+  }
 }
 
 
@@ -637,15 +510,13 @@ function renderMenuAvatar() {
    BOUTONS MENU
 ========================================================= */
 
-on(
-  "raceBtn",
+$("raceBtn").addEventListener(
   "click",
   startNextRace
 );
 
 
-on(
-  "garageBtn",
+$("garageBtn").addEventListener(
   "click",
   () => {
 
@@ -654,12 +525,12 @@ on(
     showScreen(
       "garageScreen"
     );
+
   }
 );
 
 
-on(
-  "customizeBtn",
+$("customizeBtn").addEventListener(
   "click",
   () => {
 
@@ -673,8 +544,7 @@ on(
 );
 
 
-on(
-  "garageBackBtn",
+$("garageBackBtn").addEventListener(
   "click",
   () => {
 
@@ -688,8 +558,7 @@ on(
 );
 
 
-on(
-  "resetBtn",
+$("resetBtn").addEventListener(
   "click",
   () => {
 
@@ -707,9 +576,9 @@ on(
     );
 
     save =
-      cloneDefaultSave();
-
-    clearAvatarForm();
+      structuredClone(
+        defaultSave
+      );
 
     updateAvatarPreview();
 
@@ -731,81 +600,38 @@ function loadAvatarIntoForm() {
     return;
   }
 
-  const avatar =
-    save.avatar;
+  $("avatarName").value =
+    save.avatar.name || "";
 
-  if ($("avatarName"))
-    $("avatarName").value =
-      avatar.name || "Pilote";
+  $("avatarGender").value =
+    save.avatar.gender || "A";
 
-  if ($("avatarGender"))
-    $("avatarGender").value =
-      avatar.gender || "A";
+  $("avatarAge").value =
+    save.avatar.age || "teen";
 
-  if ($("avatarAge"))
-    $("avatarAge").value =
-      avatar.age || "teen";
+  $("avatarHeight").value =
+    save.avatar.height || "medium";
 
-  if ($("avatarHeight"))
-    $("avatarHeight").value =
-      avatar.height || "medium";
+  $("avatarHair").value =
+    save.avatar.hair || "short";
 
-  if ($("avatarHair"))
-    $("avatarHair").value =
-      avatar.hair || "short";
+  $("avatarHairColor").value =
+    save.avatar.hairColor ||
+    "#24170f";
 
-  if ($("avatarHairColor"))
-    $("avatarHairColor").value =
-      avatar.hairColor || "#24170f";
+  $("avatarGlasses").value =
+    save.avatar.glasses ||
+    "none";
 
-  if ($("avatarGlasses"))
-    $("avatarGlasses").value =
-      avatar.glasses || "none";
+  $("avatarHelmet").value =
+    save.avatar.helmet ||
+    "none";
 
-  if ($("avatarHelmet"))
-    $("avatarHelmet").value =
-      avatar.helmet || "none";
-
-  if ($("avatarMask"))
-    $("avatarMask").value =
-      avatar.mask || "none";
+  $("avatarMask").value =
+    save.avatar.mask ||
+    "none";
 
   updateAvatarPreview();
-}
-
-
-function clearAvatarForm() {
-
-  if ($("avatarName"))
-    $("avatarName").value = "";
-
-  if ($("avatarGender"))
-    $("avatarGender").value = "A";
-
-  if ($("avatarAge"))
-    $("avatarAge").value = "teen";
-
-  if ($("avatarHeight"))
-    $("avatarHeight").value = "medium";
-
-  if ($("avatarHair"))
-    $("avatarHair").value = "short";
-
-  if ($("avatarHairColor"))
-    $("avatarHairColor").value =
-      "#24170f";
-
-  if ($("avatarGlasses"))
-    $("avatarGlasses").value =
-      "none";
-
-  if ($("avatarHelmet"))
-    $("avatarHelmet").value =
-      "none";
-
-  if ($("avatarMask"))
-    $("avatarMask").value =
-      "none";
 }
 
 
@@ -863,6 +689,7 @@ const shopItems = [
     price: 300,
     type: "mask"
   }
+
 ];
 
 
@@ -871,30 +698,27 @@ function renderShop() {
   const container =
     $("shopItems");
 
-  if (!container) {
-    return;
-  }
-
   container.innerHTML = "";
 
   shopItems.forEach(item => {
 
     const owned =
-      save.unlockedItems.includes(
-        item.id
-      );
+      save.unlockedItems
+        .includes(item.id);
 
     const div =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
     div.className =
       "shop-item";
 
     div.innerHTML = `
+
       <h3>${item.name}</h3>
-      <p>⭐ ${item.price}</p>
+
+      <p>
+        ⭐ ${item.price}
+      </p>
 
       <button
         ${owned ? "disabled" : ""}
@@ -905,62 +729,55 @@ function renderShop() {
             : "Acheter"
         }
       </button>
+
     `;
+
 
     const button =
       div.querySelector("button");
 
-    if (button) {
+    button.addEventListener(
+      "click",
+      () => {
 
-      button.addEventListener(
-        "click",
-        () => {
+        if (
+          save.points <
+          item.price
+        ) {
 
-          if (
-            save.points <
-            item.price
-          ) {
+          alert(
+            "Tu n'as pas assez de points !"
+          );
 
-            alert(
-              "Tu n'as pas assez de points !"
-            );
-
-            return;
-          }
-
-          save.points -=
-            item.price;
-
-          if (
-            !save.unlockedItems.includes(
-              item.id
-            )
-          ) {
-
-            save.unlockedItems.push(
-              item.id
-            );
-          }
-
-          saveGame();
-
-          renderShop();
-
-          updateMenu();
+          return;
         }
-      );
-    }
 
-    container.appendChild(
-      div
+        save.points -=
+          item.price;
+
+        save.unlockedItems.push(
+          item.id
+        );
+
+        saveGame();
+
+        renderShop();
+
+        updateMenu();
+
+      }
     );
 
+
+    container.appendChild(div);
+
   });
+
 }
 
 
 /* =========================================================
-   NOMS DES PILOTES
+   NOMS PILOTES
 ========================================================= */
 
 const driverNames = [
@@ -1161,148 +978,128 @@ const driverNames = [
 
 
 /* =========================================================
-   GRANDS RIVAUX
+   RIVAUX
 ========================================================= */
 
 const rivals = {
 
   10: {
     name: "Noah Turbo",
-    quote:
-      "Tu vas devoir aller beaucoup plus vite.",
+    quote: "Tu vas devoir aller beaucoup plus vite.",
     strength: 1.08
   },
 
   20: {
     name: "Mira Flash",
-    quote:
-      "J'espère que tu es prêt pour le duel.",
+    quote: "J'espère que tu es prêt pour le duel.",
     strength: 1.10
   },
 
   30: {
     name: "Axel Vortex",
-    quote:
-      "Les virages sont mon terrain de jeu.",
+    quote: "Les virages sont mon terrain de jeu.",
     strength: 1.12
   },
 
   40: {
     name: "Luna Storm",
-    quote:
-      "Cette piste va devenir intéressante.",
+    quote: "Cette piste va devenir intéressante.",
     strength: 1.14
   },
 
   50: {
     name: "Max Falcon",
-    quote:
-      "Bienvenue chez les grands.",
+    quote: "Bienvenue chez les grands.",
     strength: 1.16
   },
 
   60: {
     name: "Niko Blaze",
-    quote:
-      "Essaie donc de me suivre.",
+    quote: "Essaie donc de me suivre.",
     strength: 1.18
   },
 
   70: {
     name: "Jade Velocity",
-    quote:
-      "La vitesse, c'est tout ce qui compte.",
+    quote: "La vitesse, c'est tout ce qui compte.",
     strength: 1.20
   },
 
   80: {
     name: "Leo Thunder",
-    quote:
-      "Tu vas entendre le tonnerre.",
+    quote: "Tu vas entendre le tonnerre.",
     strength: 1.22
   },
 
   90: {
     name: "Maya Inferno",
-    quote:
-      "La piste va chauffer.",
+    quote: "La piste va chauffer.",
     strength: 1.24
   },
 
   100: {
     name: "Ryan Phoenix",
-    quote:
-      "Je renais toujours plus rapide.",
+    quote: "Je renais toujours plus rapide.",
     strength: 1.26
   },
 
   110: {
     name: "Sacha Drift",
-    quote:
-      "Regarde bien mes trajectoires.",
+    quote: "Regarde bien mes trajectoires.",
     strength: 1.28
   },
 
   120: {
     name: "Lina Rocket",
-    quote:
-      "Décollage imminent.",
+    quote: "Décollage imminent.",
     strength: 1.30
   },
 
   130: {
     name: "Theo Bolt",
-    quote:
-      "Tu ne verras qu'une traînée.",
+    quote: "Tu ne verras qu'une traînée.",
     strength: 1.32
   },
 
   140: {
     name: "Nina Wildfire",
-    quote:
-      "La course va être brûlante.",
+    quote: "La course va être brûlante.",
     strength: 1.34
   },
 
   150: {
     name: "Hugo Maverick",
-    quote:
-      "Je n'abandonne jamais.",
+    quote: "Je n'abandonne jamais.",
     strength: 1.36
   },
 
   160: {
     name: "Zoe Dash",
-    quote:
-      "Essaie de garder le rythme.",
+    quote: "Essaie de garder le rythme.",
     strength: 1.38
   },
 
   170: {
     name: "Enzo Lightning",
-    quote:
-      "Prépare-toi à éclaircir la piste.",
+    quote: "Prépare-toi à éclaircir la piste.",
     strength: 1.40
   },
 
   180: {
     name: "Emma Storm",
-    quote:
-      "La tempête arrive.",
+    quote: "La tempête arrive.",
     strength: 1.42
   },
 
   190: {
     name: "Kai Comet",
-    quote:
-      "Je serai déjà à l'arrivée.",
+    quote: "Je serai déjà à l'arrivée.",
     strength: 1.44
   },
 
   200: {
     name: "???",
-    quote:
-      "Le dernier rival sera révélé maintenant.",
+    quote: "Le dernier rival sera révélé maintenant.",
     strength: 1.48
   }
 
@@ -1333,7 +1130,7 @@ let previousTime = 0;
 
 
 /* =========================================================
-   CRÉATION DES PILOTES
+   PILOTES
 ========================================================= */
 
 function createNormalDrivers() {
@@ -1369,6 +1166,7 @@ function createNormalDrivers() {
         aiSkill:
           0.85 +
           Math.random() * 0.2
+
       };
 
     }
@@ -1404,7 +1202,7 @@ function createPlayer() {
 
 
 /* =========================================================
-   DIFFICULTÉ IA
+   DIFFICULTÉ
 ========================================================= */
 
 function calculatePlayerLevel() {
@@ -1417,7 +1215,9 @@ function calculatePlayerLevel() {
 
   if (save.bestPosition === 1) {
     score += 2;
-  } else if (save.bestPosition === 2) {
+  } else if (
+    save.bestPosition === 2
+  ) {
     score += 1;
   }
 
@@ -1439,11 +1239,13 @@ function getAdaptiveDifficulty() {
     calculatePlayerLevel();
 
   const difficulty = {
+
     1: 0.86,
     2: 0.91,
     3: 0.96,
     4: 1.00,
     5: 1.04
+
   };
 
   return difficulty[level];
@@ -1457,15 +1259,12 @@ function adaptAI(driver) {
 
   driver.aiSkill =
     difficulty *
-    (
-      0.92 +
-      Math.random() * 0.12
-    );
+    (0.92 + Math.random() * 0.12);
 }
 
 
 /* =========================================================
-   DÉMARRER COURSE
+   DÉMARRAGE
 ========================================================= */
 
 function startNextRace() {
@@ -1508,24 +1307,29 @@ function startNormalRace() {
 
     elapsed: 0,
 
-    countdown: 0,
+    countdown: 3,
 
-    started: true,
+    started: false,
 
     finished: false,
 
     trackLength: 5000,
 
     drivers: [
+
       createPlayer(),
+
       ...createNormalDrivers()
+
     ]
 
   };
 
+
   currentRace.drivers
     .slice(1)
     .forEach(adaptAI);
+
 
   prepareGameCanvas();
 
@@ -1533,8 +1337,8 @@ function startNormalRace() {
     "gameScreen"
   );
 
-  previousTime =
-    performance.now();
+
+  previousTime = 0;
 
   cancelAnimationFrame(
     animationFrame
@@ -1558,9 +1362,16 @@ function getRivalForCourse(course) {
   }
 
   return {
-    name: "Champion Inconnu",
-    quote: "Je suis prêt.",
-    strength: 1.2
+
+    name:
+      "Champion Inconnu",
+
+    quote:
+      "Je suis prêt.",
+
+    strength:
+      1.2
+
   };
 }
 
@@ -1572,34 +1383,26 @@ function startDuelIntro() {
       save.course
     );
 
-  if ($("rivalName")) {
-    $("rivalName").textContent =
-      rival.name;
-  }
 
-  if ($("rivalQuote")) {
-    $("rivalQuote").textContent =
-      `"${rival.quote}"`;
-  }
+  $("rivalName").textContent =
+    rival.name;
 
-  if ($("duelPlayerName")) {
-    $("duelPlayerName").textContent =
-      save.avatar.name;
-  }
+  $("rivalQuote").textContent =
+    `"${rival.quote}"`;
 
-  if ($("rivalReveal")) {
-    $("rivalReveal")
-      .classList.remove(
-        "hidden"
-      );
-  }
+  $("duelPlayerName").textContent =
+    save.avatar.name;
 
-  if ($("startDuelBtn")) {
-    $("startDuelBtn")
-      .classList.remove(
-        "hidden"
-      );
-  }
+
+  $("rivalReveal")
+    .classList
+    .remove("hidden");
+
+
+  $("startDuelBtn")
+    .classList
+    .remove("hidden");
+
 
   showScreen(
     "duelIntroScreen"
@@ -1607,8 +1410,7 @@ function startDuelIntro() {
 }
 
 
-on(
-  "startDuelBtn",
+$("startDuelBtn").addEventListener(
   "click",
   startDuelRace
 );
@@ -1626,6 +1428,7 @@ function startDuelRace() {
       save.course
     ] || 0;
 
+
   currentRace = {
 
     duel: true,
@@ -1639,9 +1442,9 @@ function startDuelRace() {
 
     elapsed: 0,
 
-    countdown: 0,
+    countdown: 3,
 
-    started: true,
+    started: false,
 
     finished: false,
 
@@ -1656,12 +1459,13 @@ function startDuelRace() {
 
       {
 
-        name: rival.name,
+        name:
+          rival.name,
 
-        isPlayer: false,
+        isPlayer:
+          false,
 
         x: 0,
-
         y: 0,
 
         angle: 0,
@@ -1678,11 +1482,13 @@ function startDuelRace() {
 
         aiSkill:
           rival.strength
+
       }
 
     ]
 
   };
+
 
   prepareGameCanvas();
 
@@ -1690,8 +1496,8 @@ function startDuelRace() {
     "gameScreen"
   );
 
-  previousTime =
-    performance.now();
+
+  previousTime = 0;
 
   cancelAnimationFrame(
     animationFrame
@@ -1712,9 +1518,7 @@ const canvas =
   $("gameCanvas");
 
 const ctx =
-  canvas
-    ? canvas.getContext("2d")
-    : null;
+  canvas.getContext("2d");
 
 let camera = {
   x: 0,
@@ -1723,10 +1527,6 @@ let camera = {
 
 
 function resizeCanvas() {
-
-  if (!canvas || !ctx) {
-    return;
-  }
 
   const dpr =
     window.devicePixelRatio ||
@@ -1741,10 +1541,10 @@ function resizeCanvas() {
     dpr;
 
   canvas.style.width =
-    `${window.innerWidth}px`;
+    window.innerWidth + "px";
 
   canvas.style.height =
-    `${window.innerHeight}px`;
+    window.innerHeight + "px";
 
   ctx.setTransform(
     dpr,
@@ -1767,15 +1567,9 @@ function prepareGameCanvas() {
 
   resizeCanvas();
 
-  camera.x = 0;
-  camera.y = 0;
+  camera.x = 400;
+  camera.y = 300;
 
-  if (
-    !currentRace ||
-    !currentRace.drivers
-  ) {
-    return;
-  }
 
   currentRace.drivers
     .forEach(
@@ -1794,37 +1588,31 @@ function prepareGameCanvas() {
       }
     );
 
-  if ($("hudCourse")) {
-    $("hudCourse").textContent =
-      save.course;
-  }
 
-  if ($("hudLap")) {
-    $("hudLap").textContent =
-      "1";
-  }
+  $("hudCourse").textContent =
+    save.course;
+
+  $("hudLap").textContent =
+    "1";
+
 }
 
 
 /* =========================================================
-   PISTE
+   SPECTATEURS
 ========================================================= */
 
 function drawCrowd() {
-
-  if (!ctx) {
-    return;
-  }
 
   ctx.save();
 
   ctx.translate(
     -camera.x +
       window.innerWidth / 2,
-
     -camera.y +
       window.innerHeight / 2
   );
+
 
   const stands = [
 
@@ -1858,6 +1646,7 @@ function drawCrowd() {
 
   ];
 
+
   stands.forEach(
     stand => {
 
@@ -1870,6 +1659,7 @@ function drawCrowd() {
         stand.w,
         stand.h
       );
+
 
       for (
         let row = 0;
@@ -1906,37 +1696,6 @@ function drawCrowd() {
     }
   );
 
-  const crowdPositions = [
-
-    { x: 50, y: -130 },
-    { x: 130, y: -150 },
-    { x: 220, y: -140 },
-
-    { x: 1550, y: 180 },
-    { x: 1580, y: 250 },
-    { x: 1560, y: 320 },
-
-    { x: 500, y: 1150 },
-    { x: 600, y: 1160 },
-    { x: 700, y: 1140 },
-
-    { x: -250, y: 450 },
-    { x: -230, y: 530 },
-    { x: -250, y: 610 }
-
-  ];
-
-  crowdPositions.forEach(
-    (person, index) => {
-
-      drawSpectator(
-        person.x,
-        person.y,
-        index % 5
-      );
-
-    }
-  );
 
   ctx.restore();
 }
@@ -1948,16 +1707,13 @@ function drawSpectator(
   variant
 ) {
 
-  if (!ctx) {
-    return;
-  }
-
   ctx.save();
 
   ctx.translate(
     x,
     y
   );
+
 
   ctx.fillStyle =
     "#385070";
@@ -1968,6 +1724,7 @@ function drawSpectator(
     14,
     20
   );
+
 
   ctx.beginPath();
 
@@ -1984,12 +1741,15 @@ function drawSpectator(
 
   ctx.fill();
 
+
   const clothes = [
+
     "#e34d4d",
     "#4d82d8",
     "#4dbd76",
     "#d4a33a",
     "#9b62c4"
+
   ];
 
   ctx.fillStyle =
@@ -2001,6 +1761,7 @@ function drawSpectator(
     14,
     20
   );
+
 
   if (
     variant === 0 ||
@@ -2026,6 +1787,7 @@ function drawSpectator(
 
     ctx.stroke();
 
+
     ctx.fillStyle =
       variant === 0
         ? "#e34d4d"
@@ -2037,27 +1799,28 @@ function drawSpectator(
       20,
       10
     );
+
   }
 
   ctx.restore();
 }
 
 
-function drawTrack() {
+/* =========================================================
+   PISTE
+========================================================= */
 
-  if (!ctx) {
-    return;
-  }
+function drawTrack() {
 
   ctx.save();
 
   ctx.translate(
     -camera.x +
       window.innerWidth / 2,
-
     -camera.y +
       window.innerHeight / 2
   );
+
 
   ctx.fillStyle =
     "#237044";
@@ -2070,11 +1833,13 @@ function drawTrack() {
       window.innerHeight,
 
     window.innerWidth * 2,
-
     window.innerHeight * 2
   );
 
-  const trackWidth = 220;
+
+  const trackWidth =
+    220;
+
 
   ctx.beginPath();
 
@@ -2082,6 +1847,7 @@ function drawTrack() {
     0,
     0
   );
+
 
   ctx.bezierCurveTo(
     500,
@@ -2092,6 +1858,7 @@ function drawTrack() {
     100
   );
 
+
   ctx.bezierCurveTo(
     1800,
     600,
@@ -2100,6 +1867,7 @@ function drawTrack() {
     700,
     1000
   );
+
 
   ctx.bezierCurveTo(
     100,
@@ -2110,6 +1878,7 @@ function drawTrack() {
     0
   );
 
+
   ctx.lineWidth =
     trackWidth;
 
@@ -2117,6 +1886,7 @@ function drawTrack() {
     "#333";
 
   ctx.stroke();
+
 
   ctx.lineWidth =
     trackWidth - 25;
@@ -2126,8 +1896,8 @@ function drawTrack() {
 
   ctx.stroke();
 
-  ctx.lineWidth =
-    5;
+
+  ctx.lineWidth = 5;
 
   ctx.strokeStyle =
     "#eee";
@@ -2154,10 +1924,6 @@ function drawCar(
   index
 ) {
 
-  if (!ctx) {
-    return;
-  }
-
   const screenX =
     driver.x -
     camera.x +
@@ -2168,19 +1934,24 @@ function drawCar(
     camera.y +
     window.innerHeight / 2;
 
+
   ctx.save();
+
 
   ctx.translate(
     screenX,
     screenY
   );
 
+
   ctx.rotate(
     driver.angle
   );
 
+
   const width = 45;
   const height = 25;
+
 
   if (driver.isPlayer) {
 
@@ -2193,7 +1964,9 @@ function drawCar(
       index === 1
         ? "#e54b4b"
         : "#4287e5";
+
   }
+
 
   ctx.fillRect(
     -width / 2,
@@ -2201,6 +1974,7 @@ function drawCar(
     width,
     height
   );
+
 
   ctx.fillStyle =
     "#111";
@@ -2212,6 +1986,7 @@ function drawCar(
     8
   );
 
+
   ctx.fillStyle =
     "#eee";
 
@@ -2222,13 +1997,23 @@ function drawCar(
     height
   );
 
+
   ctx.restore();
 }
 
 
 /* =========================================================
-   CLAVIER
+   CONTRÔLES CLAVIER
 ========================================================= */
+
+/*
+   Compatible clavier AZERTY :
+
+   Z / W / ↑ = accélérer
+   S / ↓     = freiner
+   Q / A / ← = gauche
+   D / →     = droite
+*/
 
 window.addEventListener(
   "keydown",
@@ -2237,40 +2022,50 @@ window.addEventListener(
     const key =
       event.key.toLowerCase();
 
+
     if (
       key === "arrowup" ||
-      key === "w"
+      key === "w" ||
+      key === "z"
     ) {
 
-      keys.up = true;
       event.preventDefault();
+
+      keys.up = true;
     }
+
 
     if (
       key === "arrowdown" ||
       key === "s"
     ) {
 
-      keys.down = true;
       event.preventDefault();
+
+      keys.down = true;
     }
+
 
     if (
       key === "arrowleft" ||
-      key === "a"
+      key === "a" ||
+      key === "q"
     ) {
 
-      keys.left = true;
       event.preventDefault();
+
+      keys.left = true;
     }
+
 
     if (
       key === "arrowright" ||
       key === "d"
     ) {
 
-      keys.right = true;
       event.preventDefault();
+
+      keys.right = true;
     }
 
   }
@@ -2284,31 +2079,41 @@ window.addEventListener(
     const key =
       event.key.toLowerCase();
 
+
     if (
       key === "arrowup" ||
-      key === "w"
+      key === "w" ||
+      key === "z"
     ) {
+
       keys.up = false;
     }
+
 
     if (
       key === "arrowdown" ||
       key === "s"
     ) {
+
       keys.down = false;
     }
 
+
     if (
       key === "arrowleft" ||
-      key === "a"
+      key === "a" ||
+      key === "q"
     ) {
+
       keys.left = false;
     }
+
 
     if (
       key === "arrowright" ||
       key === "d"
     ) {
+
       keys.right = false;
     }
 
@@ -2332,16 +2137,10 @@ function updateJoystick(
   clientY
 ) {
 
-  if (
-    !joystickElement ||
-    !joystickKnob
-  ) {
-    return;
-  }
-
   const rect =
     joystickElement
       .getBoundingClientRect();
+
 
   const centerX =
     rect.left +
@@ -2351,6 +2150,7 @@ function updateJoystick(
     rect.top +
     rect.height / 2;
 
+
   let dx =
     clientX -
     centerX;
@@ -2359,15 +2159,18 @@ function updateJoystick(
     clientY -
     centerY;
 
+
   const max =
     rect.width / 2 -
     32;
+
 
   const distance =
     Math.sqrt(
       dx * dx +
       dy * dy
     );
+
 
   if (distance > max) {
 
@@ -2378,14 +2181,17 @@ function updateJoystick(
       dy / distance * max;
   }
 
+
   joystick.x =
     dx / max;
 
   joystick.y =
     dy / max;
 
+
   joystickKnob.style.transform =
     `translate(${dx}px, ${dy}px)`;
+
 }
 
 
@@ -2394,79 +2200,72 @@ function resetJoystick() {
   joystick.x = 0;
   joystick.y = 0;
 
-  if (joystickKnob) {
-
-    joystickKnob.style.transform =
-      "translate(0, 0)";
-  }
+  joystickKnob.style.transform =
+    "translate(0, 0)";
 
   joystick.active = false;
 }
 
 
-if (joystickElement) {
+joystickElement.addEventListener(
+  "pointerdown",
+  event => {
 
-  joystickElement.addEventListener(
-    "pointerdown",
-    event => {
+    event.preventDefault();
 
-      joystick.active = true;
+    joystick.active = true;
 
-      joystickElement.setPointerCapture(
-        event.pointerId
-      );
+    joystickElement.setPointerCapture(
+      event.pointerId
+    );
 
-      updateJoystick(
-        event.clientX,
-        event.clientY
-      );
+    updateJoystick(
+      event.clientX,
+      event.clientY
+    );
 
+  }
+);
+
+
+joystickElement.addEventListener(
+  "pointermove",
+  event => {
+
+    if (!joystick.active) {
+      return;
     }
-  );
+
+    updateJoystick(
+      event.clientX,
+      event.clientY
+    );
+
+  }
+);
 
 
-  joystickElement.addEventListener(
-    "pointermove",
-    event => {
-
-      if (!joystick.active) {
-        return;
-      }
-
-      updateJoystick(
-        event.clientX,
-        event.clientY
-      );
-
-    }
-  );
+joystickElement.addEventListener(
+  "pointerup",
+  resetJoystick
+);
 
 
-  joystickElement.addEventListener(
-    "pointerup",
-    resetJoystick
-  );
-
-
-  joystickElement.addEventListener(
-    "pointercancel",
-    resetJoystick
-  );
-
-
-  joystickElement.addEventListener(
-    "lostpointercapture",
-    resetJoystick
-  );
-}
+joystickElement.addEventListener(
+  "pointercancel",
+  resetJoystick
+);
 
 
 /* =========================================================
-   ACCÉLÉRATION / FREIN
+   BOUTONS ACCÉLÉRATION / FREIN
 ========================================================= */
 
-let acceleratePressed = false;
-let brakePressed = false;
+let acceleratePressed =
+  false;
+
+let brakePressed =
+  false;
 
 
 function pressButton(
@@ -2474,10 +2273,6 @@ function pressButton(
   callbackDown,
   callbackUp
 ) {
-
-  if (!element) {
-    return;
-  }
 
   element.addEventListener(
     "pointerdown",
@@ -2490,6 +2285,7 @@ function pressButton(
     }
   );
 
+
   element.addEventListener(
     "pointerup",
     event => {
@@ -2501,10 +2297,12 @@ function pressButton(
     }
   );
 
+
   element.addEventListener(
     "pointercancel",
     callbackUp
   );
+
 
   element.addEventListener(
     "pointerleave",
@@ -2553,10 +2351,12 @@ function updatePlayer(
   const friction =
     0.96;
 
+
   const accelerating =
     keys.up ||
     acceleratePressed ||
     joystick.y < -0.25;
+
 
   const braking =
     keys.down ||
@@ -2577,6 +2377,7 @@ function updatePlayer(
         friction,
         delta / 16
       );
+
   }
 
 
@@ -2598,6 +2399,7 @@ function updatePlayer(
 
   let steering = 0;
 
+
   if (keys.left) {
     steering -= 1;
   }
@@ -2605,6 +2407,7 @@ function updatePlayer(
   if (keys.right) {
     steering += 1;
   }
+
 
   if (
     Math.abs(joystick.x) >
@@ -2616,11 +2419,26 @@ function updatePlayer(
   }
 
 
-  driver.angle +=
-    steering *
-    0.055 *
-    (driver.speed / maxSpeed) *
-    delta;
+  /*
+    On permet au joueur de tourner
+    même à basse vitesse.
+  */
+
+  if (
+    Math.abs(driver.speed) >
+    0.05
+  ) {
+
+    driver.angle +=
+      steering *
+      0.055 *
+      Math.max(
+        0.35,
+        Math.abs(driver.speed) /
+          maxSpeed
+      ) *
+      delta;
+  }
 
 
   driver.x +=
@@ -2629,6 +2447,7 @@ function updatePlayer(
     ) *
     driver.speed *
     delta;
+
 
   driver.y +=
     Math.sin(
@@ -2645,6 +2464,7 @@ function updatePlayer(
     ) *
     delta *
     0.045;
+
 }
 
 
@@ -2661,6 +2481,7 @@ function updateAI(
     driver.baseSpeed *
     driver.aiSkill;
 
+
   if (
     driver.speed <
     targetSpeed
@@ -2674,7 +2495,9 @@ function updateAI(
 
     driver.speed *=
       0.995;
+
   }
+
 
   const variation =
     Math.sin(
@@ -2684,9 +2507,11 @@ function updateAI(
     ) *
     0.025;
 
+
   driver.angle +=
     variation *
     delta;
+
 
   driver.x +=
     Math.cos(
@@ -2695,6 +2520,7 @@ function updateAI(
     driver.speed *
     delta;
 
+
   driver.y +=
     Math.sin(
       driver.angle
@@ -2702,10 +2528,12 @@ function updateAI(
     driver.speed *
     delta;
 
+
   driver.progress +=
     driver.speed *
     delta *
     0.045;
+
 }
 
 
@@ -2714,13 +2542,6 @@ function updateAI(
 ========================================================= */
 
 function getRanking() {
-
-  if (
-    !currentRace ||
-    !currentRace.drivers
-  ) {
-    return [];
-  }
 
   return [
     ...currentRace.drivers
@@ -2734,12 +2555,9 @@ function getRanking() {
 
 function updateHUD() {
 
-  if (!currentRace) {
-    return;
-  }
-
   const ranking =
     getRanking();
+
 
   const playerIndex =
     ranking.findIndex(
@@ -2747,24 +2565,14 @@ function updateHUD() {
         driver.isPlayer
     );
 
-  if ($("hudPosition")) {
 
-    $("hudPosition")
-      .textContent =
-      playerIndex >= 0
-        ? playerIndex + 1
-        : "-";
-  }
+  $("hudPosition").textContent =
+    playerIndex + 1;
+
 
   const player =
-    currentRace.drivers
-      .find(
-        d => d.isPlayer
-      );
+    currentRace.drivers[0];
 
-  if (!player) {
-    return;
-  }
 
   const lap =
     Math.min(
@@ -2778,19 +2586,9 @@ function updateHUD() {
       ) + 1
     );
 
-  if ($("hudLap")) {
 
-    $("hudLap")
-      .textContent =
-      lap;
-  }
-
-  if ($("hudPoints")) {
-
-    $("hudPoints")
-      .textContent =
-      save.points;
-  }
+  $("hudLap").textContent =
+    lap;
 }
 
 
@@ -2800,22 +2598,16 @@ function updateHUD() {
 
 function checkRaceFinished() {
 
-  if (
-    !currentRace ||
-    currentRace.finished
-  ) {
-    return;
-  }
-
   const player =
-    currentRace.drivers
-      .find(
-        d => d.isPlayer
-      );
+    currentRace.drivers.find(
+      d => d.isPlayer
+    );
+
 
   if (!player) {
     return;
   }
+
 
   if (
     player.progress >=
@@ -2827,11 +2619,12 @@ function checkRaceFinished() {
     return;
   }
 
+
   const winner =
     getRanking()[0];
 
+
   if (
-    winner &&
     winner.progress >=
     currentRace.trackLength
   ) {
@@ -2849,8 +2642,11 @@ function checkRaceFinished() {
     ) {
 
       finishRace();
+
     }
+
   }
+
 }
 
 
@@ -2881,6 +2677,7 @@ function pointsForPosition(
 
     default:
       return 0;
+
   }
 }
 
@@ -2892,21 +2689,20 @@ function pointsForPosition(
 function finishRace() {
 
   if (
-    !currentRace ||
     currentRace.finished
   ) {
+
     return;
   }
+
 
   currentRace.finished =
     true;
 
-  cancelAnimationFrame(
-    animationFrame
-  );
 
   const ranking =
     getRanking();
+
 
   let playerPosition =
     ranking.findIndex(
@@ -2930,24 +2726,24 @@ function finishRace() {
     ranking.sort(
       (a, b) => {
 
-        if (a.isPlayer) {
+        if (a.isPlayer)
           return -1;
-        }
 
-        if (b.isPlayer) {
+        if (b.isPlayer)
           return 1;
-        }
 
         return b.progress -
           a.progress;
+
       }
     );
+
   }
 
 
-  /*
-    DUEL
-  */
+  /* =========================
+     DUEL
+  ========================== */
 
   if (currentRace.duel) {
 
@@ -2959,17 +2755,19 @@ function finishRace() {
   }
 
 
-  /*
-    COURSE NORMALE
-  */
+  /* =========================
+     COURSE NORMALE
+  ========================== */
 
   const reward =
     pointsForPosition(
       playerPosition
     );
 
+
   save.points +=
     reward;
+
 
   save.totalRaces++;
 
@@ -2982,6 +2780,7 @@ function finishRace() {
 
     save.bestPosition =
       playerPosition;
+
   }
 
 
@@ -2991,13 +2790,16 @@ function finishRace() {
       save.course + 1
     );
 
+
   saveGame();
+
 
   showResults(
     ranking,
     playerPosition,
     reward
   );
+
 }
 
 
@@ -3012,126 +2814,126 @@ function showResults(
 ) {
 
   const positions = [
+
     "🥇",
     "🥈",
     "🥉",
     "4️⃣",
     "5️⃣"
+
   ];
+
 
   const animations = {
 
     1: "🏆🎉",
-
     2: "🥈👏",
-
     3: "🥉📸",
-
     4: "😅💪",
-
     5: "😤🔥"
+
   };
 
 
-  if ($("resultsTitle")) {
-
-    $("resultsTitle")
-      .textContent =
-      playerPosition === 1
-        ? "🏆 VICTOIRE !"
-        : "🏁 COURSE TERMINÉE !";
-  }
+  $("resultsTitle").textContent =
+    playerPosition === 1
+      ? "🏆 VICTOIRE !"
+      : "🏁 COURSE TERMINÉE !";
 
 
-  if ($("resultsAnimation")) {
-
-    $("resultsAnimation")
-      .textContent =
-      animations[playerPosition] ||
-      "🏁";
-  }
+  $("resultsAnimation")
+    .textContent =
+      animations[playerPosition];
 
 
   const list =
     $("resultsList");
 
-  if (list) {
 
-    list.innerHTML = "";
+  list.innerHTML = "";
 
-    ranking.forEach(
-      (driver, index) => {
 
-        const row =
-          document.createElement(
-            "div"
-          );
+  ranking.forEach(
+    (driver, index) => {
 
-        row.className =
-          "result-row";
+      const row =
+        document.createElement(
+          "div"
+        );
 
-        if (driver.isPlayer) {
 
-          row.classList.add(
-            "player"
-          );
-        }
+      row.className =
+        "result-row";
 
-        row.innerHTML = `
-          <span>
-            ${
-              positions[index] ||
-              `${index + 1}.`
-            }
-          </span>
 
-          <strong>
-            ${driver.name}
-          </strong>
+      if (driver.isPlayer) {
 
-          <span>
-            ${
-              driver.isPlayer
-                ? `+${reward} ⭐`
-                : ""
-            }
-          </span>
-        `;
-
-        list.appendChild(
-          row
+        row.classList.add(
+          "player"
         );
 
       }
-    );
-  }
 
 
-  if ($("rewardText")) {
+      row.innerHTML = `
 
-    $("rewardText")
-      .textContent =
-      `Tu gagnes ${reward} point${
-        reward > 1 ? "s" : ""
-      }. ⭐`;
-  }
+        <span>
+          ${
+            positions[index] ||
+            `${index + 1}.`
+          }
+        </span>
+
+        <strong>
+          ${driver.name}
+        </strong>
+
+        <span>
+          ${
+            driver.isPlayer
+              ? `+${reward} ⭐`
+              : ""
+          }
+        </span>
+
+      `;
+
+
+      list.appendChild(row);
+
+    }
+  );
+
+
+  $("rewardText").textContent =
+    `Tu gagnes ${reward} point${
+      reward > 1 ? "s" : ""
+    }. ⭐`;
 
 
   showScreen(
     "resultsScreen"
   );
+
 }
 
 
-on(
-  "continueBtn",
+/* =========================================================
+   CONTINUER
+========================================================= */
+
+$("continueBtn").addEventListener(
   "click",
   () => {
 
     updateMenu();
 
-    if (save.course > 200) {
+    if (
+      save.course > 200
+    ) {
+
       save.course = 200;
+
     }
 
     showScreen(
@@ -3153,18 +2955,22 @@ function finishDuel(
   const course =
     save.course;
 
+
   const attempts =
     save.duelAttempts[
       course
     ] || 0;
+
 
   save.duelAttempts[
     course
   ] =
     attempts + 1;
 
+
   const playerWon =
     playerPosition === 1;
+
 
   const actualWin =
     currentRace.forceRivalWin
@@ -3179,45 +2985,44 @@ function finishDuel(
 
     save.duelWins++;
 
+
     save.course =
       Math.min(
         200,
         save.course + 1
       );
 
+
     saveGame();
 
-    if ($("duelResultTitle")) {
 
-      $("duelResultTitle")
-        .textContent =
-        "🏆 RIVAL VAINCU !";
-    }
+    $("duelResultTitle")
+      .textContent =
+      "🏆 RIVAL VAINCU !";
 
-    if ($("duelResultContent")) {
 
-      $("duelResultContent")
-        .innerHTML = `
+    $("duelResultContent")
+      .innerHTML = `
 
-          <div class="results-animation">
-            🏆🔥🎉
-          </div>
+        <div class="results-animation">
+          🏆🔥🎉
+        </div>
 
-          <h2>
-            ${currentRace.rival.name}
-          </h2>
+        <h2>
+          ${currentRace.rival.name}
+        </h2>
 
-          <p>
-            Tu as remporté le duel !
-          </p>
+        <p>
+          Tu as remporté le duel !
+        </p>
 
-          <p>
-            ⭐ <strong>
-              +1000 points
-            </strong>
-          </p>
-        `;
-    }
+        <p>
+          ⭐ <strong>
+            +1000 points
+          </strong>
+        </p>
+
+      `;
 
   } else {
 
@@ -3227,47 +3032,51 @@ function finishDuel(
         save.course + 1
       );
 
+
     saveGame();
 
-    if ($("duelResultTitle")) {
 
-      $("duelResultTitle")
-        .textContent =
-        "🏎️ Le rival gagne !";
-    }
+    $("duelResultTitle")
+      .textContent =
+      "🏎️ Le rival gagne !";
 
-    if ($("duelResultContent")) {
 
-      $("duelResultContent")
-        .innerHTML = `
+    $("duelResultContent")
+      .innerHTML = `
 
-          <div class="results-animation">
-            😤🏎️💨
-          </div>
+        <div class="results-animation">
+          😤🏎️💨
+        </div>
 
-          <h2>
-            ${currentRace.rival.name}
-          </h2>
+        <h2>
+          ${currentRace.rival.name}
+        </h2>
 
-          <p>
-            Cette fois, le rival était trop fort.
-          </p>
+        <p>
+          Cette fois, le rival était trop fort.
+        </p>
 
-          <p>
-            Continue à t'entraîner !
-          </p>
-        `;
-    }
+        <p>
+          Continue à t'entraîner !
+        </p>
+
+      `;
+
   }
+
 
   showScreen(
     "duelResultScreen"
   );
+
 }
 
 
-on(
-  "duelContinueBtn",
+/* =========================================================
+   CONTINUER APRÈS DUEL
+========================================================= */
+
+$("duelContinueBtn").addEventListener(
   "click",
   () => {
 
@@ -3291,28 +3100,34 @@ function gameLoop(time) {
     !currentRace ||
     currentRace.finished
   ) {
+
     return;
   }
+
 
   const delta =
     Math.min(
       32,
       time -
-      (previousTime || time)
+      (
+        previousTime ||
+        time
+      )
     );
+
 
   previousTime =
     time;
 
-  updateGame(
-    delta
-  );
+
+  updateGame(delta);
 
   drawGame();
 
   updateHUD();
 
   checkRaceFinished();
+
 
   if (
     currentRace &&
@@ -3323,7 +3138,9 @@ function gameLoop(time) {
       requestAnimationFrame(
         gameLoop
       );
+
   }
+
 }
 
 
@@ -3333,21 +3150,15 @@ function gameLoop(time) {
 
 function updateGame(delta) {
 
-  if (!currentRace) {
-    return;
-  }
-
   const player =
     currentRace.drivers[0];
 
-  if (!player) {
-    return;
-  }
 
   updatePlayer(
     player,
     delta
   );
+
 
   currentRace.drivers
     .slice(1)
@@ -3363,15 +3174,12 @@ function updateGame(delta) {
     );
 
 
-  /*
-    Caméra joueur.
-  */
-
   camera.x =
     player.x;
 
   camera.y =
     player.y;
+
 }
 
 
@@ -3381,10 +3189,6 @@ function updateGame(delta) {
 
 function drawGame() {
 
-  if (!ctx) {
-    return;
-  }
-
   ctx.clearRect(
     0,
     0,
@@ -3392,27 +3196,22 @@ function drawGame() {
     window.innerHeight
   );
 
+
   drawTrack();
 
-  drawCrowd();
 
-  if (
-    currentRace &&
-    currentRace.drivers
-  ) {
+  currentRace.drivers
+    .forEach(
+      (driver, index) => {
 
-    currentRace.drivers
-      .forEach(
-        (driver, index) => {
+        drawCar(
+          driver,
+          index
+        );
 
-          drawCar(
-            driver,
-            index
-          );
+      }
+    );
 
-        }
-      );
-  }
 }
 
 
@@ -3420,34 +3219,33 @@ function drawGame() {
    QUITTER COURSE
 ========================================================= */
 
-on(
-  "leaveRaceBtn",
+$("leaveRaceBtn").addEventListener(
   "click",
   () => {
 
-    const confirmation =
-      confirm(
+    if (
+      !confirm(
         "Quitter cette course ?"
-      );
+      )
+    ) {
 
-    if (!confirmation) {
       return;
     }
 
-    currentRace =
-      null;
+
+    currentRace = null;
+
 
     cancelAnimationFrame(
       animationFrame
     );
 
-    animationFrame =
-      null;
 
     keys.up = false;
     keys.down = false;
     keys.left = false;
     keys.right = false;
+
 
     acceleratePressed =
       false;
@@ -3455,7 +3253,9 @@ on(
     brakePressed =
       false;
 
+
     resetJoystick();
+
 
     updateMenu();
 
@@ -3468,55 +3268,67 @@ on(
 
 
 /* =========================================================
-   INITIALISATION
+   DÉMARRAGE INITIAL
 ========================================================= */
 
-function initGame() {
+if (save.avatar) {
 
-  /*
-    Vérification rapide de l'HTML.
-  */
+  loadAvatarIntoForm();
 
-  console.log(
-    "🏎️ Turbo Racers : game.js chargé."
-  );
+  updateMenu();
 
-  if (save.avatar) {
-
-    loadAvatarIntoForm();
-
-    updateMenu();
-
-    showScreen(
-      "menuScreen"
-    );
-
-  } else {
-
-    updateAvatarPreview();
-
-    showScreen(
-      "avatarScreen"
-    );
-  }
-}
-
-
-/* =========================================================
-   LANCEMENT
-========================================================= */
-
-if (
-  document.readyState ===
-  "loading"
-) {
-
-  document.addEventListener(
-    "DOMContentLoaded",
-    initGame
+  showScreen(
+    "menuScreen"
   );
 
 } else {
 
-  initGame();
+  updateAvatarPreview();
+
+  showScreen(
+    "avatarScreen"
+  );
+
 }
+```
+
+**Et pour le problème “Nom du pilote / Pilote A-B”**, ajoute ce petit bloc **tout à la fin de ton `style.css`** :
+
+```css
+/* =========================================================
+   CORRECTION FORMULAIRE AVATAR
+========================================================= */
+
+.form-grid {
+  width: 100%;
+}
+
+.form-grid label {
+  min-width: 0;
+  width: 100%;
+}
+
+.form-grid input,
+.form-grid select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  display: block;
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+⚠️ **Important :** ton `index.html` doit continuer à avoir exactement :
+
+```html
+<script src="game.js"></script>
+```
+
+et ton fichier doit bien s'appeler **`game.js`**, pas `script.js`.
+
+J'ai aussi corrigé un truc important : quand tu modifies ton avatar avec **« Mon avatar »**, ça ne remet plus tes points et ta progression à zéro.
