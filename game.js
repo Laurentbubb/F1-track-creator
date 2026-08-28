@@ -1,9 +1,8 @@
-```javascript
 "use strict";
 
 /* =========================================================
    TURBO RACERS
-   Version corrigée
+   GAME.JS — VERSION CORRIGÉE
 ========================================================= */
 
 
@@ -35,22 +34,28 @@ function loadSave() {
       return structuredClone(defaultSave);
     }
 
+    const data = JSON.parse(raw);
+
     return {
       ...structuredClone(defaultSave),
-      ...JSON.parse(raw)
+      ...data
     };
 
   } catch (error) {
-    console.error("Erreur de sauvegarde :", error);
+    console.error("Erreur sauvegarde :", error);
     return structuredClone(defaultSave);
   }
 }
 
 function saveGame() {
-  localStorage.setItem(
-    SAVE_KEY,
-    JSON.stringify(save)
-  );
+  try {
+    localStorage.setItem(
+      SAVE_KEY,
+      JSON.stringify(save)
+    );
+  } catch (error) {
+    console.error("Impossible de sauvegarder :", error);
+  }
 }
 
 
@@ -74,6 +79,10 @@ function shuffle(array) {
   return [...array].sort(
     () => Math.random() - 0.5
   );
+}
+
+function exists(id) {
+  return $(id) !== null;
 }
 
 
@@ -105,25 +114,8 @@ function showScreen(id) {
 
   const target = $(id);
 
-  if (!target) {
-    console.error(
-      `Écran introuvable : ${id}`
-    );
-    return;
-  }
-
-  target.classList.remove("hidden");
-
-  /*
-    IMPORTANT :
-    On remet le scroll en haut à chaque changement
-    d'écran, mais l'écran reste scrollable.
-  */
-  target.scrollTop = 0;
-
-  if (id !== "gameScreen") {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+  if (target) {
+    target.classList.remove("hidden");
   }
 }
 
@@ -136,31 +128,31 @@ function getAvatarFromForm() {
 
   return {
     name:
-      $("avatarName").value.trim() || "Pilote",
+      $("avatarName")?.value.trim() || "Pilote",
 
     gender:
-      $("avatarGender").value,
+      $("avatarGender")?.value || "A",
 
     age:
-      $("avatarAge").value,
+      $("avatarAge")?.value || "teen",
 
     height:
-      $("avatarHeight").value,
+      $("avatarHeight")?.value || "medium",
 
     hair:
-      $("avatarHair").value,
+      $("avatarHair")?.value || "short",
 
     hairColor:
-      $("avatarHairColor").value,
+      $("avatarHairColor")?.value || "#24170f",
 
     glasses:
-      $("avatarGlasses").value,
+      $("avatarGlasses")?.value || "none",
 
     helmet:
-      $("avatarHelmet").value,
+      $("avatarHelmet")?.value || "none",
 
     mask:
-      $("avatarMask").value,
+      $("avatarMask")?.value || "none",
 
     outfit:
       "neutral"
@@ -168,48 +160,214 @@ function getAvatarFromForm() {
 }
 
 
-function updateAvatarPreview() {
+/* =========================================================
+   STYLE AVATAR
+========================================================= */
 
-  const avatar =
-    getAvatarFromForm();
+function applyAvatarStyle(container, avatar) {
 
-  const hair =
-    $("previewHair");
-
-  const glasses =
-    $("previewGlasses");
-
-  const helmet =
-    $("previewHelmet");
-
-  if (hair) {
-
-    hair.style.background =
-      avatar.hairColor;
-
-    hair.className =
-      "hair " + avatar.hair;
+  if (!container || !avatar) {
+    return;
   }
 
-  if (glasses) {
+  container.innerHTML = `
+    <div class="hair"></div>
+    <div class="face">
+      <div class="glasses"></div>
+      <div class="mask"></div>
+    </div>
+    <div class="helmet"></div>
+    <div class="body"></div>
+  `;
 
-    glasses.style.display =
-      avatar.glasses === "none"
-        ? "none"
-        : "block";
+  const hair =
+    container.querySelector(".hair");
+
+  const face =
+    container.querySelector(".face");
+
+  const glasses =
+    container.querySelector(".glasses");
+
+  const helmet =
+    container.querySelector(".helmet");
+
+  const body =
+    container.querySelector(".body");
+
+  const mask =
+    container.querySelector(".mask");
+
+
+  /* =========================
+     CHEVEUX
+  ========================= */
+
+  hair.style.background =
+    avatar.hairColor;
+
+  hair.className =
+    `hair hair-${avatar.hair}`;
+
+
+  if (avatar.hair === "short") {
+
+    hair.style.width = "75px";
+    hair.style.height = "45px";
+    hair.style.left = "12px";
+    hair.style.top = "10px";
+    hair.style.borderRadius =
+      "50% 50% 30% 30%";
+
+  }
+
+  if (avatar.hair === "spiky") {
+
+    hair.style.width = "80px";
+    hair.style.height = "50px";
+    hair.style.left = "10px";
+    hair.style.top = "5px";
+    hair.style.borderRadius =
+      "30% 50% 20% 40%";
+
+    hair.style.clipPath =
+      "polygon(0 40%, 15% 5%, 30% 30%, 45% 0%, 60% 28%, 78% 3%, 100% 40%, 90% 100%, 10% 100%)";
+  }
+
+  if (avatar.hair === "long") {
+
+    hair.style.width = "78px";
+    hair.style.height = "80px";
+    hair.style.left = "11px";
+    hair.style.top = "8px";
+    hair.style.borderRadius =
+      "45% 45% 35% 35%";
+  }
+
+  if (avatar.hair === "curly") {
+
+    hair.style.width = "80px";
+    hair.style.height = "55px";
+    hair.style.left = "10px";
+    hair.style.top = "8px";
+    hair.style.borderRadius =
+      "50%";
+  }
+
+
+  /* =========================
+     APPARENCE / VISAGE
+  ========================= */
+
+  if (avatar.gender === "B") {
+    face.style.background = "#dca77e";
+  } else {
+    face.style.background = "#f0c19b";
+  }
+
+
+  /* =========================
+     TAILLE
+  ========================= */
+
+  container.style.transformOrigin =
+    "center center";
+
+  if (
+    container.classList.contains(
+      "large-avatar"
+    )
+  ) {
+
+    if (avatar.height === "small") {
+      container.style.transform =
+        "scale(1.05)";
+    }
+
+    if (avatar.height === "medium") {
+      container.style.transform =
+        "scale(1.2)";
+    }
+
+    if (avatar.height === "tall") {
+      container.style.transform =
+        "scale(1.35)";
+    }
+
+  }
+
+
+  /* =========================
+     ÂGE
+  ========================= */
+
+  if (avatar.age === "child") {
+
+    face.style.width = "62px";
+    face.style.height = "67px";
+
+    body.style.width = "75px";
+    body.style.height = "65px";
+
+  } else if (avatar.age === "adult") {
+
+    face.style.width = "73px";
+    face.style.height = "78px";
+
+    body.style.width = "90px";
+    body.style.height = "80px";
+
+  } else {
+
+    face.style.width = "70px";
+    face.style.height = "75px";
+
+    body.style.width = "85px";
+    body.style.height = "75px";
+  }
+
+
+  /* =========================
+     LUNETTES
+  ========================= */
+
+  if (avatar.glasses === "none") {
+
+    glasses.style.display = "none";
+
+  } else {
+
+    glasses.style.display = "block";
 
     if (avatar.glasses === "round") {
+
       glasses.style.borderRadius = "50%";
+      glasses.style.width = "58px";
+      glasses.style.height = "18px";
+
     }
 
     if (avatar.glasses === "sport") {
+
       glasses.style.borderRadius = "4px";
+      glasses.style.width = "65px";
+      glasses.style.height = "17px";
+
     }
 
     if (avatar.glasses === "square") {
+
       glasses.style.borderRadius = "2px";
+      glasses.style.width = "58px";
+      glasses.style.height = "18px";
+
     }
   }
+
+
+  /* =========================
+     CASQUE
+  ========================= */
 
   const helmetColors = {
     none: "transparent",
@@ -220,21 +378,99 @@ function updateAvatarPreview() {
     gold: "#d4af37"
   };
 
-  if (helmet) {
+  helmet.style.background =
+    helmetColors[avatar.helmet] ||
+    "transparent";
 
-    helmet.style.background =
-      helmetColors[avatar.helmet] ||
-      "transparent";
+  helmet.style.display =
+    avatar.helmet === "none"
+      ? "none"
+      : "block";
 
-    helmet.style.display =
-      avatar.helmet === "none"
-        ? "none"
-        : "block";
+
+  /* =========================
+     MASQUE
+  ========================= */
+
+  const maskColors = {
+    none: "transparent",
+    white: "#eeeeee",
+    black: "#151515",
+    blue: "#397bd1",
+    red: "#d84040"
+  };
+
+  mask.style.background =
+    maskColors[avatar.mask] ||
+    "transparent";
+
+  mask.style.display =
+    avatar.mask === "none"
+      ? "none"
+      : "block";
+
+  mask.style.position = "absolute";
+  mask.style.left = "12px";
+  mask.style.top = "48px";
+  mask.style.width = "46px";
+  mask.style.height = "18px";
+  mask.style.borderRadius = "4px";
+  mask.style.zIndex = "7";
+
+
+  /* =========================
+     TENUE
+  ========================= */
+
+  body.style.background =
+    "#ffffff";
+
+  if (avatar.outfit === "blue") {
+    body.style.background = "#397bd1";
+  }
+
+  if (avatar.outfit === "red") {
+    body.style.background = "#d84040";
+  }
+
+  if (avatar.outfit === "black") {
+    body.style.background = "#151515";
+  }
+
+  if (avatar.outfit === "gold") {
+    body.style.background = "#d4af37";
   }
 }
 
 
-[
+/* =========================================================
+   APERÇU AVATAR
+========================================================= */
+
+function updateAvatarPreview() {
+
+  const avatar =
+    getAvatarFromForm();
+
+  const container =
+    $("previewAvatar");
+
+  if (!container) {
+    return;
+  }
+
+  applyAvatarStyle(
+    container,
+    avatar
+  );
+}
+
+
+/* =========================================================
+   CHANGEMENTS FORMULAIRE
+========================================================= */
+
+const avatarFields = [
   "avatarName",
   "avatarGender",
   "avatarAge",
@@ -244,7 +480,9 @@ function updateAvatarPreview() {
   "avatarGlasses",
   "avatarHelmet",
   "avatarMask"
-].forEach(id => {
+];
+
+avatarFields.forEach(id => {
 
   const element = $(id);
 
@@ -264,23 +502,50 @@ function updateAvatarPreview() {
 });
 
 
-$("createAvatarBtn").addEventListener(
-  "click",
-  () => {
+/* =========================================================
+   CRÉER / SAUVER AVATAR
+========================================================= */
 
-    save.avatar =
-      getAvatarFromForm();
+function createAvatar() {
 
-    save.points = 0;
+  save.avatar =
+    getAvatarFromForm();
+
+  /*
+    On ne remet plus les points à zéro
+    lorsqu'on modifie simplement l'avatar.
+  */
+
+  if (!save.course) {
     save.course = 1;
-
-    saveGame();
-
-    updateMenu();
-
-    showScreen("menuScreen");
   }
-);
+
+  saveGame();
+
+  updateMenu();
+
+  showScreen(
+    "menuScreen"
+  );
+}
+
+
+const createAvatarButton =
+  $("createAvatarBtn");
+
+if (createAvatarButton) {
+
+  createAvatarButton.addEventListener(
+    "click",
+    event => {
+
+      event.preventDefault();
+
+      createAvatar();
+
+    }
+  );
+}
 
 
 /* =========================================================
@@ -293,130 +558,186 @@ function updateMenu() {
     return;
   }
 
-  $("welcomeText").textContent =
-    `Bienvenue, ${save.avatar.name} !`;
+  if ($("welcomeText")) {
 
-  $("menuPoints").textContent =
-    save.points;
+    $("welcomeText").textContent =
+      `Bienvenue, ${save.avatar.name} !`;
+  }
 
-  $("courseNumber").textContent =
-    save.course;
+  if ($("menuPoints")) {
 
-  $("bestPosition").textContent =
-    save.bestPosition || "-";
+    $("menuPoints").textContent =
+      save.points;
+  }
 
-  $("garagePoints").textContent =
-    save.points;
+  if ($("courseNumber")) {
 
-  $("hudPoints").textContent =
-    save.points;
+    $("courseNumber").textContent =
+      save.course;
+  }
+
+  if ($("bestPosition")) {
+
+    $("bestPosition").textContent =
+      save.bestPosition || "-";
+  }
+
+  if ($("garagePoints")) {
+
+    $("garagePoints").textContent =
+      save.points;
+  }
+
+  if ($("hudPoints")) {
+
+    $("hudPoints").textContent =
+      save.points;
+  }
 
   renderMenuAvatar();
 }
 
+
+/* =========================================================
+   AVATAR DU MENU
+========================================================= */
 
 function renderMenuAvatar() {
 
   const container =
     $("menuAvatar");
 
-  if (!container) {
+  if (!container || !save.avatar) {
     return;
   }
 
-  container.innerHTML = `
-    <div class="avatar large-avatar">
-      <div class="hair"></div>
-      <div class="face"></div>
-      <div class="body"></div>
-    </div>
-  `;
+  applyAvatarStyle(
+    container,
+    save.avatar
+  );
 
-  const hair =
-    container.querySelector(".hair");
-
-  if (hair && save.avatar) {
-    hair.style.background =
-      save.avatar.hairColor;
-  }
+  container.classList.add(
+    "large-avatar"
+  );
 }
 
 
-$("raceBtn").addEventListener(
-  "click",
-  startNextRace
-);
+/* =========================================================
+   BOUTONS MENU
+========================================================= */
 
+if ($("raceBtn")) {
 
-$("garageBtn").addEventListener(
-  "click",
-  () => {
+  $("raceBtn").addEventListener(
+    "click",
+    event => {
 
-    renderShop();
+      event.preventDefault();
 
-    showScreen(
-      "garageScreen"
-    );
-  }
-);
+      startNextRace();
 
-
-$("customizeBtn").addEventListener(
-  "click",
-  () => {
-
-    loadAvatarIntoForm();
-
-    showScreen(
-      "avatarScreen"
-    );
-  }
-);
-
-
-$("garageBackBtn").addEventListener(
-  "click",
-  () => {
-
-    updateMenu();
-
-    showScreen(
-      "menuScreen"
-    );
-  }
-);
-
-
-$("resetBtn").addEventListener(
-  "click",
-  () => {
-
-    const confirmation =
-      confirm(
-        "Effacer toute ta progression ?"
-      );
-
-    if (!confirmation) {
-      return;
     }
+  );
+}
 
-    localStorage.removeItem(
-      SAVE_KEY
-    );
 
-    save =
-      structuredClone(
-        defaultSave
+if ($("garageBtn")) {
+
+  $("garageBtn").addEventListener(
+    "click",
+    event => {
+
+      event.preventDefault();
+
+      renderShop();
+
+      showScreen(
+        "garageScreen"
       );
 
-    showScreen(
-      "avatarScreen"
-    );
+    }
+  );
+}
 
-    updateAvatarPreview();
-  }
-);
 
+if ($("customizeBtn")) {
+
+  $("customizeBtn").addEventListener(
+    "click",
+    event => {
+
+      event.preventDefault();
+
+      loadAvatarIntoForm();
+
+      showScreen(
+        "avatarScreen"
+      );
+
+    }
+  );
+}
+
+
+if ($("garageBackBtn")) {
+
+  $("garageBackBtn").addEventListener(
+    "click",
+    event => {
+
+      event.preventDefault();
+
+      updateMenu();
+
+      showScreen(
+        "menuScreen"
+      );
+
+    }
+  );
+}
+
+
+if ($("resetBtn")) {
+
+  $("resetBtn").addEventListener(
+    "click",
+    event => {
+
+      event.preventDefault();
+
+      const confirmation =
+        confirm(
+          "Effacer toute ta progression ?"
+        );
+
+      if (!confirmation) {
+        return;
+      }
+
+      localStorage.removeItem(
+        SAVE_KEY
+      );
+
+      save =
+        structuredClone(
+          defaultSave
+        );
+
+      updateAvatarPreview();
+
+      showScreen(
+        "avatarScreen"
+      );
+
+    }
+  );
+}
+
+
+/* =========================================================
+   CHARGER AVATAR
+========================================================= */
 
 function loadAvatarIntoForm() {
 
@@ -424,32 +745,44 @@ function loadAvatarIntoForm() {
     return;
   }
 
-  $("avatarName").value =
-    save.avatar.name;
+  const avatar =
+    save.avatar;
 
-  $("avatarGender").value =
-    save.avatar.gender;
+  if ($("avatarName"))
+    $("avatarName").value =
+      avatar.name || "Pilote";
 
-  $("avatarAge").value =
-    save.avatar.age;
+  if ($("avatarGender"))
+    $("avatarGender").value =
+      avatar.gender || "A";
 
-  $("avatarHeight").value =
-    save.avatar.height;
+  if ($("avatarAge"))
+    $("avatarAge").value =
+      avatar.age || "teen";
 
-  $("avatarHair").value =
-    save.avatar.hair;
+  if ($("avatarHeight"))
+    $("avatarHeight").value =
+      avatar.height || "medium";
 
-  $("avatarHairColor").value =
-    save.avatar.hairColor;
+  if ($("avatarHair"))
+    $("avatarHair").value =
+      avatar.hair || "short";
 
-  $("avatarGlasses").value =
-    save.avatar.glasses;
+  if ($("avatarHairColor"))
+    $("avatarHairColor").value =
+      avatar.hairColor || "#24170f";
 
-  $("avatarHelmet").value =
-    save.avatar.helmet;
+  if ($("avatarGlasses"))
+    $("avatarGlasses").value =
+      avatar.glasses || "none";
 
-  $("avatarMask").value =
-    save.avatar.mask;
+  if ($("avatarHelmet"))
+    $("avatarHelmet").value =
+      avatar.helmet || "none";
+
+  if ($("avatarMask"))
+    $("avatarMask").value =
+      avatar.mask || "none";
 
   updateAvatarPreview();
 }
@@ -509,6 +842,7 @@ const shopItems = [
     price: 300,
     type: "mask"
   }
+
 ];
 
 
@@ -526,11 +860,14 @@ function renderShop() {
   shopItems.forEach(item => {
 
     const owned =
-      save.unlockedItems
-        .includes(item.id);
+      save.unlockedItems.includes(
+        item.id
+      );
 
     const div =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     div.className =
       "shop-item";
@@ -538,51 +875,65 @@ function renderShop() {
     div.innerHTML = `
       <h3>${item.name}</h3>
       <p>⭐ ${item.price}</p>
-      <button ${owned ? "disabled" : ""}>
-        ${owned ? "✓ Débloqué" : "Acheter"}
+
+      <button
+        type="button"
+        ${owned ? "disabled" : ""}
+      >
+        ${
+          owned
+            ? "✓ Débloqué"
+            : "Acheter"
+        }
       </button>
     `;
 
     const button =
       div.querySelector("button");
 
-    button.addEventListener(
-      "click",
-      () => {
+    if (button && !owned) {
 
-        if (
-          save.points <
-          item.price
-        ) {
+      button.addEventListener(
+        "click",
+        () => {
 
-          alert(
-            "Tu n'as pas assez de points !"
+          if (
+            save.points <
+            item.price
+          ) {
+
+            alert(
+              "Tu n'as pas assez de points !"
+            );
+
+            return;
+          }
+
+          save.points -=
+            item.price;
+
+          save.unlockedItems.push(
+            item.id
           );
 
-          return;
+          saveGame();
+
+          renderShop();
+
+          updateMenu();
+
         }
-
-        save.points -=
-          item.price;
-
-        save.unlockedItems.push(
-          item.id
-        );
-
-        saveGame();
-
-        renderShop();
-        updateMenu();
-      }
-    );
+      );
+    }
 
     container.appendChild(div);
+
   });
 }
 
 
 /* =========================================================
-   NOMS DES PILOTES
+   PILOTES
 ========================================================= */
 
 const driverNames = [
@@ -635,278 +986,156 @@ const driverNames = [
   "Jules Viperon",
   "Ryan Rocketson",
   "Sacha Speedman",
-  "Kylian Rocketman",
-  "Milo Voltcrest",
-  "Enzo Stormax",
-  "Kai Turbofire",
-  "Maxime Driftwood",
-  "Lina Stormwind",
-  "Mia Rockwell",
-  "Sara Flashman",
-  "Iris Nitron",
-  "Lana Venator",
-  "Mila Swift",
-  "Amy Flame",
-  "Theo Flashburn",
-  "Hugo Falconis",
-  "Tom Blazewood",
-  "Lucas Rushford",
-  "Evan Rocketeer",
-  "Adam Draven",
-  "Sam Speedwell",
-  "Lenny Voltrix",
-  "Nolan Turbostar",
-  "Aaron Stormborn",
-  "Dylan Flashfire",
-  "Ethan Blazewing",
-  "Logan Nitrox",
-  "Nathan Vortexon",
-  "Oscar Rushmore",
-  "Eli Vortex",
-  "Kylian Rocket",
-  "Max Voltrane",
-  "Leo Nitronix",
-  "Niko Falconis",
-  "Milo Blazeon",
-  "Enzo Storm",
-  "Kai Turbo",
-  "Noah Viper",
-  "Liam Flashford",
-  "Maxime Racer",
-  "Sacha Nitro",
-  "Ryan Rocket",
-  "Axel Vortexis",
-  "Theo Blazeford",
-  "Hugo Nitros",
-  "Tom Falconet",
-  "Lucas Stormex",
-  "Evan Flashwell",
-  "Adam Viper",
-  "Jules Rocketis",
-  "Sam Drifton",
-  "Lenny Rushwell",
-  "Nolan Voltrix",
-  "Aaron Blazewell",
-  "Dylan Turbex",
-  "Ethan Falconix",
-  "Logan Vortexwell",
-  "Nathan Nitron",
-  "Oscar Stormix",
-  "Eli Flashon",
-  "Kylian Blazecrest",
-  "Max Rocketwell",
-  "Leo Drifton",
-  "Niko Speedon",
-  "Milo Vipercrest",
-  "Enzo Voltrix",
-  "Kai Falconwell",
-  "Noah Rushford",
-  "Liam Blazenix",
-  "Maxime Stormcrest",
-  "Sacha Nitrovale",
-  "Ryan Flashcrest",
-  "Axel Rocketvale",
-  "Theo Vortexvale",
-  "Hugo Speedcrest",
-  "Tom Viperwell",
-  "Lucas Voltane",
-  "Evan Blazevale",
-  "Adam Turboford",
-  "Jules Falconcrest",
-  "Sam Stormvale",
-  "Lenny Flashvale",
-  "Nolan Viperford",
-  "Aaron Rocketcrest",
-  "Dylan Driftvale",
-  "Ethan Rushcrest",
-  "Logan Blazevale",
-  "Nathan Turboval",
-  "Oscar Falconvale",
-  "Eli Nitrocrest",
-  "Kylian Stormford",
-  "Max Flashvale",
-  "Leo Viperford",
-  "Niko Rocketford",
-  "Milo Voltcrest",
-  "Enzo Speedvale",
-  "Kai Blazeford",
-  "Noah Falconford",
-  "Liam Stormvale",
-  "Maxime Vortexcrest",
-  "Sacha Flashford",
-  "Ryan Vipercrest",
-  "Axel Nitrovale",
-  "Theo Rocketcrest",
-  "Hugo Voltford",
-  "Tom Speedford",
-  "Lucas Blazecrest",
-  "Evan Falconvale",
-  "Adam Stormcrest",
-  "Jules Flashcrest",
-  "Sam Viperford",
-  "Lenny Rocketvale",
-  "Nolan Driftcrest",
-  "Aaron Rushvale",
-  "Dylan Blazecrest",
-  "Ethan Turbovale",
-  "Logan Falconcrest",
-  "Nathan Vortexford",
-  "Oscar Nitrovale",
-  "Eli Stormcrest",
-  "Kylian Flashvale",
-  "Max Vipercrest",
-  "Leo Rocketvale",
-  "Niko Voltford",
-  "Milo Speedcrest",
-  "Enzo Blazevale",
-  "Kai Stormford",
-  "Noah Flashvale",
-  "Liam Vipercrest",
-  "Maxime Rocketford",
-  "Sacha Voltvale",
-  "Ryan Blazecrest",
-  "Axel Falconford",
-  "Theo Nitrocrest",
-  "Hugo Vortexvale",
-  "Tom Rocketcrest",
-  "Lucas Viperford",
-  "Evan Voltvale",
-  "Adam Speedcrest",
-  "Jules Blazeford",
-  "Sam Falconvale",
-  "Lenny Stormcrest",
-  "Nolan Flashford",
-  "Aaron Vipercrest",
-  "Dylan Rocketvale",
-  "Ethan Vortexcrest"
+  "Kylian Rocketman"
 ];
 
 
 /* =========================================================
-   GRANDS RIVAUX
+   RIVAUX
 ========================================================= */
 
 const rivals = {
 
   10: {
     name: "Noah Turbo",
-    quote: "Tu vas devoir aller beaucoup plus vite.",
+    quote:
+      "Tu vas devoir aller beaucoup plus vite.",
     strength: 1.08
   },
 
   20: {
     name: "Mira Flash",
-    quote: "J'espère que tu es prêt pour le duel.",
+    quote:
+      "J'espère que tu es prêt pour le duel.",
     strength: 1.10
   },
 
   30: {
     name: "Axel Vortex",
-    quote: "Les virages sont mon terrain de jeu.",
+    quote:
+      "Les virages sont mon terrain de jeu.",
     strength: 1.12
   },
 
   40: {
     name: "Luna Storm",
-    quote: "Cette piste va devenir intéressante.",
+    quote:
+      "Cette piste va devenir intéressante.",
     strength: 1.14
   },
 
   50: {
     name: "Max Falcon",
-    quote: "Bienvenue chez les grands.",
+    quote:
+      "Bienvenue chez les grands.",
     strength: 1.16
   },
 
   60: {
     name: "Niko Blaze",
-    quote: "Essaie donc de me suivre.",
+    quote:
+      "Essaie donc de me suivre.",
     strength: 1.18
   },
 
   70: {
     name: "Jade Velocity",
-    quote: "La vitesse, c'est tout ce qui compte.",
+    quote:
+      "La vitesse, c'est tout ce qui compte.",
     strength: 1.20
   },
 
   80: {
     name: "Leo Thunder",
-    quote: "Tu vas entendre le tonnerre.",
+    quote:
+      "Tu vas entendre le tonnerre.",
     strength: 1.22
   },
 
   90: {
     name: "Maya Inferno",
-    quote: "La piste va chauffer.",
+    quote:
+      "La piste va chauffer.",
     strength: 1.24
   },
 
   100: {
     name: "Ryan Phoenix",
-    quote: "Je renais toujours plus rapide.",
+    quote:
+      "Je renais toujours plus rapide.",
     strength: 1.26
   },
 
   110: {
     name: "Sacha Drift",
-    quote: "Regarde bien mes trajectoires.",
+    quote:
+      "Regarde bien mes trajectoires.",
     strength: 1.28
   },
 
   120: {
     name: "Lina Rocket",
-    quote: "Décollage imminent.",
+    quote:
+      "Décollage imminent.",
     strength: 1.30
   },
 
   130: {
     name: "Theo Bolt",
-    quote: "Tu ne verras qu'une traînée.",
+    quote:
+      "Tu ne verras qu'une traînée.",
     strength: 1.32
   },
 
   140: {
     name: "Nina Wildfire",
-    quote: "La course va être brûlante.",
+    quote:
+      "La course va être brûlante.",
     strength: 1.34
   },
 
   150: {
     name: "Hugo Maverick",
-    quote: "Je n'abandonne jamais.",
+    quote:
+      "Je n'abandonne jamais.",
     strength: 1.36
   },
 
   160: {
     name: "Zoe Dash",
-    quote: "Essaie de garder le rythme.",
+    quote:
+      "Essaie de garder le rythme.",
     strength: 1.38
   },
 
   170: {
     name: "Enzo Lightning",
-    quote: "Prépare-toi à éclaircir la piste.",
+    quote:
+      "Prépare-toi à éclaircir la piste.",
     strength: 1.40
   },
 
   180: {
     name: "Emma Storm",
-    quote: "La tempête arrive.",
+    quote:
+      "La tempête arrive.",
     strength: 1.42
   },
 
   190: {
     name: "Kai Comet",
-    quote: "Je serai déjà à l'arrivée.",
+    quote:
+      "Je serai déjà à l'arrivée.",
     strength: 1.44
   },
 
   200: {
     name: "???",
-    quote: "Le dernier rival sera révélé maintenant.",
+    quote:
+      "Le dernier rival sera révélé maintenant.",
     strength: 1.48
   }
+
 };
 
 
@@ -934,20 +1163,19 @@ let previousTime = 0;
 
 
 /* =========================================================
-   CRÉATION DES PILOTES
+   CRÉATION DES VOITURES
 ========================================================= */
 
 function createNormalDrivers() {
 
-  const names =
-    shuffle(driverNames)
-      .slice(0, 4);
-
-  return names.map(
-    (name, index) => {
+  return shuffle(driverNames)
+    .slice(0, 4)
+    .map((name, index) => {
 
       return {
+
         name,
+
         isPlayer: false,
 
         x: 0,
@@ -967,9 +1195,10 @@ function createNormalDrivers() {
         aiSkill:
           0.85 +
           Math.random() * 0.2
+
       };
-    }
-  );
+
+    });
 }
 
 
@@ -978,7 +1207,8 @@ function createPlayer() {
   return {
 
     name:
-      save.avatar.name,
+      save.avatar?.name ||
+      "Pilote",
 
     isPlayer: true,
 
@@ -994,12 +1224,13 @@ function createPlayer() {
     progress: 0,
 
     finished: false
+
   };
 }
 
 
 /* =========================================================
-   IA ADAPTATIVE
+   DIFFICULTÉ
 ========================================================= */
 
 function calculatePlayerLevel() {
@@ -1047,34 +1278,37 @@ function getAdaptiveDifficulty() {
 
 function adaptAI(driver) {
 
-  const difficulty =
-    getAdaptiveDifficulty();
-
   driver.aiSkill =
-    difficulty *
-    (0.92 +
-    Math.random() * 0.12);
+    getAdaptiveDifficulty() *
+    (0.92 + Math.random() * 0.12);
 }
 
 
 /* =========================================================
-   DÉMARRER UNE COURSE
+   DÉMARRER COURSE
 ========================================================= */
 
 function startNextRace() {
 
   if (!save.avatar) {
-    showScreen("avatarScreen");
+
+    showScreen(
+      "avatarScreen"
+    );
+
     return;
   }
 
-  const isDuel =
-    save.course % 10 === 0;
+  if (
+    save.course % 10 === 0
+  ) {
 
-  if (isDuel) {
     startDuelIntro();
+
   } else {
+
     startNormalRace();
+
   }
 }
 
@@ -1105,18 +1339,25 @@ function startNormalRace() {
       createPlayer(),
       ...createNormalDrivers()
     ]
+
   };
 
   currentRace.drivers
     .slice(1)
-    .forEach(adaptAI);
-
-  previousTime = 0;
+    .forEach(
+      adaptAI
+    );
 
   prepareGameCanvas();
 
   showScreen(
     "gameScreen"
+  );
+
+  previousTime = 0;
+
+  cancelAnimationFrame(
+    animationFrame
   );
 
   animationFrame =
@@ -1132,14 +1373,14 @@ function startNormalRace() {
 
 function getRivalForCourse(course) {
 
-  if (rivals[course]) {
-    return rivals[course];
-  }
+  return rivals[course] || {
 
-  return {
     name: "Champion Inconnu",
+
     quote: "Je suis prêt.",
+
     strength: 1.2
+
   };
 }
 
@@ -1151,20 +1392,29 @@ function startDuelIntro() {
       save.course
     );
 
-  $("rivalName").textContent =
-    rival.name;
+  if ($("rivalName"))
+    $("rivalName").textContent =
+      rival.name;
 
-  $("rivalQuote").textContent =
-    `"${rival.quote}"`;
+  if ($("rivalQuote"))
+    $("rivalQuote").textContent =
+      `"${rival.quote}"`;
 
-  $("duelPlayerName").textContent =
-    save.avatar.name;
+  if ($("duelPlayerName"))
+    $("duelPlayerName").textContent =
+      save.avatar.name;
 
-  $("rivalReveal")
-    .classList.remove("hidden");
+  if ($("rivalReveal"))
+    $("rivalReveal")
+      .classList.remove(
+        "hidden"
+      );
 
-  $("startDuelBtn")
-    .classList.remove("hidden");
+  if ($("startDuelBtn"))
+    $("startDuelBtn")
+      .classList.remove(
+        "hidden"
+      );
 
   showScreen(
     "duelIntroScreen"
@@ -1172,10 +1422,20 @@ function startDuelIntro() {
 }
 
 
-$("startDuelBtn").addEventListener(
-  "click",
-  startDuelRace
-);
+if ($("startDuelBtn")) {
+
+  $("startDuelBtn")
+    .addEventListener(
+      "click",
+      event => {
+
+        event.preventDefault();
+
+        startDuelRace();
+
+      }
+    );
+}
 
 
 function startDuelRace() {
@@ -1219,7 +1479,9 @@ function startDuelRace() {
       createPlayer(),
 
       {
-        name: rival.name,
+
+        name:
+          rival.name,
 
         isPlayer: false,
 
@@ -1240,16 +1502,23 @@ function startDuelRace() {
 
         aiSkill:
           rival.strength
-      }
-    ]
-  };
 
-  previousTime = 0;
+      }
+
+    ]
+
+  };
 
   prepareGameCanvas();
 
   showScreen(
     "gameScreen"
+  );
+
+  previousTime = 0;
+
+  cancelAnimationFrame(
+    animationFrame
   );
 
   animationFrame =
@@ -1267,7 +1536,9 @@ const canvas =
   $("gameCanvas");
 
 const ctx =
-  canvas.getContext("2d");
+  canvas
+    ? canvas.getContext("2d")
+    : null;
 
 let camera = {
   x: 0,
@@ -1276,6 +1547,10 @@ let camera = {
 
 
 function resizeCanvas() {
+
+  if (!canvas || !ctx) {
+    return;
+  }
 
   const width =
     window.innerWidth;
@@ -1290,14 +1565,10 @@ function resizeCanvas() {
     );
 
   canvas.width =
-    Math.floor(
-      width * dpr
-    );
+    width * dpr;
 
   canvas.height =
-    Math.floor(
-      height * dpr
-    );
+    height * dpr;
 
   canvas.style.width =
     `${width}px`;
@@ -1320,12 +1591,8 @@ window.addEventListener(
   "resize",
   () => {
 
-    if (
-      currentRace &&
-      !currentRace.finished
-    ) {
-      resizeCanvas();
-    }
+    resizeCanvas();
+
   }
 );
 
@@ -1337,26 +1604,39 @@ function prepareGameCanvas() {
   camera.x = 0;
   camera.y = 0;
 
-  currentRace.drivers.forEach(
-    (driver, index) => {
+  currentRace.drivers
+    .forEach(
+      (driver, index) => {
 
-      driver.x =
-        400 -
-        index * 55;
+        driver.x =
+          400 -
+          index * 55;
 
-      driver.y =
-        300 +
-        index * 30;
+        driver.y =
+          300 +
+          index * 30;
 
-      driver.angle = 0;
-    }
-  );
+        driver.angle = 0;
 
-  $("hudCourse").textContent =
-    save.course;
+        driver.speed = 0;
 
-  $("hudLap").textContent =
-    "1";
+        driver.progress = 0;
+
+      }
+    );
+
+  if ($("hudCourse"))
+    $("hudCourse").textContent =
+      save.course;
+
+  if ($("hudLap"))
+    $("hudLap").textContent =
+      "1";
+
+  if ($("hudPosition"))
+    $("hudPosition").textContent =
+      "1";
+
 }
 
 
@@ -1364,240 +1644,42 @@ function prepareGameCanvas() {
    PISTE
 ========================================================= */
 
-function drawCrowd() {
-
-  ctx.save();
-
-  ctx.translate(
-    -camera.x +
-      window.innerWidth / 2,
-    -camera.y +
-      window.innerHeight / 2
-  );
-
-  const stands = [
-    {
-      x: 350,
-      y: -260,
-      w: 500,
-      h: 120
-    },
-    {
-      x: 1250,
-      y: 250,
-      w: 450,
-      h: 120
-    },
-    {
-      x: 450,
-      y: 900,
-      w: 500,
-      h: 120
-    },
-    {
-      x: -300,
-      y: 300,
-      w: 400,
-      h: 120
-    }
-  ];
-
-  stands.forEach(stand => {
-
-    ctx.fillStyle =
-      "#26354d";
-
-    ctx.fillRect(
-      stand.x,
-      stand.y,
-      stand.w,
-      stand.h
-    );
-
-    for (
-      let row = 0;
-      row < 3;
-      row++
-    ) {
-
-      for (
-        let i = 0;
-        i < 15;
-        i++
-      ) {
-
-        const x =
-          stand.x +
-          20 +
-          i * 30;
-
-        const y =
-          stand.y +
-          25 +
-          row * 30;
-
-        drawSpectator(
-          x,
-          y,
-          (i + row) % 4
-        );
-      }
-    }
-  });
-
-  const crowdPositions = [
-
-    { x: 50, y: -130 },
-    { x: 130, y: -150 },
-    { x: 220, y: -140 },
-
-    { x: 1550, y: 180 },
-    { x: 1580, y: 250 },
-    { x: 1560, y: 320 },
-
-    { x: 500, y: 1150 },
-    { x: 600, y: 1160 },
-    { x: 700, y: 1140 },
-
-    { x: -250, y: 450 },
-    { x: -230, y: 530 },
-    { x: -250, y: 610 }
-  ];
-
-  crowdPositions.forEach(
-    (person, index) => {
-
-      drawSpectator(
-        person.x,
-        person.y,
-        index % 5
-      );
-    }
-  );
-
-  ctx.restore();
-}
-
-
-function drawSpectator(
-  x,
-  y,
-  variant
-) {
-
-  ctx.save();
-
-  ctx.translate(
-    x,
-    y
-  );
-
-  ctx.fillStyle =
-    "#385070";
-
-  ctx.fillRect(
-    -7,
-    8,
-    14,
-    20
-  );
-
-  ctx.beginPath();
-
-  ctx.arc(
-    0,
-    0,
-    8,
-    0,
-    Math.PI * 2
-  );
-
-  ctx.fillStyle =
-    "#e8b38d";
-
-  ctx.fill();
-
-  const clothes = [
-    "#e34d4d",
-    "#4d82d8",
-    "#4dbd76",
-    "#d4a33a",
-    "#9b62c4"
-  ];
-
-  ctx.fillStyle =
-    clothes[variant];
-
-  ctx.fillRect(
-    -7,
-    8,
-    14,
-    20
-  );
-
-  if (
-    variant === 0 ||
-    variant === 3
-  ) {
-
-    ctx.strokeStyle =
-      "#dddddd";
-
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-      12,
-      10
-    );
-
-    ctx.lineTo(
-      12,
-      -15
-    );
-
-    ctx.stroke();
-
-    ctx.fillStyle =
-      variant === 0
-        ? "#e34d4d"
-        : "#4d82d8";
-
-    ctx.fillRect(
-      12,
-      -15,
-      20,
-      10
-    );
-  }
-
-  ctx.restore();
-}
-
-
 function drawTrack() {
 
+  if (!ctx) {
+    return;
+  }
+
+  const width =
+    window.innerWidth;
+
+  const height =
+    window.innerHeight;
+
   ctx.save();
 
   ctx.translate(
     -camera.x +
-      window.innerWidth / 2,
+      width / 2,
+
     -camera.y +
-      window.innerHeight / 2
+      height / 2
   );
+
+  /* Herbe */
 
   ctx.fillStyle =
     "#237044";
 
   ctx.fillRect(
-    camera.x -
-      window.innerWidth,
-    camera.y -
-      window.innerHeight,
-    window.innerWidth * 2,
-    window.innerHeight * 2
+    camera.x - width,
+    camera.y - height,
+    width * 2,
+    height * 2
   );
+
+
+  /* Circuit */
 
   const trackWidth = 220;
 
@@ -1651,6 +1733,9 @@ function drawTrack() {
 
   ctx.stroke();
 
+
+  /* Ligne centrale */
+
   ctx.lineWidth = 5;
 
   ctx.strokeStyle =
@@ -1678,6 +1763,10 @@ function drawCar(
   index
 ) {
 
+  if (!ctx) {
+    return;
+  }
+
   const screenX =
     driver.x -
     camera.x +
@@ -1702,6 +1791,7 @@ function drawCar(
   const width = 45;
   const height = 25;
 
+
   if (driver.isPlayer) {
 
     ctx.fillStyle =
@@ -1713,6 +1803,7 @@ function drawCar(
       index === 1
         ? "#e54b4b"
         : "#4287e5";
+
   }
 
   ctx.fillRect(
@@ -1721,6 +1812,9 @@ function drawCar(
     width,
     height
   );
+
+
+  /* Vitres */
 
   ctx.fillStyle =
     "#111";
@@ -1732,6 +1826,9 @@ function drawCar(
     8
   );
 
+
+  /* Avant */
+
   ctx.fillStyle =
     "#eee";
 
@@ -1742,12 +1839,27 @@ function drawCar(
     height
   );
 
+
+  /* Contour */
+
+  ctx.strokeStyle =
+    "#111";
+
+  ctx.lineWidth = 2;
+
+  ctx.strokeRect(
+    -width / 2,
+    -height / 2,
+    width,
+    height
+  );
+
   ctx.restore();
 }
 
 
 /* =========================================================
-   CONTRÔLES CLAVIER
+   CLAVIER
 ========================================================= */
 
 window.addEventListener(
@@ -1758,32 +1870,45 @@ window.addEventListener(
       event.key.toLowerCase();
 
     if (
-      event.key === "ArrowUp" ||
+      key === "arrowup" ||
       key === "w"
     ) {
+
       keys.up = true;
+
+      event.preventDefault();
     }
 
     if (
-      event.key === "ArrowDown" ||
+      key === "arrowdown" ||
       key === "s"
     ) {
+
       keys.down = true;
+
+      event.preventDefault();
     }
 
     if (
-      event.key === "ArrowLeft" ||
+      key === "arrowleft" ||
       key === "a"
     ) {
+
       keys.left = true;
+
+      event.preventDefault();
     }
 
     if (
-      event.key === "ArrowRight" ||
+      key === "arrowright" ||
       key === "d"
     ) {
+
       keys.right = true;
+
+      event.preventDefault();
     }
+
   }
 );
 
@@ -1796,32 +1921,37 @@ window.addEventListener(
       event.key.toLowerCase();
 
     if (
-      event.key === "ArrowUp" ||
+      key === "arrowup" ||
       key === "w"
     ) {
+
       keys.up = false;
     }
 
     if (
-      event.key === "ArrowDown" ||
+      key === "arrowdown" ||
       key === "s"
     ) {
+
       keys.down = false;
     }
 
     if (
-      event.key === "ArrowLeft" ||
+      key === "arrowleft" ||
       key === "a"
     ) {
+
       keys.left = false;
     }
 
     if (
-      event.key === "ArrowRight" ||
+      key === "arrowright" ||
       key === "d"
     ) {
+
       keys.right = false;
     }
+
   }
 );
 
@@ -1841,6 +1971,13 @@ function updateJoystick(
   clientX,
   clientY
 ) {
+
+  if (
+    !joystickElement ||
+    !joystickKnob
+  ) {
+    return;
+  }
 
   const rect =
     joystickElement
@@ -1876,6 +2013,7 @@ function updateJoystick(
 
     dy =
       dy / distance * max;
+
   }
 
   joystick.x =
@@ -1894,57 +2032,72 @@ function resetJoystick() {
   joystick.x = 0;
   joystick.y = 0;
 
-  joystickKnob.style.transform =
-    "translate(0, 0)";
-
   joystick.active = false;
+
+  if (joystickKnob) {
+
+    joystickKnob.style.transform =
+      "translate(0, 0)";
+  }
 }
 
 
-joystickElement.addEventListener(
-  "pointerdown",
-  event => {
+if (joystickElement) {
 
-    joystick.active = true;
+  joystickElement.addEventListener(
+    "pointerdown",
+    event => {
 
-    joystickElement.setPointerCapture(
-      event.pointerId
-    );
+      event.preventDefault();
 
-    updateJoystick(
-      event.clientX,
-      event.clientY
-    );
-  }
-);
+      joystick.active = true;
 
+      try {
 
-joystickElement.addEventListener(
-  "pointermove",
-  event => {
+        joystickElement.setPointerCapture(
+          event.pointerId
+        );
 
-    if (!joystick.active) {
-      return;
+      } catch (error) {}
+
+      updateJoystick(
+        event.clientX,
+        event.clientY
+      );
+
     }
-
-    updateJoystick(
-      event.clientX,
-      event.clientY
-    );
-  }
-);
+  );
 
 
-joystickElement.addEventListener(
-  "pointerup",
-  resetJoystick
-);
+  joystickElement.addEventListener(
+    "pointermove",
+    event => {
+
+      if (!joystick.active) {
+        return;
+      }
+
+      updateJoystick(
+        event.clientX,
+        event.clientY
+      );
+
+    }
+  );
 
 
-joystickElement.addEventListener(
-  "pointercancel",
-  resetJoystick
-);
+  joystickElement.addEventListener(
+    "pointerup",
+    resetJoystick
+  );
+
+
+  joystickElement.addEventListener(
+    "pointercancel",
+    resetJoystick
+  );
+
+}
 
 
 /* =========================================================
@@ -1961,6 +2114,10 @@ function pressButton(
   callbackUp
 ) {
 
+  if (!element) {
+    return;
+  }
+
   element.addEventListener(
     "pointerdown",
     event => {
@@ -1968,6 +2125,7 @@ function pressButton(
       event.preventDefault();
 
       callbackDown();
+
     }
   );
 
@@ -1978,6 +2136,7 @@ function pressButton(
       event.preventDefault();
 
       callbackUp();
+
     }
   );
 
@@ -2016,7 +2175,7 @@ pressButton(
 
 
 /* =========================================================
-   PHYSIQUE DU JOUEUR
+   PHYSIQUE JOUEUR
 ========================================================= */
 
 function updatePlayer(
@@ -2043,11 +2202,11 @@ function updatePlayer(
     brakePressed ||
     joystick.y > 0.35;
 
+
   if (accelerating) {
 
     driver.speed +=
-      acceleration *
-      delta;
+      acceleration * delta;
 
   } else {
 
@@ -2056,14 +2215,17 @@ function updatePlayer(
         friction,
         delta / 16
       );
+
   }
+
 
   if (braking) {
 
     driver.speed -=
-      0.13 *
-      delta;
+      0.13 * delta;
+
   }
+
 
   driver.speed =
     clamp(
@@ -2072,7 +2234,9 @@ function updatePlayer(
       maxSpeed
     );
 
+
   let steering = 0;
+
 
   if (keys.left) {
     steering -= 1;
@@ -2082,20 +2246,24 @@ function updatePlayer(
     steering += 1;
   }
 
+
   if (
-    Math.abs(joystick.x) >
-    0.15
+    Math.abs(
+      joystick.x
+    ) > 0.15
   ) {
 
     steering =
       joystick.x;
   }
 
+
   driver.angle +=
     steering *
     0.055 *
     (driver.speed / maxSpeed) *
     delta;
+
 
   driver.x +=
     Math.cos(
@@ -2104,12 +2272,14 @@ function updatePlayer(
     driver.speed *
     delta;
 
+
   driver.y +=
     Math.sin(
       driver.angle
     ) *
     driver.speed *
     delta;
+
 
   driver.progress +=
     Math.max(
@@ -2134,32 +2304,36 @@ function updateAI(
     driver.baseSpeed *
     driver.aiSkill;
 
+
   if (
     driver.speed <
     targetSpeed
   ) {
 
     driver.speed +=
-      0.05 *
-      delta;
+      0.05 * delta;
 
   } else {
 
     driver.speed *=
       0.995;
+
   }
+
 
   const variation =
     Math.sin(
       performance.now() /
-      800 +
-      driver.name.length
+        800 +
+        driver.name.length
     ) *
     0.025;
+
 
   driver.angle +=
     variation *
     delta;
+
 
   driver.x +=
     Math.cos(
@@ -2168,12 +2342,14 @@ function updateAI(
     driver.speed *
     delta;
 
+
   driver.y +=
     Math.sin(
       driver.angle
     ) *
     driver.speed *
     delta;
+
 
   driver.progress +=
     driver.speed *
@@ -2187,6 +2363,10 @@ function updateAI(
 ========================================================= */
 
 function getRanking() {
+
+  if (!currentRace) {
+    return [];
+  }
 
   return [
     ...currentRace.drivers
@@ -2213,8 +2393,12 @@ function updateHUD() {
         driver.isPlayer
     );
 
-  $("hudPosition").textContent =
-    playerIndex + 1;
+  if ($("hudPosition")) {
+
+    $("hudPosition").textContent =
+      playerIndex + 1;
+  }
+
 
   const player =
     currentRace.drivers[0];
@@ -2224,17 +2408,25 @@ function updateHUD() {
       3,
       Math.floor(
         player.progress /
-        (currentRace.trackLength / 3)
+        (
+          currentRace.trackLength /
+          3
+        )
       ) + 1
     );
 
-  $("hudLap").textContent =
-    lap;
+
+  if ($("hudLap")) {
+
+    $("hudLap").textContent =
+      lap;
+  }
+
 }
 
 
 /* =========================================================
-   FIN DE COURSE
+   FIN COURSE
 ========================================================= */
 
 function checkRaceFinished() {
@@ -2244,14 +2436,15 @@ function checkRaceFinished() {
   }
 
   const player =
-    currentRace.drivers.find(
-      driver =>
-        driver.isPlayer
-    );
+    currentRace.drivers
+      .find(
+        d => d.isPlayer
+      );
 
   if (!player) {
     return;
   }
+
 
   if (
     player.progress >=
@@ -2263,10 +2456,13 @@ function checkRaceFinished() {
     return;
   }
 
+
   const winner =
     getRanking()[0];
 
+
   if (
+    winner &&
     winner.progress >=
     currentRace.trackLength
   ) {
@@ -2284,7 +2480,16 @@ function checkRaceFinished() {
     ) {
 
       finishRace();
+
+    } else if (
+      currentRace.duel &&
+      winner !== player
+    ) {
+
+      finishRace();
+
     }
+
   }
 }
 
@@ -2311,11 +2516,9 @@ function pointsForPosition(
     case 4:
       return 10;
 
-    case 5:
-      return 0;
-
     default:
       return 0;
+
   }
 }
 
@@ -2330,22 +2533,21 @@ function finishRace() {
     !currentRace ||
     currentRace.finished
   ) {
+
     return;
   }
 
-  currentRace.finished = true;
+  currentRace.finished =
+    true;
 
-  if (animationFrame) {
+  cancelAnimationFrame(
+    animationFrame
+  );
 
-    cancelAnimationFrame(
-      animationFrame
-    );
-
-    animationFrame = null;
-  }
 
   const ranking =
     getRanking();
+
 
   let playerPosition =
     ranking.findIndex(
@@ -2353,10 +2555,8 @@ function finishRace() {
         driver.isPlayer
     ) + 1;
 
-  /*
-    Première course :
-    victoire obligatoire.
-  */
+
+  /* Première course = victoire */
 
   if (
     save.course === 1 &&
@@ -2368,24 +2568,22 @@ function finishRace() {
     ranking.sort(
       (a, b) => {
 
-        if (a.isPlayer) {
+        if (a.isPlayer)
           return -1;
-        }
 
-        if (b.isPlayer) {
+        if (b.isPlayer)
           return 1;
-        }
 
         return b.progress -
           a.progress;
+
       }
     );
+
   }
 
 
-  /* =========================
-     DUEL
-  ========================== */
+  /* Duel */
 
   if (currentRace.duel) {
 
@@ -2397,19 +2595,19 @@ function finishRace() {
   }
 
 
-  /* =========================
-     COURSE NORMALE
-  ========================== */
+  /* Course normale */
 
   const reward =
     pointsForPosition(
       playerPosition
     );
 
+
   save.points +=
     reward;
 
   save.totalRaces++;
+
 
   if (
     !save.bestPosition ||
@@ -2419,7 +2617,9 @@ function finishRace() {
 
     save.bestPosition =
       playerPosition;
+
   }
+
 
   save.course =
     Math.min(
@@ -2427,7 +2627,9 @@ function finishRace() {
       save.course + 1
     );
 
+
   saveGame();
+
 
   showResults(
     ranking,
@@ -2455,6 +2657,7 @@ function showResults(
     "5️⃣"
   ];
 
+
   const animations = {
     1: "🏆🎉",
     2: "🥈👏",
@@ -2463,63 +2666,101 @@ function showResults(
     5: "😤🔥"
   };
 
-  $("resultsTitle").textContent =
-    playerPosition === 1
-      ? "🏆 VICTOIRE !"
-      : "🏁 COURSE TERMINÉE !";
 
-  $("resultsAnimation").textContent =
-    animations[playerPosition] ||
-    "🏁";
+  if ($("resultsTitle")) {
+
+    $("resultsTitle").textContent =
+      playerPosition === 1
+        ? "🏆 VICTOIRE !"
+        : "🏁 COURSE TERMINÉE !";
+
+  }
+
+
+  if ($("resultsAnimation")) {
+
+    $("resultsAnimation")
+      .textContent =
+      animations[
+        playerPosition
+      ] || "🏁";
+
+  }
+
 
   const list =
     $("resultsList");
 
-  list.innerHTML = "";
+  if (list) {
 
-  ranking.forEach(
-    (driver, index) => {
+    list.innerHTML = "";
 
-      const row =
-        document.createElement(
-          "div"
+    ranking.forEach(
+      (driver, index) => {
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+        row.className =
+          "result-row";
+
+
+        if (
+          driver.isPlayer
+        ) {
+
+          row.classList.add(
+            "player"
+          );
+
+        }
+
+
+        row.innerHTML = `
+
+          <span>
+            ${
+              positions[index] ||
+              `${index + 1}.`
+            }
+          </span>
+
+          <strong>
+            ${driver.name}
+          </strong>
+
+          <span>
+            ${
+              driver.isPlayer
+                ? `+${reward} ⭐`
+                : ""
+            }
+          </span>
+
+        `;
+
+
+        list.appendChild(
+          row
         );
 
-      row.className =
-        "result-row";
-
-      if (driver.isPlayer) {
-        row.classList.add(
-          "player"
-        );
       }
+    );
 
-      row.innerHTML = `
-        <span>
-          ${positions[index] || `${index + 1}.`}
-        </span>
+  }
 
-        <strong>
-          ${driver.name}
-        </strong>
 
-        <span>
-          ${
-            driver.isPlayer
-              ? `+${reward} ⭐`
-              : ""
-          }
-        </span>
-      `;
+  if ($("rewardText")) {
 
-      list.appendChild(row);
-    }
-  );
+    $("rewardText").textContent =
+      `Tu gagnes ${reward} point${
+        reward > 1 ? "s" : ""
+      }. ⭐`;
 
-  $("rewardText").textContent =
-    `Tu gagnes ${reward} point${
-      reward > 1 ? "s" : ""
-    }. ⭐`;
+  }
+
 
   showScreen(
     "resultsScreen"
@@ -2527,21 +2768,28 @@ function showResults(
 }
 
 
-$("continueBtn").addEventListener(
-  "click",
-  () => {
+/* =========================================================
+   CONTINUER
+========================================================= */
 
-    updateMenu();
+if ($("continueBtn")) {
 
-    if (save.course > 200) {
-      save.course = 200;
-    }
+  $("continueBtn")
+    .addEventListener(
+      "click",
+      event => {
 
-    showScreen(
-      "menuScreen"
+        event.preventDefault();
+
+        updateMenu();
+
+        showScreen(
+          "menuScreen"
+        );
+
+      }
     );
-  }
-);
+}
 
 
 /* =========================================================
@@ -2560,16 +2808,22 @@ function finishDuel(
       course
     ] || 0;
 
-  save.duelAttempts[course] =
+
+  save.duelAttempts[
+    course
+  ] =
     attempts + 1;
+
 
   const playerWon =
     playerPosition === 1;
+
 
   const actualWin =
     currentRace.forceRivalWin
       ? false
       : playerWon;
+
 
   if (actualWin) {
 
@@ -2584,30 +2838,45 @@ function finishDuel(
         save.course + 1
       );
 
+
     saveGame();
 
-    $("duelResultTitle")
-      .textContent =
-      "🏆 RIVAL VAINCU !";
 
-    $("duelResultContent")
-      .innerHTML = `
-        <div class="results-animation">
-          🏆🔥🎉
-        </div>
+    if ($("duelResultTitle")) {
 
-        <h2>
-          ${currentRace.rival.name}
-        </h2>
+      $("duelResultTitle")
+        .textContent =
+        "🏆 RIVAL VAINCU !";
 
-        <p>
-          Tu as remporté le duel !
-        </p>
+    }
 
-        <p>
-          ⭐ <strong>+1000 points</strong>
-        </p>
-      `;
+
+    if ($("duelResultContent")) {
+
+      $("duelResultContent")
+        .innerHTML = `
+
+          <div class="results-animation">
+            🏆🔥🎉
+          </div>
+
+          <h2>
+            ${currentRace.rival.name}
+          </h2>
+
+          <p>
+            Tu as remporté le duel !
+          </p>
+
+          <p>
+            ⭐ <strong>
+              +1000 points
+            </strong>
+          </p>
+
+        `;
+
+    }
 
   } else {
 
@@ -2617,31 +2886,46 @@ function finishDuel(
         save.course + 1
       );
 
+
     saveGame();
 
-    $("duelResultTitle")
-      .textContent =
-      "🏎️ Le rival gagne !";
 
-    $("duelResultContent")
-      .innerHTML = `
-        <div class="results-animation">
-          😤🏎️💨
-        </div>
+    if ($("duelResultTitle")) {
 
-        <h2>
-          ${currentRace.rival.name}
-        </h2>
+      $("duelResultTitle")
+        .textContent =
+        "🏎️ Le rival gagne !";
 
-        <p>
-          Cette fois, le rival était trop fort.
-        </p>
+    }
 
-        <p>
-          Continue à t'entraîner !
-        </p>
-      `;
+
+    if ($("duelResultContent")) {
+
+      $("duelResultContent")
+        .innerHTML = `
+
+          <div class="results-animation">
+            😤🏎️💨
+          </div>
+
+          <h2>
+            ${currentRace.rival.name}
+          </h2>
+
+          <p>
+            Cette fois, le rival était trop fort.
+          </p>
+
+          <p>
+            Continue à t'entraîner !
+          </p>
+
+        `;
+
+    }
+
   }
+
 
   showScreen(
     "duelResultScreen"
@@ -2649,17 +2933,24 @@ function finishDuel(
 }
 
 
-$("duelContinueBtn").addEventListener(
-  "click",
-  () => {
+if ($("duelContinueBtn")) {
 
-    updateMenu();
+  $("duelContinueBtn")
+    .addEventListener(
+      "click",
+      event => {
 
-    showScreen(
-      "menuScreen"
+        event.preventDefault();
+
+        updateMenu();
+
+        showScreen(
+          "menuScreen"
+        );
+
+      }
     );
-  }
-);
+}
 
 
 /* =========================================================
@@ -2672,26 +2963,36 @@ function gameLoop(time) {
     !currentRace ||
     currentRace.finished
   ) {
+
     return;
   }
+
 
   const delta =
     Math.min(
       32,
       time -
-      (previousTime || time)
+      (
+        previousTime ||
+        time
+      )
     );
+
 
   previousTime =
     time;
 
-  updateGame(delta);
+
+  updateGame(
+    delta
+  );
 
   drawGame();
 
   updateHUD();
 
   checkRaceFinished();
+
 
   if (
     currentRace &&
@@ -2702,7 +3003,9 @@ function gameLoop(time) {
       requestAnimationFrame(
         gameLoop
       );
+
   }
+
 }
 
 
@@ -2710,7 +3013,9 @@ function gameLoop(time) {
    UPDATE
 ========================================================= */
 
-function updateGame(delta) {
+function updateGame(
+  delta
+) {
 
   if (!currentRace) {
     return;
@@ -2719,10 +3024,12 @@ function updateGame(delta) {
   const player =
     currentRace.drivers[0];
 
+
   updatePlayer(
     player,
     delta
   );
+
 
   currentRace.drivers
     .slice(1)
@@ -2733,14 +3040,17 @@ function updateGame(delta) {
           driver,
           delta
         );
+
       }
     );
+
 
   camera.x =
     player.x;
 
   camera.y =
     player.y;
+
 }
 
 
@@ -2750,6 +3060,10 @@ function updateGame(delta) {
 
 function drawGame() {
 
+  if (!ctx) {
+    return;
+  }
+
   ctx.clearRect(
     0,
     0,
@@ -2757,81 +3071,136 @@ function drawGame() {
     window.innerHeight
   );
 
+
   drawTrack();
 
-  drawCrowd();
 
-  currentRace.drivers.forEach(
-    (driver, index) => {
+  if (currentRace) {
 
-      drawCar(
-        driver,
-        index
+    currentRace.drivers
+      .forEach(
+        (driver, index) => {
+
+          drawCar(
+            driver,
+            index
+          );
+
+        }
       );
-    }
-  );
+
+  }
+
 }
 
 
 /* =========================================================
-   QUITTER UNE COURSE
+   QUITTER COURSE
 ========================================================= */
 
-$("leaveRaceBtn").addEventListener(
-  "click",
-  () => {
+if ($("leaveRaceBtn")) {
 
-    const confirmation =
-      confirm(
-        "Quitter cette course ?"
-      );
+  $("leaveRaceBtn")
+    .addEventListener(
+      "click",
+      event => {
 
-    if (!confirmation) {
-      return;
-    }
+        event.preventDefault();
 
-    currentRace = null;
+        const confirmation =
+          confirm(
+            "Quitter cette course ?"
+          );
 
-    if (animationFrame) {
+        if (!confirmation) {
+          return;
+        }
 
-      cancelAnimationFrame(
-        animationFrame
-      );
 
-      animationFrame = null;
-    }
+        currentRace =
+          null;
 
-    previousTime = 0;
+
+        cancelAnimationFrame(
+          animationFrame
+        );
+
+
+        acceleratePressed =
+          false;
+
+        brakePressed =
+          false;
+
+
+        keys.up = false;
+        keys.down = false;
+        keys.left = false;
+        keys.right = false;
+
+
+        resetJoystick();
+
+
+        updateMenu();
+
+
+        showScreen(
+          "menuScreen"
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   DÉMARRAGE
+========================================================= */
+
+function initializeGame() {
+
+  console.log(
+    "🏎️ Turbo Racers chargé !"
+  );
+
+
+  if (save.avatar) {
+
+    loadAvatarIntoForm();
 
     updateMenu();
 
     showScreen(
       "menuScreen"
     );
+
+  } else {
+
+    updateAvatarPreview();
+
+    showScreen(
+      "avatarScreen"
+    );
+
   }
-);
+
+}
 
 
-/* =========================================================
-   PREMIER DÉMARRAGE
-========================================================= */
+if (
+  document.readyState ===
+  "loading"
+) {
 
-if (save.avatar) {
-
-  loadAvatarIntoForm();
-
-  updateMenu();
-
-  showScreen(
-    "menuScreen"
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeGame
   );
 
 } else {
 
-  updateAvatarPreview();
+  initializeGame();
 
-  showScreen(
-    "avatarScreen"
-  );
 }
-```
