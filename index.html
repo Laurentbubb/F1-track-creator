@@ -1,237 +1,345 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0,
-                   maximum-scale=1.0, user-scalable=no">
-
-    <title>F1 Track Creator</title>
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#111827">
+  <title>Turbo Racers</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
+  <div id="app">
 
-    <div class="title">
-        <h1>🏎️ F1 Track Creator</h1>
-        <p>Crée ton circuit et conduis dessus !</p>
-    </div>
+    <!-- =========================
+         CRÉATION DE L'AVATAR
+    ========================== -->
+    <section id="avatarScreen" class="screen">
 
-    <div class="top-buttons">
-        <button id="createBtn">🖌️ Créer</button>
-        <button id="raceBtn">🏁 Course</button>
-        <button id="saveBtn">💾 Sauver</button>
-        <button id="newBtn">🗑️ Effacer</button>
-    </div>
+      <div class="panel avatar-panel">
 
-</header>
+        <h1>🏎️ TURBO RACERS</h1>
+        <h2>Crée ton pilote</h2>
 
-
-<div class="layout">
-
-    <main>
-        <canvas id="gameCanvas"></canvas>
-
-        <!-- CONTROLES IPAD -->
-
-        <div id="touchControls" class="touch-controls">
-
-            <div class="steering">
-
-                <button
-                    class="touch-button"
-                    id="leftButton">
-                    ◀
-                </button>
-
-                <button
-                    class="touch-button"
-                    id="rightButton">
-                    ▶
-                </button>
-
+        <div class="avatar-preview">
+          <div id="previewAvatar" class="avatar">
+            <div id="previewHair" class="hair">●</div>
+            <div id="previewFace" class="face">
+              <div id="previewGlasses" class="glasses"></div>
             </div>
+            <div id="previewHelmet" class="helmet"></div>
+            <div id="previewBody" class="body"></div>
+          </div>
+        </div>
 
-            <div class="pedals">
+        <div class="form-grid">
 
-                <button
-                    class="touch-button brake"
-                    id="brakeButton">
-                    ▼
-                </button>
+          <label>
+            Nom du pilote
+            <input id="avatarName" type="text" maxlength="18"
+                   placeholder="Ton nom">
+          </label>
 
-                <button
-                    class="touch-button accelerate"
-                    id="accelerateButton">
-                    ▲
-                </button>
+          <label>
+            Apparence
+            <select id="avatarGender">
+              <option value="A">Pilote A</option>
+              <option value="B">Pilote B</option>
+            </select>
+          </label>
 
-            </div>
+          <label>
+            Âge
+            <select id="avatarAge">
+              <option value="child">Jeune</option>
+              <option value="teen" selected>Adolescent</option>
+              <option value="adult">Adulte</option>
+            </select>
+          </label>
+
+          <label>
+            Taille
+            <select id="avatarHeight">
+              <option value="small">Petite</option>
+              <option value="medium" selected>Moyenne</option>
+              <option value="tall">Grande</option>
+            </select>
+          </label>
+
+          <label>
+            Coupe
+            <select id="avatarHair">
+              <option value="short">Courte</option>
+              <option value="spiky">Ébouriffée</option>
+              <option value="long">Longue</option>
+              <option value="curly">Bouclée</option>
+            </select>
+          </label>
+
+          <label>
+            Couleur cheveux
+            <select id="avatarHairColor">
+              <option value="#24170f">Brun</option>
+              <option value="#111111">Noir</option>
+              <option value="#d7a64b">Blond</option>
+              <option value="#a84b2a">Roux</option>
+              <option value="#6b4a35">Châtain</option>
+            </select>
+          </label>
+
+          <label>
+            Lunettes
+            <select id="avatarGlasses">
+              <option value="none">Aucune</option>
+              <option value="round">Rondes</option>
+              <option value="sport">Sport</option>
+              <option value="square">Carrées</option>
+            </select>
+          </label>
+
+          <label>
+            Casque
+            <select id="avatarHelmet">
+              <option value="none">Aucun</option>
+              <option value="white">Blanc</option>
+              <option value="red">Rouge</option>
+              <option value="blue">Bleu</option>
+              <option value="black">Noir</option>
+              <option value="gold">Doré</option>
+            </select>
+          </label>
+
+          <label>
+            Masque
+            <select id="avatarMask">
+              <option value="none">Aucun</option>
+              <option value="white">Blanc</option>
+              <option value="black">Noir</option>
+              <option value="blue">Bleu</option>
+              <option value="red">Rouge</option>
+            </select>
+          </label>
 
         </div>
 
-    </main>
-
-
-    <aside>
-
-        <section>
-
-            <h2>🚗 Voiture</h2>
-
-            <button
-                class="car-button selected"
-                data-car="red">
-
-                <span class="car-color red"></span>
-                F1 Rouge
-
-            </button>
-
-            <button
-                class="car-button"
-                data-car="blue">
-
-                <span class="car-color blue"></span>
-                F1 Bleue
-
-            </button>
-
-            <button
-                class="car-button"
-                data-car="yellow">
-
-                <span class="car-color yellow"></span>
-                F1 Jaune
-
-            </button>
-
-            <button
-                class="car-button"
-                data-car="black">
-
-                <span class="car-color black"></span>
-                F1 Noire
-
-            </button>
-
-        </section>
-
-
-        <section class="stats">
-
-            <h2>🏆 Course</h2>
-
-            <div class="stat">
-                <span>Tour</span>
-                <strong id="lapText">0 / 3</strong>
-            </div>
-
-            <div class="stat">
-                <span>Temps</span>
-                <strong id="timeText">00:00.000</strong>
-            </div>
-
-            <div class="stat">
-                <span>Meilleur</span>
-                <strong id="bestText">--:--.---</strong>
-            </div>
-
-            <div class="stat">
-                <span>Vitesse</span>
-                <strong id="speedText">0 km/h</strong>
-            </div>
-
-        </section>
-
-
-        <section>
-
-            <h2>🎮 PC</h2>
-
-            <p>⬆️ Accélérer</p>
-            <p>⬇️ Freiner</p>
-            <p>⬅️ Tourner à gauche</p>
-            <p>➡️ Tourner à droite</p>
-
-        </section>
-
-
-        <section>
-
-            <h2>📱 iPad</h2>
-
-            <p>Utilise les boutons à l'écran pour conduire.</p>
-
-        </section>
-
-
-        <section>
-
-            <h2>ℹ️ État</h2>
-
-            <p id="status">
-                🖌️ Maintiens le doigt ou la souris
-                pour dessiner.
-            </p>
-
-        </section>
-
-    </aside>
-
-</div>
-
-
-<!-- COMPTE A REBOURS -->
-
-<div id="startOverlay" class="overlay hidden">
-
-    <div class="overlay-box">
-
-        <div class="lights">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-
-        <h2 id="countdown">3</h2>
-
-        <p>Prépare-toi...</p>
-
-    </div>
-
-</div>
-
-
-<!-- FIN DE COURSE -->
-
-<div id="finishOverlay" class="overlay hidden">
-
-    <div class="overlay-box">
-
-        <h2>🏆 Course terminée !</h2>
-
-        <p id="finalTime">
-            Temps : --:--.---
-        </p>
-
-        <p id="finalBest">
-            Meilleur temps : --:--.---
-        </p>
-
-        <button id="restartBtn">
-            🔄 Recommencer
+        <button id="createAvatarBtn" class="primary-btn">
+          🏁 Créer mon pilote
         </button>
 
-    </div>
+      </div>
 
-</div>
+    </section>
 
 
-<script src="game.js"></script>
+    <!-- =========================
+         MENU PRINCIPAL
+    ========================== -->
+    <section id="menuScreen" class="screen hidden">
 
+      <div class="menu-header">
+        <div>
+          <h1>🏎️ Turbo Racers</h1>
+          <p id="welcomeText"></p>
+        </div>
+
+        <div class="points-box">
+          ⭐ <span id="menuPoints">0</span>
+        </div>
+      </div>
+
+      <div class="menu-avatar-area">
+        <div id="menuAvatar" class="avatar large-avatar">
+          <div class="hair">●</div>
+          <div class="face"></div>
+          <div class="body"></div>
+        </div>
+      </div>
+
+      <div class="menu-buttons">
+        <button id="raceBtn" class="primary-btn">
+          🏁 Nouvelle course
+        </button>
+
+        <button id="garageBtn" class="secondary-btn">
+          🚗 Garage
+        </button>
+
+        <button id="customizeBtn" class="secondary-btn">
+          👤 Mon avatar
+        </button>
+
+        <button id="resetBtn" class="danger-btn">
+          ♻️ Réinitialiser la sauvegarde
+        </button>
+      </div>
+
+      <div class="progress-box">
+        <h3>Progression</h3>
+        <p>Course : <strong id="courseNumber">1</strong> / 200</p>
+        <p>Meilleure position : <strong id="bestPosition">-</strong></p>
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         GARAGE
+    ========================== -->
+    <section id="garageScreen" class="screen hidden">
+
+      <div class="panel">
+
+        <h1>🚗 Garage</h1>
+
+        <p>
+          Tes points : ⭐ <strong id="garagePoints">0</strong>
+        </p>
+
+        <div id="shopItems" class="shop-grid"></div>
+
+        <button id="garageBackBtn" class="secondary-btn">
+          ← Retour
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         JEU
+    ========================== -->
+    <section id="gameScreen" class="game-screen hidden">
+
+      <canvas id="gameCanvas"></canvas>
+
+      <div class="hud">
+
+        <div class="hud-left">
+          <div>🏁 Course <span id="hudCourse">1</span></div>
+          <div>⭐ <span id="hudPoints">0</span></div>
+        </div>
+
+        <div class="position-box">
+          <span id="hudPosition">1</span> / 5
+        </div>
+
+        <div class="lap-box">
+          Tour <span id="hudLap">1</span>/3
+        </div>
+
+      </div>
+
+      <!-- Contrôles tactiles -->
+      <div id="touchControls">
+
+        <div id="joystick" class="joystick">
+          <div id="joystickKnob" class="joystick-knob"></div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="accelerateBtn">▲</button>
+          <button id="brakeBtn">▼</button>
+        </div>
+
+      </div>
+
+      <button id="leaveRaceBtn" class="leave-btn">
+        ✕
+      </button>
+
+    </section>
+
+
+    <!-- =========================
+         RÉSULTATS
+    ========================== -->
+    <section id="resultsScreen" class="screen hidden">
+
+      <div class="panel results-panel">
+
+        <h1 id="resultsTitle">🏁 Course terminée !</h1>
+
+        <div id="resultsAnimation" class="results-animation"></div>
+
+        <div id="resultsList"></div>
+
+        <div class="reward-box">
+          <p id="rewardText"></p>
+        </div>
+
+        <button id="continueBtn" class="primary-btn">
+          Continuer →
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         DUEL
+    ========================== -->
+    <section id="duelIntroScreen" class="screen hidden">
+
+      <div class="panel duel-panel">
+
+        <div class="duel-warning">
+          ⚠️ DUEL SPÉCIAL
+        </div>
+
+        <h1>1 VS 1</h1>
+
+        <p class="duel-subtitle">
+          Un nouveau rival vous attend...
+        </p>
+
+        <div id="rivalReveal" class="rival-reveal hidden">
+
+          <div id="rivalAvatar" class="avatar large-avatar"></div>
+
+          <h2 id="rivalName"></h2>
+
+          <p id="rivalQuote"></p>
+
+          <div class="versus">VS</div>
+
+          <strong id="duelPlayerName"></strong>
+
+        </div>
+
+        <button id="startDuelBtn" class="primary-btn hidden">
+          🏁 Commencer le duel
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         DÉFAITE DU DUEL
+    ========================== -->
+    <section id="duelResultScreen" class="screen hidden">
+
+      <div class="panel duel-result-panel">
+
+        <h1 id="duelResultTitle"></h1>
+
+        <div id="duelResultContent"></div>
+
+        <button id="duelContinueBtn" class="primary-btn">
+          Continuer
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="game.js"></script>
 </body>
 </html>
