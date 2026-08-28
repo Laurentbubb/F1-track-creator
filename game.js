@@ -1,39 +1,85 @@
-```javascript
 // ============================================================
 // F1 TRACK CREATOR
+// PC + IPAD
 // ============================================================
 
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+const canvas =
+    document.getElementById("gameCanvas");
 
-// ------------------------------------------------------------
+const ctx =
+    canvas.getContext("2d");
+
+
+// ============================================================
 // INTERFACE
-// ------------------------------------------------------------
+// ============================================================
 
-const createBtn = document.getElementById("createBtn");
-const raceBtn = document.getElementById("raceBtn");
-const saveBtn = document.getElementById("saveBtn");
-const newBtn = document.getElementById("newBtn");
-const restartBtn = document.getElementById("restartBtn");
+const createBtn =
+    document.getElementById("createBtn");
 
-const statusText = document.getElementById("status");
+const raceBtn =
+    document.getElementById("raceBtn");
 
-const lapText = document.getElementById("lapText");
-const timeText = document.getElementById("timeText");
-const bestText = document.getElementById("bestText");
-const speedText = document.getElementById("speedText");
+const saveBtn =
+    document.getElementById("saveBtn");
 
-const startOverlay = document.getElementById("startOverlay");
-const countdownText = document.getElementById("countdown");
+const newBtn =
+    document.getElementById("newBtn");
 
-const finishOverlay = document.getElementById("finishOverlay");
-const finalTime = document.getElementById("finalTime");
-const finalBest = document.getElementById("finalBest");
+const restartBtn =
+    document.getElementById("restartBtn");
+
+const statusText =
+    document.getElementById("status");
+
+const lapText =
+    document.getElementById("lapText");
+
+const timeText =
+    document.getElementById("timeText");
+
+const bestText =
+    document.getElementById("bestText");
+
+const speedText =
+    document.getElementById("speedText");
+
+const startOverlay =
+    document.getElementById("startOverlay");
+
+const countdownText =
+    document.getElementById("countdown");
+
+const finishOverlay =
+    document.getElementById("finishOverlay");
+
+const finalTime =
+    document.getElementById("finalTime");
+
+const finalBest =
+    document.getElementById("finalBest");
 
 
-// ------------------------------------------------------------
+// ============================================================
+// BOUTONS TACTILES
+// ============================================================
+
+const accelerateButton =
+    document.getElementById("accelerateButton");
+
+const brakeButton =
+    document.getElementById("brakeButton");
+
+const leftButton =
+    document.getElementById("leftButton");
+
+const rightButton =
+    document.getElementById("rightButton");
+
+
+// ============================================================
 // VARIABLES
-// ------------------------------------------------------------
+// ============================================================
 
 let mode = "edit";
 
@@ -45,534 +91,760 @@ let selectedCar = "red";
 
 let keys = {};
 
-let countdownRunning = false;
-
 let raceStarted = false;
 
-let raceFinished = false;
+let countdownRunning = false;
 
 let raceStartTime = 0;
 
 let currentLap = 0;
 
-const totalLaps = 3;
-
-let lastCheckpoint = 0;
+let checkpointsPassed = 0;
 
 let bestTime = null;
 
-let lastSave = 0;
+const totalLaps = 3;
 
 
-// ------------------------------------------------------------
+// ============================================================
 // VOITURES
-// ------------------------------------------------------------
+// ============================================================
 
 const cars = {
 
     red: {
+
         color: "#e10600",
-        maxSpeed: 8.5,
-        acceleration: 0.16,
-        brake: 0.25,
-        turning: 0.065,
-        grip: 1
+
+        maxSpeed: 9,
+
+        acceleration: 0.18,
+
+        brake: 0.30,
+
+        turning: 0.065
+
     },
 
     blue: {
-        color: "#1683ff",
-        maxSpeed: 9.2,
-        acceleration: 0.14,
-        brake: 0.23,
-        turning: 0.060,
-        grip: 1.05
+
+        color: "#1677ff",
+
+        maxSpeed: 9.7,
+
+        acceleration: 0.16,
+
+        brake: 0.28,
+
+        turning: 0.070
+
     },
 
     yellow: {
+
         color: "#ffd000",
-        maxSpeed: 8,
-        acceleration: 0.19,
-        brake: 0.27,
-        turning: 0.060,
-        grip: 0.98
+
+        maxSpeed: 8.5,
+
+        acceleration: 0.21,
+
+        brake: 0.32,
+
+        turning: 0.060
+
     },
 
     black: {
+
         color: "#151515",
-        maxSpeed: 10,
-        acceleration: 0.13,
-        brake: 0.22,
-        turning: 0.072,
-        grip: 1.1
+
+        maxSpeed: 10.5,
+
+        acceleration: 0.15,
+
+        brake: 0.27,
+
+        turning: 0.075
+
     }
 
 };
 
 
-// ------------------------------------------------------------
+// ============================================================
 // JOUEUR
-// ------------------------------------------------------------
+// ============================================================
 
 const player = {
 
-    x: 0,
-    y: 0,
+    x: 300,
+
+    y: 300,
 
     angle: 0,
 
-    speed: 0,
-
-    width: 24,
-    height: 11
+    speed: 0
 
 };
 
 
-// ------------------------------------------------------------
+// ============================================================
 // RESIZE
-// ------------------------------------------------------------
+// ============================================================
 
 function resizeCanvas() {
 
-    const rect = canvas.getBoundingClientRect();
+    const rect =
+        canvas.getBoundingClientRect();
 
-    canvas.width = Math.floor(rect.width);
-    canvas.height = Math.floor(rect.height);
+    canvas.width =
+        Math.floor(rect.width);
+
+    canvas.height =
+        Math.floor(rect.height);
 
     draw();
 
 }
 
-window.addEventListener("resize", resizeCanvas);
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
 
 
-// ------------------------------------------------------------
-// CLAVIER
-// ------------------------------------------------------------
+// ============================================================
+// CLAVIER PC
+// ============================================================
 
-window.addEventListener("keydown", event => {
+window.addEventListener(
+    "keydown",
+    function(event) {
 
-    const key = event.key.toLowerCase();
+        if (
+            event.key === "ArrowUp" ||
+            event.key === "ArrowDown" ||
+            event.key === "ArrowLeft" ||
+            event.key === "ArrowRight"
+        ) {
 
-    keys[key] = true;
+            event.preventDefault();
 
-    if (
-        [
-            "arrowup",
-            "arrowdown",
-            "arrowleft",
-            "arrowright"
-        ].includes(key)
-    ) {
+        }
+
+        keys[event.key] = true;
+
+    }
+);
+
+
+window.addEventListener(
+    "keyup",
+    function(event) {
+
+        keys[event.key] = false;
+
+    }
+);
+
+
+// ============================================================
+// CONTROLES IPAD
+// ============================================================
+
+function setupTouchButton(
+    button,
+    key
+) {
+
+    function press(event) {
+
         event.preventDefault();
-    }
 
-    if (key === "r" && mode === "race") {
-
-        startRace();
+        keys[key] = true;
 
     }
 
-});
 
+    function release(event) {
 
-window.addEventListener("keyup", event => {
+        event.preventDefault();
 
-    keys[event.key.toLowerCase()] = false;
-
-});
-
-
-// ------------------------------------------------------------
-// SOURIS - EDITEUR
-// ------------------------------------------------------------
-
-canvas.addEventListener("mousedown", event => {
-
-    if (mode !== "edit") return;
-
-    drawing = true;
-
-    track = [];
-
-    addTrackPoint(event);
-
-});
-
-
-canvas.addEventListener("mousemove", event => {
-
-    if (!drawing || mode !== "edit") return;
-
-    addTrackPoint(event);
-
-});
-
-
-canvas.addEventListener("mouseup", () => {
-
-    drawing = false;
-
-    saveGame();
-
-});
-
-
-canvas.addEventListener("mouseleave", () => {
-
-    drawing = false;
-
-});
-
-
-function addTrackPoint(event) {
-
-    const rect = canvas.getBoundingClientRect();
-
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    const last = track[track.length - 1];
-
-    if (
-        !last ||
-        Math.hypot(
-            x - last.x,
-            y - last.y
-        ) > 8
-    ) {
-
-        track.push({
-            x,
-            y
-        });
+        keys[key] = false;
 
     }
+
+
+    button.addEventListener(
+        "pointerdown",
+        press
+    );
+
+
+    button.addEventListener(
+        "pointerup",
+        release
+    );
+
+
+    button.addEventListener(
+        "pointercancel",
+        release
+    );
+
+
+    button.addEventListener(
+        "pointerleave",
+        release
+    );
 
 }
 
 
-// ------------------------------------------------------------
-// TOUCH
-// ------------------------------------------------------------
-
-canvas.addEventListener("touchstart", event => {
-
-    if (mode !== "edit") return;
-
-    event.preventDefault();
-
-    drawing = true;
-
-    track = [];
-
-    addTouchPoint(event.touches[0]);
-
-});
+setupTouchButton(
+    accelerateButton,
+    "ArrowUp"
+);
 
 
-canvas.addEventListener("touchmove", event => {
-
-    if (!drawing || mode !== "edit") return;
-
-    event.preventDefault();
-
-    addTouchPoint(event.touches[0]);
-
-});
+setupTouchButton(
+    brakeButton,
+    "ArrowDown"
+);
 
 
-canvas.addEventListener("touchend", () => {
-
-    drawing = false;
-
-    saveGame();
-
-});
+setupTouchButton(
+    leftButton,
+    "ArrowLeft"
+);
 
 
-function addTouchPoint(touch) {
+setupTouchButton(
+    rightButton,
+    "ArrowRight"
+);
 
-    const rect = canvas.getBoundingClientRect();
 
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
+// ============================================================
+// DESSIN DU CIRCUIT
+// ============================================================
 
-    const last = track[track.length - 1];
+function getPointerPosition(event) {
 
-    if (
-        !last ||
-        Math.hypot(
-            x - last.x,
-            y - last.y
-        ) > 8
-    ) {
+    const rect =
+        canvas.getBoundingClientRect();
 
-        track.push({
-            x,
-            y
-        });
+    return {
 
-    }
+        x:
+            event.clientX -
+            rect.left,
+
+        y:
+            event.clientY -
+            rect.top
+
+    };
 
 }
 
 
-// ------------------------------------------------------------
-// MODE CREATION
-// ------------------------------------------------------------
+// ============================================================
+// COMMENCER A DESSINER
+// ============================================================
 
-createBtn.addEventListener("click", () => {
+canvas.addEventListener(
+    "pointerdown",
+    function(event) {
 
-    mode = "edit";
+        if (mode !== "edit") {
 
-    raceStarted = false;
+            return;
 
-    raceFinished = false;
+        }
 
-    statusText.textContent =
-        "🖌️ Mode création : dessine ton circuit.";
+        event.preventDefault();
 
-    finishOverlay.classList.add("hidden");
+        drawing = true;
 
-    draw();
+        track = [];
 
-});
+        try {
+
+            canvas.setPointerCapture(
+                event.pointerId
+            );
+
+        } catch (error) {}
 
 
-// ------------------------------------------------------------
-// MODE COURSE
-// ------------------------------------------------------------
+        const position =
+            getPointerPosition(event);
 
-raceBtn.addEventListener("click", () => {
 
-    if (track.length < 10) {
+        track.push(position);
 
-        alert(
-            "Dessine d'abord un circuit suffisamment long !"
-        );
+
+        statusText.textContent =
+            "🖌️ Dessine ton circuit...";
+
+
+        draw();
+
+    }
+);
+
+
+// ============================================================
+// DESSINER
+// ============================================================
+
+canvas.addEventListener(
+    "pointermove",
+    function(event) {
+
+        if (!drawing) {
+
+            return;
+
+        }
+
+        if (mode !== "edit") {
+
+            return;
+
+        }
+
+        event.preventDefault();
+
+
+        const position =
+            getPointerPosition(event);
+
+
+        const last =
+            track[
+                track.length - 1
+            ];
+
+
+        if (
+            !last ||
+            Math.hypot(
+                position.x - last.x,
+                position.y - last.y
+            ) > 4
+        ) {
+
+            track.push(position);
+
+        }
+
+
+        draw();
+
+    }
+);
+
+
+// ============================================================
+// FIN DU DESSIN
+// ============================================================
+
+function stopDrawing(event) {
+
+    if (!drawing) {
 
         return;
 
     }
 
-    startRace();
-
-});
+    drawing = false;
 
 
-// ------------------------------------------------------------
-// SAUVEGARDE MANUELLE
-// ------------------------------------------------------------
+    if (event) {
 
-saveBtn.addEventListener("click", () => {
+        try {
+
+            canvas.releasePointerCapture(
+                event.pointerId
+            );
+
+        } catch (error) {}
+
+    }
+
 
     saveGame();
 
-    statusText.textContent =
-        "💾 Circuit sauvegardé !";
-
-});
-
-
-// ------------------------------------------------------------
-// NOUVEAU CIRCUIT
-// ------------------------------------------------------------
-
-newBtn.addEventListener("click", () => {
-
-    const confirmed = confirm(
-        "Voulez-vous vraiment supprimer le circuit actuel ?"
-    );
-
-    if (!confirmed) return;
-
-    track = [];
-
-    mode = "edit";
-
-    raceStarted = false;
-
-    raceFinished = false;
-
-    currentLap = 0;
-
-    lastCheckpoint = 0;
-
-    player.speed = 0;
-
-    localStorage.removeItem("f1TrackCreator");
 
     statusText.textContent =
-        "🖌️ Nouveau circuit.";
+        "✅ Circuit créé ! Appuie sur Course.";
 
-    finishOverlay.classList.add("hidden");
-
-    updateStats();
 
     draw();
 
-});
+}
 
 
-// ------------------------------------------------------------
-// CHOIX VOITURE
-// ------------------------------------------------------------
+canvas.addEventListener(
+    "pointerup",
+    stopDrawing
+);
 
-document.querySelectorAll(".car-button").forEach(button => {
 
-    button.addEventListener("click", () => {
+canvas.addEventListener(
+    "pointercancel",
+    stopDrawing
+);
 
-        selectedCar = button.dataset.car;
 
-        document
-            .querySelectorAll(".car-button")
-            .forEach(b => {
-                b.classList.remove("selected");
-            });
+// ============================================================
+// CREER
+// ============================================================
 
-        button.classList.add("selected");
+createBtn.addEventListener(
+    "click",
+    function() {
+
+        mode = "edit";
+
+        raceStarted = false;
+
+        player.speed = 0;
+
+        startOverlay.classList.add(
+            "hidden"
+        );
+
+        finishOverlay.classList.add(
+            "hidden"
+        );
+
+        statusText.textContent =
+            "🖌️ Maintiens le doigt ou la souris pour dessiner.";
+
+        draw();
+
+    }
+);
+
+
+// ============================================================
+// COURSE
+// ============================================================
+
+raceBtn.addEventListener(
+    "click",
+    function() {
+
+        if (track.length < 20) {
+
+            alert(
+                "Dessine d'abord un circuit !"
+            );
+
+            return;
+
+        }
+
+        startRace();
+
+    }
+);
+
+
+// ============================================================
+// SAUVEGARDER
+// ============================================================
+
+saveBtn.addEventListener(
+    "click",
+    function() {
 
         saveGame();
 
-    });
+        statusText.textContent =
+            "💾 Circuit sauvegardé !";
 
-});
+    }
+);
 
 
-// ------------------------------------------------------------
-// INITIALISATION DE LA COURSE
-// ------------------------------------------------------------
+// ============================================================
+// EFFACER
+// ============================================================
+
+newBtn.addEventListener(
+    "click",
+    function() {
+
+        if (
+            !confirm(
+                "Effacer complètement ton circuit ?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        track = [];
+
+        mode = "edit";
+
+        raceStarted = false;
+
+        player.speed = 0;
+
+        currentLap = 0;
+
+        checkpointsPassed = 0;
+
+
+        localStorage.removeItem(
+            "f1TrackCreator"
+        );
+
+
+        statusText.textContent =
+            "🖌️ Circuit effacé !";
+
+
+        updateStats();
+
+        draw();
+
+    }
+);
+
+
+// ============================================================
+// VOITURES
+// ============================================================
+
+document
+    .querySelectorAll(".car-button")
+    .forEach(
+        function(button) {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    selectedCar =
+                        button.dataset.car;
+
+
+                    document
+                        .querySelectorAll(
+                            ".car-button"
+                        )
+                        .forEach(
+                            function(other) {
+
+                                other.classList.remove(
+                                    "selected"
+                                );
+
+                            }
+                        );
+
+
+                    button.classList.add(
+                        "selected"
+                    );
+
+
+                    saveGame();
+
+                }
+            );
+
+        }
+    );
+
+
+// ============================================================
+// DEBUT COURSE
+// ============================================================
 
 function startRace() {
-
-    if (track.length < 10) return;
 
     mode = "race";
 
     raceStarted = false;
 
-    raceFinished = false;
-
     currentLap = 0;
 
-    lastCheckpoint = 0;
+    checkpointsPassed = 0;
 
     player.speed = 0;
 
     positionAtStart();
 
-    statusText.textContent =
-        "🏁 Prépare-toi !";
-
-    finishOverlay.classList.add("hidden");
+    finishOverlay.classList.add(
+        "hidden"
+    );
 
     startCountdown();
 
 }
 
 
+// ============================================================
+// POSITION DE DEPART
+// ============================================================
+
 function positionAtStart() {
 
-    const start = track[0];
+    const start =
+        track[0];
 
-    const next = track[1];
+    const next =
+        track[1];
 
-    player.x = start.x;
-    player.y = start.y;
 
-    player.angle = Math.atan2(
-        next.y - start.y,
-        next.x - start.x
-    );
+    player.x =
+        start.x;
+
+    player.y =
+        start.y;
+
+
+    player.angle =
+        Math.atan2(
+            next.y - start.y,
+            next.x - start.x
+        );
 
 }
 
 
-// ------------------------------------------------------------
-// COMPTE À REBOURS
-// ------------------------------------------------------------
+// ============================================================
+// COMPTE A REBOURS
+// ============================================================
 
 function startCountdown() {
 
     countdownRunning = true;
 
-    startOverlay.classList.remove("hidden");
+    startOverlay.classList.remove(
+        "hidden"
+    );
 
-    let count = 3;
 
-    countdownText.textContent = count;
+    let number = 3;
 
-    const interval = setInterval(() => {
+    countdownText.textContent =
+        number;
 
-        count--;
 
-        if (count > 0) {
+    const interval =
+        setInterval(
+            function() {
 
-            countdownText.textContent = count;
+                number--;
 
-        } else {
 
-            countdownText.textContent = "GO !";
+                if (number > 0) {
 
-            setTimeout(() => {
+                    countdownText.textContent =
+                        number;
 
-                startOverlay.classList.add("hidden");
+                } else {
 
-                countdownRunning = false;
+                    countdownText.textContent =
+                        "GO !";
 
-                raceStarted = true;
 
-                raceStartTime = performance.now();
+                    clearInterval(
+                        interval
+                    );
 
-                currentLap = 1;
 
-                statusText.textContent =
-                    "🏁 Course !";
+                    setTimeout(
+                        function() {
 
-            }, 650);
+                            startOverlay.classList.add(
+                                "hidden"
+                            );
 
-            clearInterval(interval);
 
-        }
+                            countdownRunning =
+                                false;
 
-    }, 900);
+
+                            raceStarted =
+                                true;
+
+
+                            raceStartTime =
+                                performance.now();
+
+
+                            currentLap = 1;
+
+
+                            statusText.textContent =
+                                "🏁 Course !";
+
+                        },
+                        700
+                    );
+
+                }
+
+            },
+            900
+        );
 
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // PHYSIQUE
-// ------------------------------------------------------------
+// ============================================================
 
 function updateCar() {
 
-    if (!raceStarted || countdownRunning) return;
+    if (!raceStarted) {
 
-    const car = cars[selectedCar];
+        return;
+
+    }
+
+
+    const car =
+        cars[selectedCar];
+
 
     const accelerate =
-        keys["arrowup"];
+        keys["ArrowUp"];
 
     const brake =
-        keys["arrowdown"];
+        keys["ArrowDown"];
 
     const left =
-        keys["arrowleft"];
+        keys["ArrowLeft"];
 
     const right =
-        keys["arrowright"];
+        keys["ArrowRight"];
 
 
     // ACCELERATION
 
     if (accelerate) {
 
-        player.speed += car.acceleration;
+        player.speed +=
+            car.acceleration;
 
     } else {
 
-        player.speed *= 0.985;
+        player.speed *=
+            0.987;
 
     }
 
@@ -583,11 +855,13 @@ function updateCar() {
 
         if (player.speed > 0) {
 
-            player.speed -= car.brake;
+            player.speed -=
+                car.brake;
 
         } else {
 
-            player.speed -= car.acceleration * 0.7;
+            player.speed -=
+                car.acceleration * 0.7;
 
         }
 
@@ -596,21 +870,28 @@ function updateCar() {
 
     // LIMITE
 
-    player.speed = Math.max(
-        -3,
-        Math.min(
-            player.speed,
-            car.maxSpeed
-        )
-    );
+    player.speed =
+        Math.max(
+            -3,
+            Math.min(
+                player.speed,
+                car.maxSpeed
+            )
+        );
 
 
     // DIRECTION
 
-    if (Math.abs(player.speed) > 0.15) {
+    if (
+        Math.abs(player.speed) >
+        0.15
+    ) {
 
         const direction =
-            player.speed >= 0 ? 1 : -1;
+            player.speed >= 0
+                ? 1
+                : -1;
+
 
         if (left) {
 
@@ -619,6 +900,7 @@ function updateCar() {
                 direction;
 
         }
+
 
         if (right) {
 
@@ -634,51 +916,75 @@ function updateCar() {
     // DEPLACEMENT
 
     player.x +=
-        Math.cos(player.angle) *
+        Math.cos(
+            player.angle
+        ) *
         player.speed;
+
 
     player.y +=
-        Math.sin(player.angle) *
+        Math.sin(
+            player.angle
+        ) *
         player.speed;
 
 
-    // COLLISION AVEC LA PISTE
+    // HORS PISTE
 
-    if (!isOnTrack(player.x, player.y)) {
+    if (
+        !isOnTrack(
+            player.x,
+            player.y
+        )
+    ) {
 
-        player.speed *= 0.92;
+        player.speed *=
+            0.90;
 
     }
 
 
-    // SORTIE DE L'ECRAN
+    // LIMITES
 
-    const margin = 10;
+    if (player.x < 5) {
 
-    if (player.x < margin) {
+        player.x = 5;
 
-        player.x = margin;
         player.speed *= -0.2;
 
     }
 
-    if (player.x > canvas.width - margin) {
 
-        player.x = canvas.width - margin;
+    if (
+        player.x >
+        canvas.width - 5
+    ) {
+
+        player.x =
+            canvas.width - 5;
+
         player.speed *= -0.2;
 
     }
 
-    if (player.y < margin) {
 
-        player.y = margin;
+    if (player.y < 5) {
+
+        player.y = 5;
+
         player.speed *= -0.2;
 
     }
 
-    if (player.y > canvas.height - margin) {
 
-        player.y = canvas.height - margin;
+    if (
+        player.y >
+        canvas.height - 5
+    ) {
+
+        player.y =
+            canvas.height - 5;
+
         player.speed *= -0.2;
 
     }
@@ -686,18 +992,97 @@ function updateCar() {
 }
 
 
-// ------------------------------------------------------------
-// DETECTION DE LA PISTE
-// ------------------------------------------------------------
+// ============================================================
+// DISTANCE A LA PISTE
+// ============================================================
 
-function distanceToTrack(x, y) {
+function pointToSegmentDistance(
+    px,
+    py,
+    x1,
+    y1,
+    x2,
+    y2
+) {
 
-    let minDistance = Infinity;
+    const dx =
+        x2 - x1;
 
-    for (let i = 0; i < track.length - 1; i++) {
+    const dy =
+        y2 - y1;
 
-        const a = track[i];
-        const b = track[i + 1];
+
+    if (
+        dx === 0 &&
+        dy === 0
+    ) {
+
+        return Math.hypot(
+            px - x1,
+            py - y1
+        );
+
+    }
+
+
+    let t =
+        (
+            (px - x1) * dx +
+            (py - y1) * dy
+        )
+        /
+        (
+            dx * dx +
+            dy * dy
+        );
+
+
+    t =
+        Math.max(
+            0,
+            Math.min(
+                1,
+                t
+            )
+        );
+
+
+    const x =
+        x1 + t * dx;
+
+    const y =
+        y1 + t * dy;
+
+
+    return Math.hypot(
+        px - x,
+        py - y
+    );
+
+}
+
+
+function distanceToTrack(
+    x,
+    y
+) {
+
+    let minimum =
+        Infinity;
+
+
+    for (
+        let i = 0;
+        i < track.length - 1;
+        i++
+    ) {
+
+        const a =
+            track[i];
+
+        const b =
+            track[i + 1];
+
 
         const distance =
             pointToSegmentDistance(
@@ -709,85 +1094,57 @@ function distanceToTrack(x, y) {
                 b.y
             );
 
-        minDistance =
+
+        minimum =
             Math.min(
-                minDistance,
+                minimum,
                 distance
             );
 
     }
 
-    return minDistance;
+
+    return minimum;
 
 }
 
 
-function pointToSegmentDistance(
-    px,
-    py,
-    x1,
-    y1,
-    x2,
-    y2
+function isOnTrack(
+    x,
+    y
 ) {
 
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-
-    if (dx === 0 && dy === 0) {
-
-        return Math.hypot(
-            px - x1,
-            py - y1
-        );
-
-    }
-
-    const t =
-        (
-            (px - x1) * dx +
-            (py - y1) * dy
-        ) /
-        (dx * dx + dy * dy);
-
-    const clamped =
-        Math.max(
-            0,
-            Math.min(1, t)
-        );
-
-    const x =
-        x1 + clamped * dx;
-
-    const y =
-        y1 + clamped * dy;
-
-    return Math.hypot(
-        px - x,
-        py - y
+    return (
+        distanceToTrack(
+            x,
+            y
+        ) < 40
     );
 
 }
 
 
-function isOnTrack(x, y) {
-
-    return distanceToTrack(x, y) < 38;
-
-}
-
-
-// ------------------------------------------------------------
-// TOURS
-// ------------------------------------------------------------
+// ============================================================
+// CHECKPOINTS / TOURS
+// ============================================================
 
 function checkLap() {
 
-    if (!raceStarted || track.length < 10) return;
+    if (
+        !raceStarted ||
+        track.length < 20
+    ) {
 
-    const checkpointCount = 10;
+        return;
 
-    const checkpointSize =
+    }
+
+
+    const checkpointCount =
+        10;
+
+
+    const pointsPerCheckpoint =
         Math.max(
             1,
             Math.floor(
@@ -796,19 +1153,18 @@ function checkLap() {
             )
         );
 
-    const checkpoint =
-        Math.floor(
-            lastCheckpoint
-        );
 
     const targetIndex =
         Math.min(
             track.length - 1,
-            checkpoint * checkpointSize
+            checkpointsPassed *
+            pointsPerCheckpoint
         );
+
 
     const target =
         track[targetIndex];
+
 
     const distance =
         Math.hypot(
@@ -816,28 +1172,26 @@ function checkLap() {
             player.y - target.y
         );
 
-    if (distance < 35) {
 
-        lastCheckpoint++;
+    if (distance < 40) {
+
+        checkpointsPassed++;
+
 
         if (
-            lastCheckpoint >=
+            checkpointsPassed >=
             checkpointCount
         ) {
 
-            lastCheckpoint = 0;
+            checkpointsPassed = 0;
 
-            if (currentLap === 0) {
+            currentLap++;
 
-                currentLap = 1;
 
-            } else {
-
-                currentLap++;
-
-            }
-
-            if (currentLap > totalLaps) {
+            if (
+                currentLap >
+                totalLaps
+            ) {
 
                 finishRace();
 
@@ -850,60 +1204,63 @@ function checkLap() {
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // FIN DE COURSE
-// ------------------------------------------------------------
+// ============================================================
 
 function finishRace() {
 
     raceStarted = false;
 
-    raceFinished = true;
-
     player.speed = 0;
 
-    const elapsed =
+
+    const time =
         performance.now() -
         raceStartTime;
 
-    const newTime = elapsed;
 
     if (
         bestTime === null ||
-        newTime < bestTime
+        time < bestTime
     ) {
 
-        bestTime = newTime;
+        bestTime =
+            time;
 
         saveGame();
 
     }
 
+
     finalTime.textContent =
         "Temps : " +
-        formatTime(newTime);
+        formatTime(time);
+
 
     finalBest.textContent =
         "Meilleur temps : " +
         formatTime(bestTime);
 
-    finishOverlay.classList.remove("hidden");
+
+    finishOverlay.classList.remove(
+        "hidden"
+    );
+
 
     statusText.textContent =
         "🏆 Course terminée !";
 
-    updateStats();
-
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // RECOMMENCER
-// ------------------------------------------------------------
+// ============================================================
 
 restartBtn.addEventListener(
     "click",
-    () => {
+    function() {
 
         finishOverlay.classList.add(
             "hidden"
@@ -915,15 +1272,16 @@ restartBtn.addEventListener(
 );
 
 
-// ------------------------------------------------------------
+// ============================================================
 // SAUVEGARDE
-// ------------------------------------------------------------
+// ============================================================
 
 function saveGame() {
 
-    const saveData = {
+    const data = {
 
-        track: track,
+        track:
+            track,
 
         selectedCar:
             selectedCar,
@@ -933,13 +1291,18 @@ function saveGame() {
 
     };
 
+
     localStorage.setItem(
         "f1TrackCreator",
-        JSON.stringify(saveData)
+        JSON.stringify(data)
     );
 
 }
 
+
+// ============================================================
+// CHARGEMENT
+// ============================================================
 
 function loadGame() {
 
@@ -948,27 +1311,42 @@ function loadGame() {
             "f1TrackCreator"
         );
 
-    if (!saved) return;
+
+    if (!saved) {
+
+        return;
+
+    }
+
 
     try {
 
         const data =
             JSON.parse(saved);
 
+
         if (
-            Array.isArray(data.track)
+            Array.isArray(
+                data.track
+            )
         ) {
 
-            track = data.track;
+            track =
+                data.track;
 
         }
 
-        if (data.selectedCar) {
+
+        if (
+            data.selectedCar &&
+            cars[data.selectedCar]
+        ) {
 
             selectedCar =
                 data.selectedCar;
 
         }
+
 
         if (
             typeof data.bestTime ===
@@ -982,51 +1360,39 @@ function loadGame() {
 
     } catch (error) {
 
-        console.error(
-            "Erreur de sauvegarde :",
-            error
+        console.log(
+            "Impossible de charger la sauvegarde."
         );
 
     }
 
-    updateCarButtons();
-
-}
-
-
-function updateCarButtons() {
 
     document
-        .querySelectorAll(".car-button")
-        .forEach(button => {
+        .querySelectorAll(
+            ".car-button"
+        )
+        .forEach(
+            function(button) {
 
-            button.classList.toggle(
-                "selected",
-                button.dataset.car ===
-                selectedCar
-            );
+                button.classList.toggle(
+                    "selected",
+                    button.dataset.car ===
+                    selectedCar
+                );
 
-        });
+            }
+        );
 
 }
 
 
-// ------------------------------------------------------------
-// AUTOSAVE
-// ------------------------------------------------------------
-
-setInterval(() => {
-
-    saveGame();
-
-}, 5000);
-
-
-// ------------------------------------------------------------
+// ============================================================
 // FORMAT TEMPS
-// ------------------------------------------------------------
+// ============================================================
 
-function formatTime(milliseconds) {
+function formatTime(
+    milliseconds
+) {
 
     if (
         milliseconds === null ||
@@ -1037,50 +1403,72 @@ function formatTime(milliseconds) {
 
     }
 
+
     const minutes =
         Math.floor(
             milliseconds / 60000
         );
 
+
     const seconds =
         Math.floor(
-            (milliseconds % 60000) /
-            1000
+            (
+                milliseconds %
+                60000
+            ) / 1000
         );
+
 
     const ms =
         Math.floor(
             milliseconds % 1000
         );
 
+
     return (
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(seconds).padStart(2, "0") +
-        "." +
-        String(ms).padStart(3, "0")
+        String(minutes)
+            .padStart(2, "0")
+        +
+        ":"
+        +
+        String(seconds)
+            .padStart(2, "0")
+        +
+        "."
+        +
+        String(ms)
+            .padStart(3, "0")
     );
 
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // STATISTIQUES
-// ------------------------------------------------------------
+// ============================================================
 
 function updateStats() {
 
     lapText.textContent =
-        `${currentLap} / ${totalLaps}`;
+        currentLap +
+        " / " +
+        totalLaps;
+
 
     bestText.textContent =
-        formatTime(bestTime);
+        formatTime(
+            bestTime
+        );
+
 
     speedText.textContent =
         Math.round(
-            Math.abs(player.speed) * 35
+            Math.abs(
+                player.speed
+            ) * 35
         ) +
         " km/h";
+
 
     if (raceStarted) {
 
@@ -1090,18 +1478,68 @@ function updateStats() {
                 raceStartTime
             );
 
+    } else if (currentLap === 0) {
+
+        timeText.textContent =
+            "00:00.000";
+
     }
 
 }
 
 
-// ------------------------------------------------------------
-// DESSIN DU CIRCUIT
-// ------------------------------------------------------------
+// ============================================================
+// DESSIN DE LA PISTE
+// ============================================================
 
 function drawTrack() {
 
-    if (track.length < 2) return;
+    if (
+        track.length < 2
+    ) {
+
+        return;
+
+    }
+
+
+    // BORD
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        track[0].x,
+        track[0].y
+    );
+
+
+    for (
+        let i = 1;
+        i < track.length;
+        i++
+    ) {
+
+        ctx.lineTo(
+            track[i].x,
+            track[i].y
+        );
+
+    }
+
+
+    ctx.strokeStyle =
+        "#222";
+
+    ctx.lineWidth =
+        86;
+
+    ctx.lineCap =
+        "round";
+
+    ctx.lineJoin =
+        "round";
+
+    ctx.stroke();
 
 
     // ROUTE
@@ -1113,35 +1551,6 @@ function drawTrack() {
         track[0].y
     );
 
-    for (
-        let i = 1;
-        i < track.length;
-        i++
-    ) {
-
-        ctx.lineTo(
-            track[i].x,
-            track[i].y
-        );
-
-    }
-
-    ctx.strokeStyle = "#222";
-    ctx.lineWidth = 82;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-
-    ctx.stroke();
-
-
-    // ASPHALTE
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        track[0].x,
-        track[0].y
-    );
 
     for (
         let i = 1;
@@ -1156,8 +1565,12 @@ function drawTrack() {
 
     }
 
-    ctx.strokeStyle = "#666";
-    ctx.lineWidth = 70;
+
+    ctx.strokeStyle =
+        "#555";
+
+    ctx.lineWidth =
+        70;
 
     ctx.stroke();
 
@@ -1171,6 +1584,7 @@ function drawTrack() {
         track[0].y
     );
 
+
     for (
         let i = 1;
         i < track.length;
@@ -1184,29 +1598,49 @@ function drawTrack() {
 
     }
 
-    ctx.strokeStyle = "#999";
-    ctx.lineWidth = 2;
 
-    ctx.setLineDash([12, 16]);
+    ctx.strokeStyle =
+        "#aaa";
+
+    ctx.lineWidth =
+        2;
+
+    ctx.setLineDash([
+        12,
+        15
+    ]);
 
     ctx.stroke();
 
     ctx.setLineDash([]);
 
 
-    // DEPART
-
     drawStartLine();
 
 }
 
 
+// ============================================================
+// DEPART
+// ============================================================
+
 function drawStartLine() {
 
-    if (track.length < 2) return;
+    if (
+        track.length < 2
+    ) {
 
-    const start = track[0];
-    const next = track[1];
+        return;
+
+    }
+
+
+    const start =
+        track[0];
+
+    const next =
+        track[1];
+
 
     const angle =
         Math.atan2(
@@ -1215,64 +1649,83 @@ function drawStartLine() {
         ) +
         Math.PI / 2;
 
+
     ctx.save();
+
 
     ctx.translate(
         start.x,
         start.y
     );
 
-    ctx.rotate(angle);
 
-    const square = 9;
+    ctx.rotate(
+        angle
+    );
 
-    for (let i = -4; i < 4; i++) {
+
+    const size = 9;
+
+
+    for (
+        let i = -4;
+        i < 4;
+        i++
+    ) {
 
         ctx.fillStyle =
             i % 2 === 0
                 ? "white"
                 : "black";
 
+
         ctx.fillRect(
-            i * square,
-            -square,
-            square,
-            square
+            i * size,
+            -size,
+            size,
+            size
         );
+
 
         ctx.fillStyle =
             i % 2 === 0
                 ? "black"
                 : "white";
 
+
         ctx.fillRect(
-            i * square,
+            i * size,
             0,
-            square,
-            square
+            size,
+            size
         );
 
     }
+
 
     ctx.restore();
 
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // VOITURE
-// ------------------------------------------------------------
+// ============================================================
 
 function drawCar() {
 
-    const car = cars[selectedCar];
+    const car =
+        cars[selectedCar];
+
 
     ctx.save();
+
 
     ctx.translate(
         player.x,
         player.y
     );
+
 
     ctx.rotate(
         player.angle
@@ -1284,13 +1737,14 @@ function drawCar() {
     ctx.fillStyle =
         "rgba(0,0,0,0.35)";
 
+
     ctx.beginPath();
 
     ctx.ellipse(
         0,
         3,
-        19,
-        7,
+        21,
+        8,
         0,
         0,
         Math.PI * 2
@@ -1299,46 +1753,53 @@ function drawCar() {
     ctx.fill();
 
 
-    // AILERON ARRIERE
+    // AILERON
 
-    ctx.fillStyle = "#111";
+    ctx.fillStyle =
+        "#111";
+
 
     ctx.fillRect(
-        -18,
-        -8,
-        6,
-        16
+        -20,
+        -10,
+        7,
+        20
     );
 
 
     // ROUES
 
-    ctx.fillStyle = "#050505";
+    ctx.fillStyle =
+        "#050505";
+
 
     ctx.fillRect(
+        -11,
         -10,
-        -9,
         8,
-        5
+        6
     );
 
+
     ctx.fillRect(
-        -10,
+        -11,
         4,
         8,
-        5
+        6
     );
+
 
     ctx.fillRect(
         8,
-        -8,
+        -9,
         7,
         5
     );
 
+
     ctx.fillRect(
         8,
-        3,
+        4,
         7,
         5
     );
@@ -1349,23 +1810,48 @@ function drawCar() {
     ctx.fillStyle =
         car.color;
 
+
     ctx.beginPath();
 
-    ctx.moveTo(21, 0);
+    ctx.moveTo(
+        24,
+        0
+    );
 
-    ctx.lineTo(7, -5);
+    ctx.lineTo(
+        8,
+        -6
+    );
 
-    ctx.lineTo(-3, -6);
+    ctx.lineTo(
+        -5,
+        -7
+    );
 
-    ctx.lineTo(-19, -4);
+    ctx.lineTo(
+        -20,
+        -5
+    );
 
-    ctx.lineTo(-23, 0);
+    ctx.lineTo(
+        -24,
+        0
+    );
 
-    ctx.lineTo(-19, 4);
+    ctx.lineTo(
+        -20,
+        5
+    );
 
-    ctx.lineTo(-3, 6);
+    ctx.lineTo(
+        -5,
+        7
+    );
 
-    ctx.lineTo(7, 5);
+    ctx.lineTo(
+        8,
+        6
+    );
 
     ctx.closePath();
 
@@ -1377,11 +1863,23 @@ function drawCar() {
     ctx.fillStyle =
         "rgba(255,255,255,0.7)";
 
+
     ctx.beginPath();
 
-    ctx.moveTo(21, 0);
-    ctx.lineTo(7, -2);
-    ctx.lineTo(7, 2);
+    ctx.moveTo(
+        24,
+        0
+    );
+
+    ctx.lineTo(
+        8,
+        -2
+    );
+
+    ctx.lineTo(
+        8,
+        2
+    );
 
     ctx.closePath();
 
@@ -1390,14 +1888,16 @@ function drawCar() {
 
     // COCKPIT
 
-    ctx.fillStyle = "#111";
+    ctx.fillStyle =
+        "#111";
+
 
     ctx.beginPath();
 
     ctx.ellipse(
         0,
         0,
-        7,
+        8,
         4,
         0,
         0,
@@ -1412,13 +1912,15 @@ function drawCar() {
 }
 
 
-// ------------------------------------------------------------
+// ============================================================
 // HERBE
-// ------------------------------------------------------------
+// ============================================================
 
 function drawGrass() {
 
-    ctx.fillStyle = "#28732d";
+    ctx.fillStyle =
+        "#28732d";
+
 
     ctx.fillRect(
         0,
@@ -1428,11 +1930,13 @@ function drawGrass() {
     );
 
 
-    // PETITS MOTIFS
+    ctx.globalAlpha =
+        0.12;
 
-    ctx.globalAlpha = 0.12;
 
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle =
+        "#fff";
+
 
     for (
         let x = 0;
@@ -1457,14 +1961,16 @@ function drawGrass() {
 
     }
 
-    ctx.globalAlpha = 1;
+
+    ctx.globalAlpha =
+        1;
 
 }
 
 
-// ------------------------------------------------------------
-// MESSAGE CREATION
-// ------------------------------------------------------------
+// ============================================================
+// MESSAGE EDITEUR
+// ============================================================
 
 function drawEditorMessage() {
 
@@ -1473,13 +1979,17 @@ function drawEditorMessage() {
         track.length === 0
     ) {
 
+        ctx.textAlign =
+            "center";
+
+
         ctx.fillStyle =
-            "rgba(255,255,255,0.9)";
+            "white";
+
 
         ctx.font =
             "bold 25px Arial";
 
-        ctx.textAlign = "center";
 
         ctx.fillText(
             "🖌️ Dessine ton circuit !",
@@ -1487,14 +1997,17 @@ function drawEditorMessage() {
             canvas.height / 2
         );
 
+
         ctx.font =
             "16px Arial";
 
+
         ctx.fillStyle =
-            "rgba(255,255,255,0.65)";
+            "rgba(255,255,255,0.7)";
+
 
         ctx.fillText(
-            "Maintiens le clic et dessine la piste",
+            "Souris sur PC • Doigt sur iPad",
             canvas.width / 2,
             canvas.height / 2 + 32
         );
@@ -1504,9 +2017,9 @@ function drawEditorMessage() {
 }
 
 
-// ------------------------------------------------------------
-// DESSIN
-// ------------------------------------------------------------
+// ============================================================
+// DESSIN GENERAL
+// ============================================================
 
 function draw() {
 
@@ -1516,7 +2029,10 @@ function draw() {
 
     drawEditorMessage();
 
-    if (mode === "race") {
+
+    if (
+        mode === "race"
+    ) {
 
         drawCar();
 
@@ -1525,9 +2041,9 @@ function draw() {
 }
 
 
-// ------------------------------------------------------------
-// BOUCLE PRINCIPALE
-// ------------------------------------------------------------
+// ============================================================
+// BOUCLE
+// ============================================================
 
 function gameLoop() {
 
@@ -1542,9 +2058,11 @@ function gameLoop() {
 
     }
 
+
     updateStats();
 
     draw();
+
 
     requestAnimationFrame(
         gameLoop
@@ -1553,13 +2071,28 @@ function gameLoop() {
 }
 
 
-// ------------------------------------------------------------
-// DEMARRAGE
-// ------------------------------------------------------------
+// ============================================================
+// AUTOSAVE
+// ============================================================
+
+setInterval(
+    function() {
+
+        saveGame();
+
+    },
+    5000
+);
+
+
+// ============================================================
+// LANCEMENT
+// ============================================================
 
 resizeCanvas();
 
 loadGame();
 
+draw();
+
 gameLoop();
-```
