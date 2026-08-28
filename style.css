@@ -12,9 +12,9 @@ body {
   background: #101827;
   color: white;
 }
-  font-family: Arial, Helvetica, sans-serif;
-  background: #101827;
-  color: white;
+
+body {
+  overflow-x: hidden;
 }
 
 button,
@@ -26,21 +26,33 @@ select {
 button {
   cursor: pointer;
   border: none;
+  touch-action: manipulation;
 }
 
 .hidden {
   display: none !important;
 }
 
-#createAvatarBtn {
-  position: relative;
-  z-index: 20;
-  margin-bottom: 20px;
+/* =========================
+   ÉCRANS
+========================= */
+
+.screen {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* =========================
+   PANELS
+========================= */
 
 .panel {
   width: min(950px, 100%);
-  margin: auto;
+  margin: 0 auto;
   padding: 25px;
   border-radius: 25px;
   background: #182235;
@@ -57,13 +69,14 @@ h2 {
   text-align: center;
 }
 
-button {
-  touch-action: manipulation;
-}
+/* =========================
+   BOUTONS
+========================= */
 
 .primary-btn,
 .secondary-btn,
 .danger-btn {
+  display: block;
   width: 100%;
   padding: 16px 20px;
   margin-top: 12px;
@@ -94,8 +107,17 @@ button {
 }
 
 /* =========================
-   AVATAR
+   CRÉATION AVATAR
 ========================= */
+
+#createAvatarBtn {
+  position: relative;
+  z-index: 20;
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
 .avatar-preview {
   height: 240px;
@@ -280,10 +302,11 @@ button {
 
 .game-screen {
   width: 100%;
-  height: 100%;
+  height: 100vh;
   position: relative;
   overflow: hidden;
   background: #111;
+  padding: 0;
 }
 
 #gameCanvas {
@@ -387,8 +410,17 @@ button {
    RÉSULTATS
 ========================= */
 
+#resultsScreen {
+  display: block;
+  min-height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
 .results-panel {
   text-align: center;
+  margin: 0 auto;
+  max-height: none;
 }
 
 .results-animation {
@@ -420,6 +452,18 @@ button {
   border-radius: 15px;
   background: #263753;
   font-size: 20px;
+}
+
+#continueBtn {
+  display: block;
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  min-height: 55px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  background: #18c96e;
+  color: white;
 }
 
 /* =========================
@@ -465,6 +509,15 @@ button {
 ========================= */
 
 @media (max-width: 700px) {
+
+  .screen {
+    padding: 12px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -497,68 +550,9 @@ button {
     width: 72px;
     height: 72px;
   }
-}
-#createAvatarBtn {
-  display: block !important;
-  position: relative;
-  z-index: 9999;
-  width: 100%;
-  padding: 16px 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border-radius: 14px;
-  background: #18c96e;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.screen {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 20px;
-}
 
-#resultsScreen {
-  align-items: flex-start;
-}
-
-#resultsScreen .panel {
-  margin: 20px auto;
-}
-.screen {
-  width: 100%;
-  min-height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 20px;
-}
-
-#avatarScreen,
-#menuScreen,
-#garageScreen,
-#resultsScreen,
-#duelIntroScreen,
-#duelResultScreen {
-  min-height: 100vh;
-}
-
-#resultsScreen {
-  display: block;
-}
-
-#resultsScreen .panel {
-  margin: 0 auto;
-  max-height: none;
-}
-
-#continueBtn {
-  display: block;
-  width: 100%;
-  min-height: 55px;
-  margin-top: 20px;
-  margin-bottom: 30px;
+  .results-animation {
+    min-height: 90px;
+    font-size: 60px;
+  }
 }
