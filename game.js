@@ -1176,7 +1176,211 @@ function prepareGameCanvas() {
 /* =========================================================
    PISTE
 ========================================================= */
+function drawCrowd() {
 
+  ctx.save();
+
+  ctx.translate(
+    -camera.x + window.innerWidth / 2,
+    -camera.y + window.innerHeight / 2
+  );
+
+  /*
+    Tribunes
+  */
+  const stands = [
+    { x: 350, y: -260, w: 500, h: 120 },
+    { x: 1250, y: 250, w: 450, h: 120 },
+    { x: 450, y: 900, w: 500, h: 120 },
+    { x: -300, y: 300, w: 400, h: 120 }
+  ];
+
+  stands.forEach(stand => {
+
+    ctx.fillStyle = "#26354d";
+
+    ctx.fillRect(
+      stand.x,
+      stand.y,
+      stand.w,
+      stand.h
+    );
+
+    /*
+      Rangées de spectateurs
+    */
+    for (
+      let row = 0;
+      row < 3;
+      row++
+    ) {
+
+      for (
+        let i = 0;
+        i < 15;
+        i++
+      ) {
+
+        const x =
+          stand.x +
+          20 +
+          i * 30;
+
+        const y =
+          stand.y +
+          25 +
+          row * 30;
+
+        drawSpectator(
+          x,
+          y,
+          (i + row) % 4
+        );
+      }
+    }
+  });
+
+  /*
+    Quelques spectateurs directement autour
+    de la piste.
+  */
+  const crowdPositions = [
+
+    { x: 50, y: -130 },
+    { x: 130, y: -150 },
+    { x: 220, y: -140 },
+
+    { x: 1550, y: 180 },
+    { x: 1580, y: 250 },
+    { x: 1560, y: 320 },
+
+    { x: 500, y: 1150 },
+    { x: 600, y: 1160 },
+    { x: 700, y: 1140 },
+
+    { x: -250, y: 450 },
+    { x: -230, y: 530 },
+    { x: -250, y: 610 }
+
+  ];
+
+  crowdPositions.forEach(
+    (person, index) => {
+
+      drawSpectator(
+        person.x,
+        person.y,
+        index % 5
+      );
+
+    }
+  );
+
+  ctx.restore();
+}
+
+
+function drawSpectator(
+  x,
+  y,
+  variant
+) {
+
+  ctx.save();
+
+  ctx.translate(x, y);
+
+  /*
+    Corps
+  */
+  ctx.fillStyle =
+    "#385070";
+
+  ctx.fillRect(
+    -7,
+    8,
+    14,
+    20
+  );
+
+  /*
+    Tête
+  */
+  ctx.beginPath();
+
+  ctx.arc(
+    0,
+    0,
+    8,
+    0,
+    Math.PI * 2
+  );
+
+  ctx.fillStyle =
+    "#e8b38d";
+
+  ctx.fill();
+
+  /*
+    Vêtements différents
+  */
+  const clothes = [
+    "#e34d4d",
+    "#4d82d8",
+    "#4dbd76",
+    "#d4a33a",
+    "#9b62c4"
+  ];
+
+  ctx.fillStyle =
+    clothes[variant];
+
+  ctx.fillRect(
+    -7,
+    8,
+    14,
+    20
+  );
+
+  /*
+    Petit drapeau tenu par certains spectateurs
+  */
+  if (variant === 0 || variant === 3) {
+
+    ctx.strokeStyle =
+      "#dddddd";
+
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      12,
+      10
+    );
+
+    ctx.lineTo(
+      12,
+      -15
+    );
+
+    ctx.stroke();
+
+    ctx.fillStyle =
+      variant === 0
+        ? "#e34d4d"
+        : "#4d82d8";
+
+    ctx.fillRect(
+      12,
+      -15,
+      20,
+      10
+    );
+  }
+
+  ctx.restore();
+}
 function drawTrack() {
 
   /*
