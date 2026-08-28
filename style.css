@@ -34,18 +34,13 @@ button {
   z-index: 20;
   margin-bottom: 20px;
 }
-}
 
 .panel {
   width: min(950px, 100%);
   margin: auto;
   padding: 25px;
   border-radius: 25px;
-  backg#createAvatarBtn {
-  position: relative;
-  z-index: 20;
-  margin-bottom: 20px;
-}round: #182235;
+  background: #182235;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
 }
 
@@ -61,7 +56,7 @@ h2 {
 
 button {
   touch-action: manipulation;
-}
+}}
 
 .primary-btn,
 .secondary-btn,
