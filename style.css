@@ -56,7 +56,7 @@ h2 {
 
 button {
   touch-action: manipulation;
-}}
+}
 
 .primary-btn,
 .secondary-btn,
@@ -89,7 +89,6 @@ button {
 .danger-btn:active {
   transform: scale(0.98);
 }
-
 
 /* =========================
    AVATAR
@@ -192,7 +191,6 @@ button {
   color: white;
 }
 
-
 /* =========================
    MENU
 ========================= */
@@ -243,7 +241,6 @@ button {
   text-align: center;
 }
 
-
 /* =========================
    GARAGE
 ========================= */
@@ -273,7 +270,6 @@ button {
   background: #18c96e;
   color: white;
 }
-
 
 /* =========================
    JEU
@@ -384,7 +380,6 @@ button {
   color: white;
 }
 
-
 /* =========================
    RÉSULTATS
 ========================= */
@@ -424,7 +419,6 @@ button {
   font-size: 20px;
 }
 
-
 /* =========================
    DUEL
 ========================= */
@@ -463,13 +457,11 @@ button {
   margin: 20px;
 }
 
-
 /* =========================
    RESPONSIVE
 ========================= */
 
 @media (max-width: 700px) {
-
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -502,5 +494,4 @@ button {
     width: 72px;
     height: 72px;
   }
-
 }
