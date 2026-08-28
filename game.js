@@ -1,2098 +1,2323 @@
-// ============================================================
-// F1 TRACK CREATOR
-// PC + IPAD
-// ============================================================
+"use strict";
 
-const canvas =
-    document.getElementById("gameCanvas");
+/* =========================================================
+   TURBO RACERS
+   Version 1
+========================================================= */
 
-const ctx =
-    canvas.getContext("2d");
 
+/* =========================================================
+   SAUVEGARDE
+========================================================= */
 
-// ============================================================
-// INTERFACE
-// ============================================================
+const SAVE_KEY = "turboRacersSave_v1";
 
-const createBtn =
-    document.getElementById("createBtn");
+const defaultSave = {
+  avatar: null,
 
-const raceBtn =
-    document.getElementById("raceBtn");
+  points: 0,
 
-const saveBtn =
-    document.getElementById("saveBtn");
+  course: 1,
 
-const newBtn =
-    document.getElementById("newBtn");
+  bestPosition: null,
 
-const restartBtn =
-    document.getElementById("restartBtn");
+  unlockedItems: [],
 
-const statusText =
-    document.getElementById("status");
+  ownedCars: ["starter"],
 
-const lapText =
-    document.getElementById("lapText");
+  duelWins: 0,
 
-const timeText =
-    document.getElementById("timeText");
+  duelAttempts: {},
 
-const bestText =
-    document.getElementById("bestText");
+  totalRaces: 0
+};
 
-const speedText =
-    document.getElementById("speedText");
+let save = loadSave();
 
-const startOverlay =
-    document.getElementById("startOverlay");
+function loadSave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
 
-const countdownText =
-    document.getElementById("countdown");
-
-const finishOverlay =
-    document.getElementById("finishOverlay");
-
-const finalTime =
-    document.getElementById("finalTime");
-
-const finalBest =
-    document.getElementById("finalBest");
-
-
-// ============================================================
-// BOUTONS TACTILES
-// ============================================================
-
-const accelerateButton =
-    document.getElementById("accelerateButton");
-
-const brakeButton =
-    document.getElementById("brakeButton");
-
-const leftButton =
-    document.getElementById("leftButton");
-
-const rightButton =
-    document.getElementById("rightButton");
-
-
-// ============================================================
-// VARIABLES
-// ============================================================
-
-let mode = "edit";
-
-let track = [];
-
-let drawing = false;
-
-let selectedCar = "red";
-
-let keys = {};
-
-let raceStarted = false;
-
-let countdownRunning = false;
-
-let raceStartTime = 0;
-
-let currentLap = 0;
-
-let checkpointsPassed = 0;
-
-let bestTime = null;
-
-const totalLaps = 3;
-
-
-// ============================================================
-// VOITURES
-// ============================================================
-
-const cars = {
-
-    red: {
-
-        color: "#e10600",
-
-        maxSpeed: 9,
-
-        acceleration: 0.18,
-
-        brake: 0.30,
-
-        turning: 0.065
-
-    },
-
-    blue: {
-
-        color: "#1677ff",
-
-        maxSpeed: 9.7,
-
-        acceleration: 0.16,
-
-        brake: 0.28,
-
-        turning: 0.070
-
-    },
-
-    yellow: {
-
-        color: "#ffd000",
-
-        maxSpeed: 8.5,
-
-        acceleration: 0.21,
-
-        brake: 0.32,
-
-        turning: 0.060
-
-    },
-
-    black: {
-
-        color: "#151515",
-
-        maxSpeed: 10.5,
-
-        acceleration: 0.15,
-
-        brake: 0.27,
-
-        turning: 0.075
-
+    if (!raw) {
+      return structuredClone(defaultSave);
     }
+
+    return {
+      ...structuredClone(defaultSave),
+      ...JSON.parse(raw)
+    };
+
+  } catch (error) {
+    console.error(error);
+    return structuredClone(defaultSave);
+  }
+}
+
+function saveGame() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+}
+
+
+/* =========================================================
+   UTILITAIRES
+========================================================= */
+
+function $(id) {
+  return document.getElementById(id);
+}
+
+function random(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+
+/* =========================================================
+   ÉCRANS
+========================================================= */
+
+const screens = [
+  "avatarScreen",
+  "menuScreen",
+  "garageScreen",
+  "gameScreen",
+  "resultsScreen",
+  "duelIntroScreen",
+  "duelResultScreen"
+];
+
+function showScreen(id) {
+
+  screens.forEach(screen => {
+    $(screen).classList.add("hidden");
+  });
+
+  $(id).classList.remove("hidden");
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+function getAvatarFromForm() {
+
+  return {
+    name:
+      $("avatarName").value.trim() || "Pilote",
+
+    gender:
+      $("avatarGender").value,
+
+    age:
+      $("avatarAge").value,
+
+    height:
+      $("avatarHeight").value,
+
+    hair:
+      $("avatarHair").value,
+
+    hairColor:
+      $("avatarHairColor").value,
+
+    glasses:
+      $("avatarGlasses").value,
+
+    helmet:
+      $("avatarHelmet").value,
+
+    mask:
+      $("avatarMask").value,
+
+    outfit:
+      "neutral"
+  };
+}
+
+
+function updateAvatarPreview() {
+
+  const avatar = getAvatarFromForm();
+
+  const hair = $("previewHair");
+  const glasses = $("previewGlasses");
+  const helmet = $("previewHelmet");
+
+  hair.style.background = avatar.hairColor;
+
+  hair.className = "hair " + avatar.hair;
+
+  glasses.style.display =
+    avatar.glasses === "none" ? "none" : "block";
+
+  if (avatar.glasses === "round") {
+    glasses.style.borderRadius = "50%";
+  }
+
+  if (avatar.glasses === "sport") {
+    glasses.style.borderRadius = "4px";
+  }
+
+  if (avatar.glasses === "square") {
+    glasses.style.borderRadius = "2px";
+  }
+
+  const helmetColors = {
+    none: "transparent",
+    white: "#eeeeee",
+    red: "#d84040",
+    blue: "#397bd1",
+    black: "#151515",
+    gold: "#d4af37"
+  };
+
+  helmet.style.background =
+    helmetColors[avatar.helmet];
+
+  helmet.style.display =
+    avatar.helmet === "none" ? "none" : "block";
+}
+
+
+[
+  "avatarName",
+  "avatarGender",
+  "avatarAge",
+  "avatarHeight",
+  "avatarHair",
+  "avatarHairColor",
+  "avatarGlasses",
+  "avatarHelmet",
+  "avatarMask"
+].forEach(id => {
+  $(id).addEventListener("input", updateAvatarPreview);
+  $(id).addEventListener("change", updateAvatarPreview);
+});
+
+
+$("createAvatarBtn").addEventListener("click", () => {
+
+  save.avatar = getAvatarFromForm();
+
+  save.points = 0;
+  save.course = 1;
+
+  saveGame();
+
+  updateMenu();
+
+  showScreen("menuScreen");
+});
+
+
+/* =========================================================
+   MENU
+========================================================= */
+
+function updateMenu() {
+
+  if (!save.avatar) {
+    return;
+  }
+
+  $("welcomeText").textContent =
+    `Bienvenue, ${save.avatar.name} !`;
+
+  $("menuPoints").textContent =
+    save.points;
+
+  $("courseNumber").textContent =
+    save.course;
+
+  $("bestPosition").textContent =
+    save.bestPosition || "-";
+
+  $("garagePoints").textContent =
+    save.points;
+
+  $("hudPoints").textContent =
+    save.points;
+
+  renderMenuAvatar();
+}
+
+
+function renderMenuAvatar() {
+
+  const container = $("menuAvatar");
+
+  container.innerHTML = `
+    <div class="hair"></div>
+    <div class="face"></div>
+    <div class="body"></div>
+  `;
+
+  const hair = container.querySelector(".hair");
+
+  hair.style.background =
+    save.avatar.hairColor;
+}
+
+
+$("raceBtn").addEventListener("click", startNextRace);
+
+$("garageBtn").addEventListener("click", () => {
+  renderShop();
+  showScreen("garageScreen");
+});
+
+$("customizeBtn").addEventListener("click", () => {
+  loadAvatarIntoForm();
+  showScreen("avatarScreen");
+});
+
+
+$("garageBackBtn").addEventListener("click", () => {
+  updateMenu();
+  showScreen("menuScreen");
+});
+
+
+$("resetBtn").addEventListener("click", () => {
+
+  const confirmation =
+    confirm("Effacer toute ta progression ?");
+
+  if (!confirmation) {
+    return;
+  }
+
+  localStorage.removeItem(SAVE_KEY);
+
+  save = structuredClone(defaultSave);
+
+  showScreen("avatarScreen");
+});
+
+
+function loadAvatarIntoForm() {
+
+  if (!save.avatar) {
+    return;
+  }
+
+  $("avatarName").value = save.avatar.name;
+  $("avatarGender").value = save.avatar.gender;
+  $("avatarAge").value = save.avatar.age;
+  $("avatarHeight").value = save.avatar.height;
+  $("avatarHair").value = save.avatar.hair;
+  $("avatarHairColor").value = save.avatar.hairColor;
+  $("avatarGlasses").value = save.avatar.glasses;
+  $("avatarHelmet").value = save.avatar.helmet;
+  $("avatarMask").value = save.avatar.mask;
+
+  updateAvatarPreview();
+}
+
+
+/* =========================================================
+   BOUTIQUE
+========================================================= */
+
+const shopItems = [
+
+  {
+    id: "outfit_blue",
+    name: "Tenue bleue",
+    price: 500,
+    type: "outfit"
+  },
+
+  {
+    id: "outfit_red",
+    name: "Tenue rouge",
+    price: 500,
+    type: "outfit"
+  },
+
+  {
+    id: "outfit_black",
+    name: "Tenue noire",
+    price: 500,
+    type: "outfit"
+  },
+
+  {
+    id: "outfit_gold",
+    name: "Tenue dorée",
+    price: 1000,
+    type: "outfit"
+  },
+
+  {
+    id: "helmet_gold",
+    name: "Casque doré",
+    price: 350,
+    type: "helmet"
+  },
+
+  {
+    id: "glasses_sport",
+    name: "Lunettes sport",
+    price: 250,
+    type: "glasses"
+  },
+
+  {
+    id: "mask_black",
+    name: "Masque noir",
+    price: 300,
+    type: "mask"
+  }
+];
+
+
+function renderShop() {
+
+  const container = $("shopItems");
+
+  container.innerHTML = "";
+
+  shopItems.forEach(item => {
+
+    const owned =
+      save.unlockedItems.includes(item.id);
+
+    const div =
+      document.createElement("div");
+
+    div.className = "shop-item";
+
+    div.innerHTML = `
+      <h3>${item.name}</h3>
+      <p>⭐ ${item.price}</p>
+      <button ${owned ? "disabled" : ""}>
+        ${owned ? "✓ Débloqué" : "Acheter"}
+      </button>
+    `;
+
+    div.querySelector("button").addEventListener("click", () => {
+
+      if (save.points < item.price) {
+        alert("Tu n'as pas assez de points !");
+        return;
+      }
+
+      save.points -= item.price;
+
+      save.unlockedItems.push(item.id);
+
+      saveGame();
+
+      renderShop();
+      updateMenu();
+
+    });
+
+    container.appendChild(div);
+
+  });
+}
+
+
+/* =========================================================
+   NOMS DES PILOTES
+========================================================= */
+
+const driverNames = [
+  "Max Falcon",
+  "Leo Vortex",
+  "Niko Blaze",
+  "Alex Storm",
+  "Milo Rush",
+  "Liam Turbo",
+  "Enzo Rocket",
+  "Kai Drift",
+  "Noah Nitro",
+  "Jade Flash",
+  "Maya Velocity",
+  "Luna Speed",
+  "Zoe Thunder",
+  "Nina Volt",
+  "Eden Viper",
+  "Sacha Racer",
+  "Ryan Phoenix",
+  "Axel Inferno",
+  "Theo Comet",
+  "Hugo Maverick",
+  "Tom Wildfire",
+  "Lucas Bolt",
+  "Evan Shadow",
+  "Adam Lightning",
+  "Jules Avalanche",
+  "Sam Jet",
+  "Maxime Hurricane",
+  "Lenny Spark",
+  "Kylian Dash",
+  "Nolan Titan",
+  "Aaron Venom",
+  "Dylan Firestorm",
+  "Ethan Phantom",
+  "Logan Eclipse",
+  "Nathan Arrow",
+  "Oscar Thunderbolt",
+  "Eli Fire",
+  "Lina Falconer",
+  "Emma Wild",
+  "Eva Rushmore",
+  "Mia Tempest",
+  "Sara Nitroline",
+  "Iris Flashpoint",
+  "Lana Speedster",
+  "Amy Rockett",
+  "Mila Viperstone",
+  "Jules Viperon",
+  "Ryan Rocketson",
+  "Sacha Speedman",
+  "Kylian Rocketman",
+  "Milo Voltcrest",
+  "Enzo Stormax",
+  "Kai Turbofire",
+  "Maxime Driftwood",
+  "Lina Stormwind",
+  "Mia Rockwell",
+  "Sara Flashman",
+  "Iris Nitron",
+  "Lana Venator",
+  "Mila Swift",
+  "Amy Flame",
+  "Theo Flashburn",
+  "Hugo Falconis",
+  "Tom Blazewood",
+  "Lucas Rushford",
+  "Evan Rocketeer",
+  "Adam Draven",
+  "Sam Speedwell",
+  "Lenny Voltrix",
+  "Nolan Turbostar",
+  "Aaron Stormborn",
+  "Dylan Flashfire",
+  "Ethan Blazewing",
+  "Logan Nitrox",
+  "Nathan Vortexon",
+  "Oscar Rushmore",
+  "Eli Vortex",
+  "Kylian Rocket",
+  "Max Voltrane",
+  "Leo Nitronix",
+  "Niko Falconis",
+  "Milo Blazeon",
+  "Enzo Storm",
+  "Kai Turbo",
+  "Noah Viper",
+  "Liam Flashford",
+  "Maxime Racer",
+  "Sacha Nitro",
+  "Ryan Rocket",
+  "Axel Vortexis",
+  "Theo Blazeford",
+  "Hugo Nitros",
+  "Tom Falconet",
+  "Lucas Stormex",
+  "Evan Flashwell",
+  "Adam Viper",
+  "Jules Rocketis",
+  "Sam Drifton",
+  "Lenny Rushwell",
+  "Nolan Voltrix",
+  "Aaron Blazewell",
+  "Dylan Turbex",
+  "Ethan Falconix",
+  "Logan Vortexwell",
+  "Nathan Nitron",
+  "Oscar Stormix",
+  "Eli Flashon",
+  "Kylian Blazecrest",
+  "Max Rocketwell",
+  "Leo Drifton",
+  "Niko Speedon",
+  "Milo Vipercrest",
+  "Enzo Voltrix",
+  "Kai Falconwell",
+  "Noah Rushford",
+  "Liam Blazenix",
+  "Maxime Stormcrest",
+  "Sacha Nitrovale",
+  "Ryan Flashcrest",
+  "Axel Rocketvale",
+  "Theo Vortexvale",
+  "Hugo Speedcrest",
+  "Tom Viperwell",
+  "Lucas Voltane",
+  "Evan Blazevale",
+  "Adam Turboford",
+  "Jules Falconcrest",
+  "Sam Stormvale",
+  "Lenny Flashvale",
+  "Nolan Viperford",
+  "Aaron Rocketcrest",
+  "Dylan Driftvale",
+  "Ethan Rushcrest",
+  "Logan Blazevale",
+  "Nathan Turboval",
+  "Oscar Falconvale",
+  "Eli Nitrocrest",
+  "Kylian Stormford",
+  "Max Flashvale",
+  "Leo Viperford",
+  "Niko Rocketford",
+  "Milo Voltcrest",
+  "Enzo Speedvale",
+  "Kai Blazeford",
+  "Noah Falconford",
+  "Liam Stormvale",
+  "Maxime Vortexcrest",
+  "Sacha Flashford",
+  "Ryan Vipercrest",
+  "Axel Nitrovale",
+  "Theo Rocketcrest",
+  "Hugo Voltford",
+  "Tom Speedford",
+  "Lucas Blazecrest",
+  "Evan Falconvale",
+  "Adam Stormcrest",
+  "Jules Flashcrest",
+  "Sam Viperford",
+  "Lenny Rocketvale",
+  "Nolan Driftcrest",
+  "Aaron Rushvale",
+  "Dylan Blazecrest",
+  "Ethan Turbovale",
+  "Logan Falconcrest",
+  "Nathan Vortexford",
+  "Oscar Nitrovale",
+  "Eli Stormcrest",
+  "Kylian Flashvale",
+  "Max Vipercrest",
+  "Leo Rocketvale",
+  "Niko Voltford",
+  "Milo Speedcrest",
+  "Enzo Blazevale",
+  "Kai Stormford",
+  "Noah Flashvale",
+  "Liam Vipercrest",
+  "Maxime Rocketford",
+  "Sacha Voltvale",
+  "Ryan Blazecrest",
+  "Axel Falconford",
+  "Theo Nitrocrest",
+  "Hugo Vortexvale",
+  "Tom Rocketcrest",
+  "Lucas Viperford",
+  "Evan Voltvale",
+  "Adam Speedcrest",
+  "Jules Blazeford",
+  "Sam Falconvale",
+  "Lenny Stormcrest",
+  "Nolan Flashford",
+  "Aaron Vipercrest",
+  "Dylan Rocketvale",
+  "Ethan Vortexcrest"
+];
+
+
+/* =========================================================
+   GRANDS RIVAUX
+========================================================= */
+
+const rivals = {
+
+  10: {
+    name: "Noah Turbo",
+    quote: "Tu vas devoir aller beaucoup plus vite.",
+    strength: 1.08
+  },
+
+  20: {
+    name: "Mira Flash",
+    quote: "J'espère que tu es prêt pour le duel.",
+    strength: 1.10
+  },
+
+  30: {
+    name: "Axel Vortex",
+    quote: "Les virages sont mon terrain de jeu.",
+    strength: 1.12
+  },
+
+  40: {
+    name: "Luna Storm",
+    quote: "Cette piste va devenir intéressante.",
+    strength: 1.14
+  },
+
+  50: {
+    name: "Max Falcon",
+    quote: "Bienvenue chez les grands.",
+    strength: 1.16
+  },
+
+  60: {
+    name: "Niko Blaze",
+    quote: "Essaie donc de me suivre.",
+    strength: 1.18
+  },
+
+  70: {
+    name: "Jade Velocity",
+    quote: "La vitesse, c'est tout ce qui compte.",
+    strength: 1.20
+  },
+
+  80: {
+    name: "Leo Thunder",
+    quote: "Tu vas entendre le tonnerre.",
+    strength: 1.22
+  },
+
+  90: {
+    name: "Maya Inferno",
+    quote: "La piste va chauffer.",
+    strength: 1.24
+  },
+
+  100: {
+    name: "Ryan Phoenix",
+    quote: "Je renais toujours plus rapide.",
+    strength: 1.26
+  },
+
+  110: {
+    name: "Sacha Drift",
+    quote: "Regarde bien mes trajectoires.",
+    strength: 1.28
+  },
+
+  120: {
+    name: "Lina Rocket",
+    quote: "Décollage imminent.",
+    strength: 1.30
+  },
+
+  130: {
+    name: "Theo Bolt",
+    quote: "Tu ne verras qu'une traînée.",
+    strength: 1.32
+  },
+
+  140: {
+    name: "Nina Wildfire",
+    quote: "La course va être brûlante.",
+    strength: 1.34
+  },
+
+  150: {
+    name: "Hugo Maverick",
+    quote: "Je n'abandonne jamais.",
+    strength: 1.36
+  },
+
+  160: {
+    name: "Zoe Dash",
+    quote: "Essaie de garder le rythme.",
+    strength: 1.38
+  },
+
+  170: {
+    name: "Enzo Lightning",
+    quote: "Prépare-toi à éclaircir la piste.",
+    strength: 1.40
+  },
+
+  180: {
+    name: "Emma Storm",
+    quote: "La tempête arrive.",
+    strength: 1.42
+  },
+
+  190: {
+    name: "Kai Comet",
+    quote: "Je serai déjà à l'arrivée.",
+    strength: 1.44
+  },
+
+  200: {
+    name: "???",
+    quote: "Le dernier rival sera révélé maintenant.",
+    strength: 1.48
+  }
 
 };
 
 
-// ============================================================
-// JOUEUR
-// ============================================================
+/* =========================================================
+   COURSE
+========================================================= */
 
-const player = {
+let currentRace = null;
 
-    x: 300,
+let keys = {
+  up: false,
+  down: false,
+  left: false,
+  right: false
+};
 
-    y: 300,
+let joystick = {
+  x: 0,
+  y: 0,
+  active: false
+};
+
+let animationFrame = null;
+
+
+/* =========================================================
+   CRÉATION DES PILOTES
+========================================================= */
+
+function createNormalDrivers() {
+
+  const names =
+    shuffle(driverNames)
+      .slice(0, 4);
+
+  return names.map((name, index) => {
+
+    return {
+      name,
+      isPlayer: false,
+
+      x: 0,
+      y: 0,
+
+      angle: 0,
+
+      speed: 0,
+
+      baseSpeed:
+        2.5 + index * 0.08,
+
+      progress: 0,
+
+      finished: false,
+
+      aiSkill:
+        0.85 + Math.random() * 0.2
+    };
+
+  });
+}
+
+
+function createPlayer() {
+
+  return {
+
+    name: save.avatar.name,
+
+    isPlayer: true,
+
+    x: 0,
+    y: 0,
 
     angle: 0,
 
-    speed: 0
+    speed: 0,
 
+    baseSpeed: 3,
+
+    progress: 0,
+
+    finished: false
+
+  };
+}
+
+
+/* =========================================================
+   IA ADAPTATIVE
+========================================================= */
+
+function calculatePlayerLevel() {
+
+  /*
+    Le niveau est basé sur les résultats précédents.
+
+    1 = joueur débutant
+    2 = moyen
+    3 = bon
+    4 = très bon
+    5 = excellent
+  */
+
+  if (!save.totalRaces) {
+    return 1;
+  }
+
+  let score = 1;
+
+  if (save.bestPosition === 1) score += 2;
+  else if (save.bestPosition === 2) score += 1;
+
+  if (save.totalRaces >= 10) {
+    score += 1;
+  }
+
+  return clamp(score, 1, 5);
+}
+
+
+function getAdaptiveDifficulty() {
+
+  const level =
+    calculatePlayerLevel();
+
+  /*
+    Plus le joueur est fort,
+    plus les IA se rapprochent de lui.
+  */
+
+  const difficulty = {
+
+    1: 0.86,
+    2: 0.91,
+    3: 0.96,
+    4: 1.00,
+    5: 1.04
+
+  };
+
+  return difficulty[level];
+}
+
+
+function adaptAI(driver) {
+
+  const difficulty =
+    getAdaptiveDifficulty();
+
+  driver.aiSkill =
+    difficulty *
+    (0.92 + Math.random() * 0.12);
+}
+
+
+/* =========================================================
+   DÉMARRER UNE COURSE
+========================================================= */
+
+function startNextRace() {
+
+  if (!save.avatar) {
+    showScreen("avatarScreen");
+    return;
+  }
+
+  const isDuel =
+    save.course % 10 === 0;
+
+  if (isDuel) {
+
+    startDuelIntro();
+
+  } else {
+
+    startNormalRace();
+
+  }
+}
+
+
+/* =========================================================
+   COURSE NORMALE
+========================================================= */
+
+function startNormalRace() {
+
+  currentRace = {
+
+    duel: false,
+
+    totalLaps: 3,
+
+    elapsed: 0,
+
+    countdown: 3,
+
+    started: false,
+
+    finished: false,
+
+    trackLength: 5000,
+
+    drivers: [
+      createPlayer(),
+      ...createNormalDrivers()
+    ]
+
+  };
+
+  currentRace.drivers
+    .slice(1)
+    .forEach(adaptAI);
+
+  prepareGameCanvas();
+
+  showScreen("gameScreen");
+
+  requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================================================
+   DUEL
+========================================================= */
+
+function getRivalForCourse(course) {
+
+  if (rivals[course]) {
+    return rivals[course];
+  }
+
+  return {
+    name: "Champion Inconnu",
+    quote: "Je suis prêt.",
+    strength: 1.2
+  };
+}
+
+
+function startDuelIntro() {
+
+  const rival =
+    getRivalForCourse(save.course);
+
+  $("rivalName").textContent =
+    rival.name;
+
+  $("rivalQuote").textContent =
+    `"${rival.quote}"`;
+
+  $("duelPlayerName").textContent =
+    save.avatar.name;
+
+  $("rivalReveal").classList.remove("hidden");
+
+  $("startDuelBtn").classList.remove("hidden");
+
+  showScreen("duelIntroScreen");
+}
+
+
+$("startDuelBtn").addEventListener("click", () => {
+
+  startDuelRace();
+
+});
+
+
+function startDuelRace() {
+
+  const rival =
+    getRivalForCourse(save.course);
+
+  const attempts =
+    save.duelAttempts[save.course] || 0;
+
+  /*
+    Les 3 premiers duels sont volontairement
+    gagnés par le rival.
+
+    Ensuite le joueur peut réellement le battre.
+  */
+
+  currentRace = {
+
+    duel: true,
+
+    rival,
+
+    duelAttempts: attempts,
+
+    totalLaps: 3,
+
+    elapsed: 0,
+
+    countdown: 3,
+
+    started: false,
+
+    finished: false,
+
+    trackLength: 5000,
+
+    forceRivalWin:
+      attempts < 3,
+
+    drivers: [
+
+      createPlayer(),
+
+      {
+        name: rival.name,
+
+        isPlayer: false,
+
+        x: 0,
+        y: 0,
+
+        angle: 0,
+
+        speed: 0,
+
+        baseSpeed:
+          3.2 * rival.strength,
+
+        progress: 0,
+
+        finished: false,
+
+        aiSkill:
+          rival.strength
+      }
+
+    ]
+
+  };
+
+  prepareGameCanvas();
+
+  showScreen("gameScreen");
+
+  requestAnimationFrame(gameLoop);
+}
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+const canvas =
+  $("gameCanvas");
+
+const ctx =
+  canvas.getContext("2d");
+
+let camera = {
+  x: 0,
+  y: 0
 };
-
-
-// ============================================================
-// RESIZE
-// ============================================================
 
 function resizeCanvas() {
 
-    const rect =
-        canvas.getBoundingClientRect();
+  canvas.width =
+    window.innerWidth *
+    window.devicePixelRatio;
 
-    canvas.width =
-        Math.floor(rect.width);
+  canvas.height =
+    window.innerHeight *
+    window.devicePixelRatio;
 
-    canvas.height =
-        Math.floor(rect.height);
-
-    draw();
-
+  ctx.setTransform(
+    window.devicePixelRatio,
+    0,
+    0,
+    window.devicePixelRatio,
+    0,
+    0
+  );
 }
-
 
 window.addEventListener(
-    "resize",
-    resizeCanvas
+  "resize",
+  resizeCanvas
 );
 
 
-// ============================================================
-// CLAVIER PC
-// ============================================================
+function prepareGameCanvas() {
 
-window.addEventListener(
-    "keydown",
-    function(event) {
+  resizeCanvas();
 
-        if (
-            event.key === "ArrowUp" ||
-            event.key === "ArrowDown" ||
-            event.key === "ArrowLeft" ||
-            event.key === "ArrowRight"
-        ) {
+  camera.x = 0;
+  camera.y = 0;
 
-            event.preventDefault();
+  currentRace.drivers.forEach(
+    (driver, index) => {
 
-        }
+      driver.x =
+        400 - index * 55;
 
-        keys[event.key] = true;
+      driver.y =
+        300 + index * 30;
+
+      driver.angle = 0;
 
     }
-);
+  );
 
+  $("hudCourse").textContent =
+    save.course;
 
-window.addEventListener(
-    "keyup",
-    function(event) {
-
-        keys[event.key] = false;
-
-    }
-);
-
-
-// ============================================================
-// CONTROLES IPAD
-// ============================================================
-
-function setupTouchButton(
-    button,
-    key
-) {
-
-    function press(event) {
-
-        event.preventDefault();
-
-        keys[key] = true;
-
-    }
-
-
-    function release(event) {
-
-        event.preventDefault();
-
-        keys[key] = false;
-
-    }
-
-
-    button.addEventListener(
-        "pointerdown",
-        press
-    );
-
-
-    button.addEventListener(
-        "pointerup",
-        release
-    );
-
-
-    button.addEventListener(
-        "pointercancel",
-        release
-    );
-
-
-    button.addEventListener(
-        "pointerleave",
-        release
-    );
+  $("hudLap").textContent =
+    "1";
 
 }
 
 
-setupTouchButton(
-    accelerateButton,
-    "ArrowUp"
-);
-
-
-setupTouchButton(
-    brakeButton,
-    "ArrowDown"
-);
-
-
-setupTouchButton(
-    leftButton,
-    "ArrowLeft"
-);
-
-
-setupTouchButton(
-    rightButton,
-    "ArrowRight"
-);
-
-
-// ============================================================
-// DESSIN DU CIRCUIT
-// ============================================================
-
-function getPointerPosition(event) {
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-    return {
-
-        x:
-            event.clientX -
-            rect.left,
-
-        y:
-            event.clientY -
-            rect.top
-
-    };
-
-}
-
-
-// ============================================================
-// COMMENCER A DESSINER
-// ============================================================
-
-canvas.addEventListener(
-    "pointerdown",
-    function(event) {
-
-        if (mode !== "edit") {
-
-            return;
-
-        }
-
-        event.preventDefault();
-
-        drawing = true;
-
-        track = [];
-
-        try {
-
-            canvas.setPointerCapture(
-                event.pointerId
-            );
-
-        } catch (error) {}
-
-
-        const position =
-            getPointerPosition(event);
-
-
-        track.push(position);
-
-
-        statusText.textContent =
-            "🖌️ Dessine ton circuit...";
-
-
-        draw();
-
-    }
-);
-
-
-// ============================================================
-// DESSINER
-// ============================================================
-
-canvas.addEventListener(
-    "pointermove",
-    function(event) {
-
-        if (!drawing) {
-
-            return;
-
-        }
-
-        if (mode !== "edit") {
-
-            return;
-
-        }
-
-        event.preventDefault();
-
-
-        const position =
-            getPointerPosition(event);
-
-
-        const last =
-            track[
-                track.length - 1
-            ];
-
-
-        if (
-            !last ||
-            Math.hypot(
-                position.x - last.x,
-                position.y - last.y
-            ) > 4
-        ) {
-
-            track.push(position);
-
-        }
-
-
-        draw();
-
-    }
-);
-
-
-// ============================================================
-// FIN DU DESSIN
-// ============================================================
-
-function stopDrawing(event) {
-
-    if (!drawing) {
-
-        return;
-
-    }
-
-    drawing = false;
-
-
-    if (event) {
-
-        try {
-
-            canvas.releasePointerCapture(
-                event.pointerId
-            );
-
-        } catch (error) {}
-
-    }
-
-
-    saveGame();
-
-
-    statusText.textContent =
-        "✅ Circuit créé ! Appuie sur Course.";
-
-
-    draw();
-
-}
-
-
-canvas.addEventListener(
-    "pointerup",
-    stopDrawing
-);
-
-
-canvas.addEventListener(
-    "pointercancel",
-    stopDrawing
-);
-
-
-// ============================================================
-// CREER
-// ============================================================
-
-createBtn.addEventListener(
-    "click",
-    function() {
-
-        mode = "edit";
-
-        raceStarted = false;
-
-        player.speed = 0;
-
-        startOverlay.classList.add(
-            "hidden"
-        );
-
-        finishOverlay.classList.add(
-            "hidden"
-        );
-
-        statusText.textContent =
-            "🖌️ Maintiens le doigt ou la souris pour dessiner.";
-
-        draw();
-
-    }
-);
-
-
-// ============================================================
-// COURSE
-// ============================================================
-
-raceBtn.addEventListener(
-    "click",
-    function() {
-
-        if (track.length < 20) {
-
-            alert(
-                "Dessine d'abord un circuit !"
-            );
-
-            return;
-
-        }
-
-        startRace();
-
-    }
-);
-
-
-// ============================================================
-// SAUVEGARDER
-// ============================================================
-
-saveBtn.addEventListener(
-    "click",
-    function() {
-
-        saveGame();
-
-        statusText.textContent =
-            "💾 Circuit sauvegardé !";
-
-    }
-);
-
-
-// ============================================================
-// EFFACER
-// ============================================================
-
-newBtn.addEventListener(
-    "click",
-    function() {
-
-        if (
-            !confirm(
-                "Effacer complètement ton circuit ?"
-            )
-        ) {
-
-            return;
-
-        }
-
-
-        track = [];
-
-        mode = "edit";
-
-        raceStarted = false;
-
-        player.speed = 0;
-
-        currentLap = 0;
-
-        checkpointsPassed = 0;
-
-
-        localStorage.removeItem(
-            "f1TrackCreator"
-        );
-
-
-        statusText.textContent =
-            "🖌️ Circuit effacé !";
-
-
-        updateStats();
-
-        draw();
-
-    }
-);
-
-
-// ============================================================
-// VOITURES
-// ============================================================
-
-document
-    .querySelectorAll(".car-button")
-    .forEach(
-        function(button) {
-
-            button.addEventListener(
-                "click",
-                function() {
-
-                    selectedCar =
-                        button.dataset.car;
-
-
-                    document
-                        .querySelectorAll(
-                            ".car-button"
-                        )
-                        .forEach(
-                            function(other) {
-
-                                other.classList.remove(
-                                    "selected"
-                                );
-
-                            }
-                        );
-
-
-                    button.classList.add(
-                        "selected"
-                    );
-
-
-                    saveGame();
-
-                }
-            );
-
-        }
-    );
-
-
-// ============================================================
-// DEBUT COURSE
-// ============================================================
-
-function startRace() {
-
-    mode = "race";
-
-    raceStarted = false;
-
-    currentLap = 0;
-
-    checkpointsPassed = 0;
-
-    player.speed = 0;
-
-    positionAtStart();
-
-    finishOverlay.classList.add(
-        "hidden"
-    );
-
-    startCountdown();
-
-}
-
-
-// ============================================================
-// POSITION DE DEPART
-// ============================================================
-
-function positionAtStart() {
-
-    const start =
-        track[0];
-
-    const next =
-        track[1];
-
-
-    player.x =
-        start.x;
-
-    player.y =
-        start.y;
-
-
-    player.angle =
-        Math.atan2(
-            next.y - start.y,
-            next.x - start.x
-        );
-
-}
-
-
-// ============================================================
-// COMPTE A REBOURS
-// ============================================================
-
-function startCountdown() {
-
-    countdownRunning = true;
-
-    startOverlay.classList.remove(
-        "hidden"
-    );
-
-
-    let number = 3;
-
-    countdownText.textContent =
-        number;
-
-
-    const interval =
-        setInterval(
-            function() {
-
-                number--;
-
-
-                if (number > 0) {
-
-                    countdownText.textContent =
-                        number;
-
-                } else {
-
-                    countdownText.textContent =
-                        "GO !";
-
-
-                    clearInterval(
-                        interval
-                    );
-
-
-                    setTimeout(
-                        function() {
-
-                            startOverlay.classList.add(
-                                "hidden"
-                            );
-
-
-                            countdownRunning =
-                                false;
-
-
-                            raceStarted =
-                                true;
-
-
-                            raceStartTime =
-                                performance.now();
-
-
-                            currentLap = 1;
-
-
-                            statusText.textContent =
-                                "🏁 Course !";
-
-                        },
-                        700
-                    );
-
-                }
-
-            },
-            900
-        );
-
-}
-
-
-// ============================================================
-// PHYSIQUE
-// ============================================================
-
-function updateCar() {
-
-    if (!raceStarted) {
-
-        return;
-
-    }
-
-
-    const car =
-        cars[selectedCar];
-
-
-    const accelerate =
-        keys["ArrowUp"];
-
-    const brake =
-        keys["ArrowDown"];
-
-    const left =
-        keys["ArrowLeft"];
-
-    const right =
-        keys["ArrowRight"];
-
-
-    // ACCELERATION
-
-    if (accelerate) {
-
-        player.speed +=
-            car.acceleration;
-
-    } else {
-
-        player.speed *=
-            0.987;
-
-    }
-
-
-    // FREIN
-
-    if (brake) {
-
-        if (player.speed > 0) {
-
-            player.speed -=
-                car.brake;
-
-        } else {
-
-            player.speed -=
-                car.acceleration * 0.7;
-
-        }
-
-    }
-
-
-    // LIMITE
-
-    player.speed =
-        Math.max(
-            -3,
-            Math.min(
-                player.speed,
-                car.maxSpeed
-            )
-        );
-
-
-    // DIRECTION
-
-    if (
-        Math.abs(player.speed) >
-        0.15
-    ) {
-
-        const direction =
-            player.speed >= 0
-                ? 1
-                : -1;
-
-
-        if (left) {
-
-            player.angle -=
-                car.turning *
-                direction;
-
-        }
-
-
-        if (right) {
-
-            player.angle +=
-                car.turning *
-                direction;
-
-        }
-
-    }
-
-
-    // DEPLACEMENT
-
-    player.x +=
-        Math.cos(
-            player.angle
-        ) *
-        player.speed;
-
-
-    player.y +=
-        Math.sin(
-            player.angle
-        ) *
-        player.speed;
-
-
-    // HORS PISTE
-
-    if (
-        !isOnTrack(
-            player.x,
-            player.y
-        )
-    ) {
-
-        player.speed *=
-            0.90;
-
-    }
-
-
-    // LIMITES
-
-    if (player.x < 5) {
-
-        player.x = 5;
-
-        player.speed *= -0.2;
-
-    }
-
-
-    if (
-        player.x >
-        canvas.width - 5
-    ) {
-
-        player.x =
-            canvas.width - 5;
-
-        player.speed *= -0.2;
-
-    }
-
-
-    if (player.y < 5) {
-
-        player.y = 5;
-
-        player.speed *= -0.2;
-
-    }
-
-
-    if (
-        player.y >
-        canvas.height - 5
-    ) {
-
-        player.y =
-            canvas.height - 5;
-
-        player.speed *= -0.2;
-
-    }
-
-}
-
-
-// ============================================================
-// DISTANCE A LA PISTE
-// ============================================================
-
-function pointToSegmentDistance(
-    px,
-    py,
-    x1,
-    y1,
-    x2,
-    y2
-) {
-
-    const dx =
-        x2 - x1;
-
-    const dy =
-        y2 - y1;
-
-
-    if (
-        dx === 0 &&
-        dy === 0
-    ) {
-
-        return Math.hypot(
-            px - x1,
-            py - y1
-        );
-
-    }
-
-
-    let t =
-        (
-            (px - x1) * dx +
-            (py - y1) * dy
-        )
-        /
-        (
-            dx * dx +
-            dy * dy
-        );
-
-
-    t =
-        Math.max(
-            0,
-            Math.min(
-                1,
-                t
-            )
-        );
-
-
-    const x =
-        x1 + t * dx;
-
-    const y =
-        y1 + t * dy;
-
-
-    return Math.hypot(
-        px - x,
-        py - y
-    );
-
-}
-
-
-function distanceToTrack(
-    x,
-    y
-) {
-
-    let minimum =
-        Infinity;
-
-
-    for (
-        let i = 0;
-        i < track.length - 1;
-        i++
-    ) {
-
-        const a =
-            track[i];
-
-        const b =
-            track[i + 1];
-
-
-        const distance =
-            pointToSegmentDistance(
-                x,
-                y,
-                a.x,
-                a.y,
-                b.x,
-                b.y
-            );
-
-
-        minimum =
-            Math.min(
-                minimum,
-                distance
-            );
-
-    }
-
-
-    return minimum;
-
-}
-
-
-function isOnTrack(
-    x,
-    y
-) {
-
-    return (
-        distanceToTrack(
-            x,
-            y
-        ) < 40
-    );
-
-}
-
-
-// ============================================================
-// CHECKPOINTS / TOURS
-// ============================================================
-
-function checkLap() {
-
-    if (
-        !raceStarted ||
-        track.length < 20
-    ) {
-
-        return;
-
-    }
-
-
-    const checkpointCount =
-        10;
-
-
-    const pointsPerCheckpoint =
-        Math.max(
-            1,
-            Math.floor(
-                track.length /
-                checkpointCount
-            )
-        );
-
-
-    const targetIndex =
-        Math.min(
-            track.length - 1,
-            checkpointsPassed *
-            pointsPerCheckpoint
-        );
-
-
-    const target =
-        track[targetIndex];
-
-
-    const distance =
-        Math.hypot(
-            player.x - target.x,
-            player.y - target.y
-        );
-
-
-    if (distance < 40) {
-
-        checkpointsPassed++;
-
-
-        if (
-            checkpointsPassed >=
-            checkpointCount
-        ) {
-
-            checkpointsPassed = 0;
-
-            currentLap++;
-
-
-            if (
-                currentLap >
-                totalLaps
-            ) {
-
-                finishRace();
-
-            }
-
-        }
-
-    }
-
-}
-
-
-// ============================================================
-// FIN DE COURSE
-// ============================================================
-
-function finishRace() {
-
-    raceStarted = false;
-
-    player.speed = 0;
-
-
-    const time =
-        performance.now() -
-        raceStartTime;
-
-
-    if (
-        bestTime === null ||
-        time < bestTime
-    ) {
-
-        bestTime =
-            time;
-
-        saveGame();
-
-    }
-
-
-    finalTime.textContent =
-        "Temps : " +
-        formatTime(time);
-
-
-    finalBest.textContent =
-        "Meilleur temps : " +
-        formatTime(bestTime);
-
-
-    finishOverlay.classList.remove(
-        "hidden"
-    );
-
-
-    statusText.textContent =
-        "🏆 Course terminée !";
-
-}
-
-
-// ============================================================
-// RECOMMENCER
-// ============================================================
-
-restartBtn.addEventListener(
-    "click",
-    function() {
-
-        finishOverlay.classList.add(
-            "hidden"
-        );
-
-        startRace();
-
-    }
-);
-
-
-// ============================================================
-// SAUVEGARDE
-// ============================================================
-
-function saveGame() {
-
-    const data = {
-
-        track:
-            track,
-
-        selectedCar:
-            selectedCar,
-
-        bestTime:
-            bestTime
-
-    };
-
-
-    localStorage.setItem(
-        "f1TrackCreator",
-        JSON.stringify(data)
-    );
-
-}
-
-
-// ============================================================
-// CHARGEMENT
-// ============================================================
-
-function loadGame() {
-
-    const saved =
-        localStorage.getItem(
-            "f1TrackCreator"
-        );
-
-
-    if (!saved) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const data =
-            JSON.parse(saved);
-
-
-        if (
-            Array.isArray(
-                data.track
-            )
-        ) {
-
-            track =
-                data.track;
-
-        }
-
-
-        if (
-            data.selectedCar &&
-            cars[data.selectedCar]
-        ) {
-
-            selectedCar =
-                data.selectedCar;
-
-        }
-
-
-        if (
-            typeof data.bestTime ===
-            "number"
-        ) {
-
-            bestTime =
-                data.bestTime;
-
-        }
-
-    } catch (error) {
-
-        console.log(
-            "Impossible de charger la sauvegarde."
-        );
-
-    }
-
-
-    document
-        .querySelectorAll(
-            ".car-button"
-        )
-        .forEach(
-            function(button) {
-
-                button.classList.toggle(
-                    "selected",
-                    button.dataset.car ===
-                    selectedCar
-                );
-
-            }
-        );
-
-}
-
-
-// ============================================================
-// FORMAT TEMPS
-// ============================================================
-
-function formatTime(
-    milliseconds
-) {
-
-    if (
-        milliseconds === null ||
-        milliseconds === undefined
-    ) {
-
-        return "--:--.---";
-
-    }
-
-
-    const minutes =
-        Math.floor(
-            milliseconds / 60000
-        );
-
-
-    const seconds =
-        Math.floor(
-            (
-                milliseconds %
-                60000
-            ) / 1000
-        );
-
-
-    const ms =
-        Math.floor(
-            milliseconds % 1000
-        );
-
-
-    return (
-        String(minutes)
-            .padStart(2, "0")
-        +
-        ":"
-        +
-        String(seconds)
-            .padStart(2, "0")
-        +
-        "."
-        +
-        String(ms)
-            .padStart(3, "0")
-    );
-
-}
-
-
-// ============================================================
-// STATISTIQUES
-// ============================================================
-
-function updateStats() {
-
-    lapText.textContent =
-        currentLap +
-        " / " +
-        totalLaps;
-
-
-    bestText.textContent =
-        formatTime(
-            bestTime
-        );
-
-
-    speedText.textContent =
-        Math.round(
-            Math.abs(
-                player.speed
-            ) * 35
-        ) +
-        " km/h";
-
-
-    if (raceStarted) {
-
-        timeText.textContent =
-            formatTime(
-                performance.now() -
-                raceStartTime
-            );
-
-    } else if (currentLap === 0) {
-
-        timeText.textContent =
-            "00:00.000";
-
-    }
-
-}
-
-
-// ============================================================
-// DESSIN DE LA PISTE
-// ============================================================
+/* =========================================================
+   PISTE
+========================================================= */
 
 function drawTrack() {
 
-    if (
-        track.length < 2
-    ) {
+  /*
+    Circuit simple et large.
+    Cette version servira de base au futur
+    système de création de circuits.
+  */
 
-        return;
+  ctx.save();
 
-    }
+  ctx.translate(
+    -camera.x + window.innerWidth / 2,
+    -camera.y + window.innerHeight / 2
+  );
 
+  ctx.fillStyle = "#237044";
 
-    // BORD
+  ctx.fillRect(
+    camera.x - window.innerWidth,
+    camera.y - window.innerHeight,
+    window.innerWidth * 2,
+    window.innerHeight * 2
+  );
 
-    ctx.beginPath();
+  const trackWidth = 220;
 
-    ctx.moveTo(
-        track[0].x,
-        track[0].y
-    );
+  ctx.beginPath();
 
+  ctx.moveTo(0, 0);
 
-    for (
-        let i = 1;
-        i < track.length;
-        i++
-    ) {
+  ctx.bezierCurveTo(
+    500,
+    -500,
+    1200,
+    -400,
+    1500,
+    100
+  );
 
-        ctx.lineTo(
-            track[i].x,
-            track[i].y
-        );
+  ctx.bezierCurveTo(
+    1800,
+    600,
+    1300,
+    1100,
+    700,
+    1000
+  );
 
-    }
+  ctx.bezierCurveTo(
+    100,
+    900,
+    -300,
+    500,
+    0,
+    0
+  );
 
+  ctx.lineWidth =
+    trackWidth;
 
-    ctx.strokeStyle =
-        "#222";
+  ctx.strokeStyle =
+    "#333";
 
-    ctx.lineWidth =
-        86;
+  ctx.stroke();
 
-    ctx.lineCap =
-        "round";
+  ctx.lineWidth =
+    trackWidth - 25;
 
-    ctx.lineJoin =
-        "round";
+  ctx.strokeStyle =
+    "#555";
 
-    ctx.stroke();
+  ctx.stroke();
 
+  ctx.lineWidth = 5;
 
-    // ROUTE
+  ctx.strokeStyle =
+    "#eee";
 
-    ctx.beginPath();
+  ctx.setLineDash([25, 25]);
 
-    ctx.moveTo(
-        track[0].x,
-        track[0].y
-    );
+  ctx.stroke();
 
+  ctx.setLineDash([]);
 
-    for (
-        let i = 1;
-        i < track.length;
-        i++
-    ) {
-
-        ctx.lineTo(
-            track[i].x,
-            track[i].y
-        );
-
-    }
-
-
-    ctx.strokeStyle =
-        "#555";
-
-    ctx.lineWidth =
-        70;
-
-    ctx.stroke();
-
-
-    // LIGNE CENTRALE
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        track[0].x,
-        track[0].y
-    );
-
-
-    for (
-        let i = 1;
-        i < track.length;
-        i++
-    ) {
-
-        ctx.lineTo(
-            track[i].x,
-            track[i].y
-        );
-
-    }
-
-
-    ctx.strokeStyle =
-        "#aaa";
-
-    ctx.lineWidth =
-        2;
-
-    ctx.setLineDash([
-        12,
-        15
-    ]);
-
-    ctx.stroke();
-
-    ctx.setLineDash([]);
-
-
-    drawStartLine();
-
+  ctx.restore();
 }
 
 
-// ============================================================
-// DEPART
-// ============================================================
+/* =========================================================
+   VOITURES
+========================================================= */
 
-function drawStartLine() {
+function drawCar(driver, index) {
 
-    if (
-        track.length < 2
-    ) {
+  const screenX =
+    driver.x -
+    camera.x +
+    window.innerWidth / 2;
 
-        return;
+  const screenY =
+    driver.y -
+    camera.y +
+    window.innerHeight / 2;
 
-    }
+  ctx.save();
 
+  ctx.translate(
+    screenX,
+    screenY
+  );
 
-    const start =
-        track[0];
+  ctx.rotate(
+    driver.angle
+  );
 
-    const next =
-        track[1];
+  let width = 45;
+  let height = 25;
 
+  if (driver.isPlayer) {
 
-    const angle =
-        Math.atan2(
-            next.y - start.y,
-            next.x - start.x
-        ) +
-        Math.PI / 2;
+    ctx.fillStyle =
+      "#22c96f";
 
+  } else {
 
-    ctx.save();
+    ctx.fillStyle =
+      index === 1
+        ? "#e54b4b"
+        : "#4287e5";
+  }
 
+  ctx.fillRect(
+    -width / 2,
+    -height / 2,
+    width,
+    height
+  );
 
-    ctx.translate(
-        start.x,
-        start.y
-    );
+  ctx.fillStyle =
+    "#111";
 
+  ctx.fillRect(
+    -10,
+    -height / 2 - 3,
+    20,
+    8
+  );
 
-    ctx.rotate(
-        angle
-    );
+  ctx.fillStyle =
+    "#eee";
 
+  ctx.fillRect(
+    10,
+    -height / 2,
+    5,
+    height
+  );
 
-    const size = 9;
-
-
-    for (
-        let i = -4;
-        i < 4;
-        i++
-    ) {
-
-        ctx.fillStyle =
-            i % 2 === 0
-                ? "white"
-                : "black";
-
-
-        ctx.fillRect(
-            i * size,
-            -size,
-            size,
-            size
-        );
-
-
-        ctx.fillStyle =
-            i % 2 === 0
-                ? "black"
-                : "white";
-
-
-        ctx.fillRect(
-            i * size,
-            0,
-            size,
-            size
-        );
-
-    }
-
-
-    ctx.restore();
-
+  ctx.restore();
 }
 
 
-// ============================================================
-// VOITURE
-// ============================================================
+/* =========================================================
+   CONTRÔLES CLAVIER
+========================================================= */
 
-function drawCar() {
+window.addEventListener(
+  "keydown",
+  event => {
 
-    const car =
-        cars[selectedCar];
+    if (event.key === "ArrowUp" ||
+        event.key.toLowerCase() === "w") {
 
-
-    ctx.save();
-
-
-    ctx.translate(
-        player.x,
-        player.y
-    );
-
-
-    ctx.rotate(
-        player.angle
-    );
-
-
-    // OMBRE
-
-    ctx.fillStyle =
-        "rgba(0,0,0,0.35)";
-
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        3,
-        21,
-        8,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    // AILERON
-
-    ctx.fillStyle =
-        "#111";
-
-
-    ctx.fillRect(
-        -20,
-        -10,
-        7,
-        20
-    );
-
-
-    // ROUES
-
-    ctx.fillStyle =
-        "#050505";
-
-
-    ctx.fillRect(
-        -11,
-        -10,
-        8,
-        6
-    );
-
-
-    ctx.fillRect(
-        -11,
-        4,
-        8,
-        6
-    );
-
-
-    ctx.fillRect(
-        8,
-        -9,
-        7,
-        5
-    );
-
-
-    ctx.fillRect(
-        8,
-        4,
-        7,
-        5
-    );
-
-
-    // CARROSSERIE
-
-    ctx.fillStyle =
-        car.color;
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        24,
-        0
-    );
-
-    ctx.lineTo(
-        8,
-        -6
-    );
-
-    ctx.lineTo(
-        -5,
-        -7
-    );
-
-    ctx.lineTo(
-        -20,
-        -5
-    );
-
-    ctx.lineTo(
-        -24,
-        0
-    );
-
-    ctx.lineTo(
-        -20,
-        5
-    );
-
-    ctx.lineTo(
-        -5,
-        7
-    );
-
-    ctx.lineTo(
-        8,
-        6
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    // NEZ
-
-    ctx.fillStyle =
-        "rgba(255,255,255,0.7)";
-
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        24,
-        0
-    );
-
-    ctx.lineTo(
-        8,
-        -2
-    );
-
-    ctx.lineTo(
-        8,
-        2
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-
-    // COCKPIT
-
-    ctx.fillStyle =
-        "#111";
-
-
-    ctx.beginPath();
-
-    ctx.ellipse(
-        0,
-        0,
-        8,
-        4,
-        0,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.restore();
-
-}
-
-
-// ============================================================
-// HERBE
-// ============================================================
-
-function drawGrass() {
-
-    ctx.fillStyle =
-        "#28732d";
-
-
-    ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-
-    ctx.globalAlpha =
-        0.12;
-
-
-    ctx.fillStyle =
-        "#fff";
-
-
-    for (
-        let x = 0;
-        x < canvas.width;
-        x += 35
-    ) {
-
-        for (
-            let y = 0;
-            y < canvas.height;
-            y += 35
-        ) {
-
-            ctx.fillRect(
-                x,
-                y,
-                2,
-                2
-            );
-
-        }
-
+      keys.up = true;
     }
 
+    if (event.key === "ArrowDown" ||
+        event.key.toLowerCase() === "s") {
 
-    ctx.globalAlpha =
-        1;
-
-}
-
-
-// ============================================================
-// MESSAGE EDITEUR
-// ============================================================
-
-function drawEditorMessage() {
-
-    if (
-        mode === "edit" &&
-        track.length === 0
-    ) {
-
-        ctx.textAlign =
-            "center";
-
-
-        ctx.fillStyle =
-            "white";
-
-
-        ctx.font =
-            "bold 25px Arial";
-
-
-        ctx.fillText(
-            "🖌️ Dessine ton circuit !",
-            canvas.width / 2,
-            canvas.height / 2
-        );
-
-
-        ctx.font =
-            "16px Arial";
-
-
-        ctx.fillStyle =
-            "rgba(255,255,255,0.7)";
-
-
-        ctx.fillText(
-            "Souris sur PC • Doigt sur iPad",
-            canvas.width / 2,
-            canvas.height / 2 + 32
-        );
-
+      keys.down = true;
     }
 
-}
+    if (event.key === "ArrowLeft" ||
+        event.key.toLowerCase() === "a") {
 
-
-// ============================================================
-// DESSIN GENERAL
-// ============================================================
-
-function draw() {
-
-    drawGrass();
-
-    drawTrack();
-
-    drawEditorMessage();
-
-
-    if (
-        mode === "race"
-    ) {
-
-        drawCar();
-
+      keys.left = true;
     }
 
-}
+    if (event.key === "ArrowRight" ||
+        event.key.toLowerCase() === "d") {
 
-
-// ============================================================
-// BOUCLE
-// ============================================================
-
-function gameLoop() {
-
-    if (
-        mode === "race" &&
-        raceStarted
-    ) {
-
-        updateCar();
-
-        checkLap();
-
+      keys.right = true;
     }
 
-
-    updateStats();
-
-    draw();
-
-
-    requestAnimationFrame(
-        gameLoop
-    );
-
-}
-
-
-// ============================================================
-// AUTOSAVE
-// ============================================================
-
-setInterval(
-    function() {
-
-        saveGame();
-
-    },
-    5000
+  }
 );
 
 
-// ============================================================
-// LANCEMENT
-// ============================================================
+window.addEventListener(
+  "keyup",
+  event => {
 
-resizeCanvas();
+    if (event.key === "ArrowUp" ||
+        event.key.toLowerCase() === "w") {
 
-loadGame();
+      keys.up = false;
+    }
 
-draw();
+    if (event.key === "ArrowDown" ||
+        event.key.toLowerCase() === "s") {
 
-gameLoop();
+      keys.down = false;
+    }
+
+    if (event.key === "ArrowLeft" ||
+        event.key.toLowerCase() === "a") {
+
+      keys.left = false;
+    }
+
+    if (event.key === "ArrowRight" ||
+        event.key.toLowerCase() === "d") {
+
+      keys.right = false;
+    }
+
+  }
+);
+
+
+/* =========================================================
+   JOYSTICK
+========================================================= */
+
+const joystickElement =
+  $("joystick");
+
+const joystickKnob =
+  $("joystickKnob");
+
+function updateJoystick(clientX, clientY) {
+
+  const rect =
+    joystickElement.getBoundingClientRect();
+
+  const centerX =
+    rect.left + rect.width / 2;
+
+  const centerY =
+    rect.top + rect.height / 2;
+
+  let dx =
+    clientX - centerX;
+
+  let dy =
+    clientY - centerY;
+
+  const max =
+    rect.width / 2 - 32;
+
+  const distance =
+    Math.sqrt(
+      dx * dx + dy * dy
+    );
+
+  if (distance > max) {
+
+    dx =
+      dx / distance * max;
+
+    dy =
+      dy / distance * max;
+  }
+
+  joystick.x =
+    dx / max;
+
+  joystick.y =
+    dy / max;
+
+  joystickKnob.style.transform =
+    `translate(${dx}px, ${dy}px)`;
+
+}
+
+
+function resetJoystick() {
+
+  joystick.x = 0;
+  joystick.y = 0;
+
+  joystickKnob.style.transform =
+    "translate(0, 0)";
+
+  joystick.active = false;
+}
+
+
+joystickElement.addEventListener(
+  "pointerdown",
+  event => {
+
+    joystick.active = true;
+
+    joystickElement.setPointerCapture(
+      event.pointerId
+    );
+
+    updateJoystick(
+      event.clientX,
+      event.clientY
+    );
+
+  }
+);
+
+
+joystickElement.addEventListener(
+  "pointermove",
+  event => {
+
+    if (!joystick.active) {
+      return;
+    }
+
+    updateJoystick(
+      event.clientX,
+      event.clientY
+    );
+
+  }
+);
+
+
+joystickElement.addEventListener(
+  "pointerup",
+  resetJoystick
+);
+
+
+joystickElement.addEventListener(
+  "pointercancel",
+  resetJoystick
+);
+
+
+/* =========================================================
+   ACCÉLÉRATION / FREIN
+========================================================= */
+
+let acceleratePressed = false;
+let brakePressed = false;
+
+
+function pressButton(element, callbackDown, callbackUp) {
+
+  element.addEventListener(
+    "pointerdown",
+    event => {
+
+      event.preventDefault();
+
+      callbackDown();
+
+    }
+  );
+
+  element.addEventListener(
+    "pointerup",
+    event => {
+
+      event.preventDefault();
+
+      callbackUp();
+
+    }
+  );
+
+  element.addEventListener(
+    "pointercancel",
+    callbackUp
+  );
+
+}
+
+
+pressButton(
+  $("accelerateBtn"),
+  () => acceleratePressed = true,
+  () => acceleratePressed = false
+);
+
+
+pressButton(
+  $("brakeBtn"),
+  () => brakePressed = true,
+  () => brakePressed = false
+);
+
+
+/* =========================================================
+   PHYSIQUE DU JOUEUR
+========================================================= */
+
+function updatePlayer(driver, delta) {
+
+  const acceleration =
+    0.075;
+
+  const maxSpeed =
+    6;
+
+  const friction =
+    0.96;
+
+  let accelerating =
+    keys.up ||
+    acceleratePressed ||
+    joystick.y < -0.25;
+
+  let braking =
+    keys.down ||
+    brakePressed ||
+    joystick.y > 0.35;
+
+  if (accelerating) {
+
+    driver.speed +=
+      acceleration * delta;
+
+  } else {
+
+    driver.speed *=
+      Math.pow(friction, delta / 16);
+  }
+
+  if (braking) {
+
+    driver.speed -=
+      0.13 * delta;
+  }
+
+  driver.speed =
+    clamp(
+      driver.speed,
+      -2,
+      maxSpeed
+    );
+
+  let steering =
+    0;
+
+  if (keys.left) {
+    steering -= 1;
+  }
+
+  if (keys.right) {
+    steering += 1;
+  }
+
+  if (Math.abs(joystick.x) > 0.15) {
+
+    steering =
+      joystick.x;
+  }
+
+  driver.angle +=
+    steering *
+    0.055 *
+    (driver.speed / maxSpeed) *
+    delta;
+
+  driver.x +=
+    Math.cos(driver.angle) *
+    driver.speed *
+    delta;
+
+  driver.y +=
+    Math.sin(driver.angle) *
+    driver.speed *
+    delta;
+
+  /*
+    Progression approximative.
+    Elle permet au système de classement
+    de fonctionner dans cette première version.
+  */
+
+  driver.progress +=
+    Math.max(0, driver.speed) *
+    delta *
+    0.045;
+
+}
+
+
+/* =========================================================
+   IA
+========================================================= */
+
+function updateAI(driver, delta) {
+
+  const targetSpeed =
+    driver.baseSpeed *
+    driver.aiSkill;
+
+  if (driver.speed < targetSpeed) {
+
+    driver.speed +=
+      0.05 * delta;
+
+  } else {
+
+    driver.speed *=
+      0.995;
+  }
+
+  /*
+    Petite variation pour éviter que les IA
+    roulent toutes exactement pareil.
+  */
+
+  const variation =
+    Math.sin(
+      performance.now() / 800 +
+      driver.name.length
+    ) * 0.025;
+
+  driver.angle +=
+    variation * delta;
+
+  driver.x +=
+    Math.cos(driver.angle) *
+    driver.speed *
+    delta;
+
+  driver.y +=
+    Math.sin(driver.angle) *
+    driver.speed *
+    delta;
+
+  driver.progress +=
+    driver.speed *
+    delta *
+    0.045;
+}
+
+
+/* =========================================================
+   CLASSEMENT
+========================================================= */
+
+function getRanking() {
+
+  return [...currentRace.drivers]
+    .sort(
+      (a, b) =>
+        b.progress -
+        a.progress
+    );
+}
+
+
+function updateHUD() {
+
+  const ranking =
+    getRanking();
+
+  const playerIndex =
+    ranking.findIndex(
+      driver => driver.isPlayer
+    );
+
+  $("hudPosition").textContent =
+    playerIndex + 1;
+
+  const player =
+    currentRace.drivers[0];
+
+  const lap =
+    Math.min(
+      3,
+      Math.floor(
+        player.progress /
+        (currentRace.trackLength / 3)
+      ) + 1
+    );
+
+  $("hudLap").textContent =
+    lap;
+}
+
+
+/* =========================================================
+   FIN DE COURSE
+========================================================= */
+
+function checkRaceFinished() {
+
+  const player =
+    currentRace.drivers
+      .find(d => d.isPlayer);
+
+  if (!player) {
+    return;
+  }
+
+  if (player.progress >=
+      currentRace.trackLength) {
+
+    finishRace();
+
+  }
+
+  /*
+    Si le joueur est trop loin,
+    on termine également lorsque toutes
+    les IA sont arrivées.
+  */
+
+  const winner =
+    getRanking()[0];
+
+  if (winner.progress >=
+      currentRace.trackLength) {
+
+    if (
+      currentRace.duel &&
+      currentRace.forceRivalWin
+    ) {
+
+      finishRace();
+
+    } else if (
+      winner !== player &&
+      !currentRace.duel
+    ) {
+
+      finishRace();
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   RÉCOMPENSES
+========================================================= */
+
+function pointsForPosition(position) {
+
+  switch (position) {
+
+    case 1:
+      return 100;
+
+    case 2:
+      return 50;
+
+    case 3:
+      return 25;
+
+    case 4:
+      return 10;
+
+    case 5:
+      return 0;
+
+    default:
+      return 0;
+  }
+}
+
+
+/* =========================================================
+   FIN COURSE
+========================================================= */
+
+function finishRace() {
+
+  if (currentRace.finished) {
+    return;
+  }
+
+  currentRace.finished = true;
+
+  const ranking =
+    getRanking();
+
+  let playerPosition =
+    ranking.findIndex(
+      driver => driver.isPlayer
+    ) + 1;
+
+  /*
+    Première course :
+    victoire obligatoire.
+  */
+
+  if (
+    save.course === 1 &&
+    !currentRace.duel
+  ) {
+
+    playerPosition = 1;
+
+    ranking.sort(
+      (a, b) => {
+
+        if (a.isPlayer) return -1;
+        if (b.isPlayer) return 1;
+
+        return b.progress -
+          a.progress;
+      }
+    );
+  }
+
+
+  /* =========================
+     DUEL
+  ========================== */
+
+  if (currentRace.duel) {
+
+    finishDuel(
+      playerPosition
+    );
+
+    return;
+  }
+
+
+  /* =========================
+     COURSE NORMALE
+  ========================== */
+
+  const reward =
+    pointsForPosition(
+      playerPosition
+    );
+
+  save.points += reward;
+
+  save.totalRaces++;
+
+  if (
+    !save.bestPosition ||
+    playerPosition <
+    save.bestPosition
+  ) {
+
+    save.bestPosition =
+      playerPosition;
+  }
+
+  save.course =
+    Math.min(
+      200,
+      save.course + 1
+    );
+
+  saveGame();
+
+  showResults(
+    ranking,
+    playerPosition,
+    reward
+  );
+}
+
+
+/* =========================================================
+   RÉSULTATS
+========================================================= */
+
+function showResults(
+  ranking,
+  playerPosition,
+  reward
+) {
+
+  const positions = [
+    "🥇",
+    "🥈",
+    "🥉",
+    "4️⃣",
+    "5️⃣"
+  ];
+
+  const animations = {
+    1: "🏆🎉",
+    2: "🥈👏",
+    3: "🥉📸",
+    4: "😅💪",
+    5: "😤🔥"
+  };
+
+  $("resultsTitle").textContent =
+    playerPosition === 1
+      ? "🏆 VICTOIRE !"
+      : "🏁 COURSE TERMINÉE !";
+
+  $("resultsAnimation").textContent =
+    animations[playerPosition];
+
+  const list =
+    $("resultsList");
+
+  list.innerHTML = "";
+
+  ranking.forEach(
+    (driver, index) => {
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "result-row";
+
+      if (driver.isPlayer) {
+        row.classList.add("player");
+      }
+
+      row.innerHTML = `
+        <span>
+          ${positions[index]}
+        </span>
+
+        <strong>
+          ${driver.name}
+        </strong>
+
+        <span>
+          ${driver.isPlayer
+            ? `+${reward} ⭐`
+            : ""}
+        </span>
+      `;
+
+      list.appendChild(row);
+
+    }
+  );
+
+  $("rewardText").textContent =
+    `Tu gagnes ${reward} point${reward > 1 ? "s" : ""}. ⭐`;
+
+  showScreen("resultsScreen");
+}
+
+
+$("continueBtn").addEventListener(
+  "click",
+  () => {
+
+    updateMenu();
+
+    if (save.course > 200) {
+      save.course = 200;
+    }
+
+    showScreen("menuScreen");
+
+  }
+);
+
+
+/* =========================================================
+   DUEL — RÉSULTAT
+========================================================= */
+
+function finishDuel(playerPosition) {
+
+  const course =
+    save.course;
+
+  const attempts =
+    save.duelAttempts[course] || 0;
+
+  save.duelAttempts[course] =
+    attempts + 1;
+
+  const playerWon =
+    playerPosition === 1;
+
+  /*
+    Pendant les 3 premiers duels :
+    le rival doit gagner.
+
+    Si le joueur a réussi à gagner malgré tout,
+    on force le résultat.
+  */
+
+  const actualWin =
+    currentRace.forceRivalWin
+      ? false
+      : playerWon;
+
+  if (actualWin) {
+
+    save.points += 1000;
+
+    save.duelWins++;
+
+    save.course =
+      Math.min(
+        200,
+        save.course + 1
+      );
+
+    saveGame();
+
+    $("duelResultTitle").textContent =
+      "🏆 RIVAL VAINCU !";
+
+    $("duelResultContent").innerHTML = `
+      <div class="results-animation">
+        🏆🔥🎉
+      </div>
+
+      <h2>
+        ${currentRace.rival.name}
+      </h2>
+
+      <p>
+        Tu as remporté le duel !
+      </p>
+
+      <p>
+        ⭐ <strong>+1000 points</strong>
+      </p>
+    `;
+
+  } else {
+
+    save.course =
+      Math.min(
+        200,
+        save.course + 1
+      );
+
+    saveGame();
+
+    $("duelResultTitle").textContent =
+      "🏎️ Le rival gagne !";
+
+    $("duelResultContent").innerHTML = `
+      <div class="results-animation">
+        😤🏎️💨
+      </div>
+
+      <h2>
+        ${currentRace.rival.name}
+      </h2>
+
+      <p>
+        Cette fois, le rival était trop fort.
+      </p>
+
+      <p>
+        Continue à t'entraîner !
+      </p>
+    `;
+
+  }
+
+  showScreen(
+    "duelResultScreen"
+  );
+}
+
+
+$("duelContinueBtn").addEventListener(
+  "click",
+  () => {
+
+    updateMenu();
+
+    showScreen("menuScreen");
+
+  }
+);
+
+
+/* =========================================================
+   BOUCLE DU JEU
+========================================================= */
+
+let previousTime = 0;
+
+function gameLoop(time) {
+
+  if (
+    !currentRace ||
+    currentRace.finished
+  ) {
+    return;
+  }
+
+  const delta =
+    Math.min(
+      32,
+      time -
+      (previousTime || time)
+    );
+
+  previousTime =
+    time;
+
+  updateGame(delta);
+
+  drawGame();
+
+  updateHUD();
+
+  checkRaceFinished();
+
+  animationFrame =
+    requestAnimationFrame(
+      gameLoop
+    );
+}
+
+
+/* =========================================================
+   UPDATE
+========================================================= */
+
+function updateGame(delta) {
+
+  const player =
+    currentRace.drivers[0];
+
+  updatePlayer(
+    player,
+    delta
+  );
+
+  currentRace.drivers
+    .slice(1)
+    .forEach(driver => {
+
+      updateAI(
+        driver,
+        delta
+      );
+
+    });
+
+  /*
+    Caméra centrée sur le joueur.
+  */
+
+  camera.x =
+    player.x;
+
+  camera.y =
+    player.y;
+
+}
+
+
+/* =========================================================
+   DRAW
+========================================================= */
+
+function drawGame() {
+
+  ctx.clearRect(
+    0,
+    0,
+    window.innerWidth,
+    window.innerHeight
+  );
+
+  drawTrack();
+
+  currentRace.drivers
+    .forEach(
+      (driver, index) => {
+
+        drawCar(
+          driver,
+          index
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   QUITTER UNE COURSE
+========================================================= */
+
+$("leaveRaceBtn").addEventListener(
+  "click",
+  () => {
+
+    if (
+      !confirm(
+        "Quitter cette course ?"
+      )
+    ) {
+      return;
+    }
+
+    currentRace = null;
+
+    cancelAnimationFrame(
+      animationFrame
+    );
+
+    updateMenu();
+
+    showScreen("menuScreen");
+
+  }
+);
+
+
+/* =========================================================
+   PREMIER DÉMARRAGE
+========================================================= */
+
+if (save.avatar) {
+
+  loadAvatarIntoForm();
+
+  updateMenu();
+
+  showScreen("menuScreen");
+
+} else {
+
+  updateAvatarPreview();
+
+  showScreen("avatarScreen");
+
+}
