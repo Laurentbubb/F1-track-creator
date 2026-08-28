@@ -1,6 +1,6 @@
-```css
 * {
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -8,302 +8,596 @@ body {
     margin: 0;
     width: 100%;
     height: 100%;
+
     overflow: hidden;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #101010;
+    color: white;
+
+    touch-action: none;
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #101010;
-    color: white;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
+
 header {
-    height: 82px;
+
+    height: 78px;
+
     background: #171717;
+
     border-bottom: 2px solid #333;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    padding: 0 20px;
+    padding: 0 18px;
+
 }
 
-header h1 {
-    margin: 0 0 4px;
-    font-size: 25px;
+
+.title h1 {
+
+    margin: 0 0 3px;
+
+    font-size: 24px;
+
 }
 
-header span {
+
+.title p {
+
+    margin: 0;
+
     color: #aaa;
+
     font-size: 13px;
+
 }
+
 
 .top-buttons {
+
     display: flex;
-    gap: 8px;
+
+    gap: 7px;
+
 }
 
+
 button {
+
     border: 0;
+
     border-radius: 8px;
 
     background: #2c2c2c;
+
     color: white;
 
-    padding: 11px 14px;
+    padding: 10px 13px;
 
     font-size: 14px;
+
     font-weight: bold;
 
     cursor: pointer;
 
-    transition:
-        transform 0.1s,
-        background 0.15s;
+    touch-action: manipulation;
+
 }
+
 
 button:hover {
+
     background: #444;
+
 }
+
 
 button:active {
-    transform: scale(0.97);
+
+    transform: scale(0.96);
+
 }
+
 
 .layout {
-    height: calc(100vh - 82px);
+
+    height: calc(100vh - 78px);
+
     display: flex;
+
 }
+
 
 main {
+
     flex: 1;
+
     min-width: 0;
+
     position: relative;
+
 }
+
 
 canvas {
-    width: 100%;
-    height: 100%;
+
     display: block;
 
+    width: 100%;
+
+    height: 100%;
+
     background: #28732d;
+
     cursor: crosshair;
+
+    touch-action: none;
+
 }
 
+
 aside {
-    width: 250px;
+
+    width: 245px;
+
     flex-shrink: 0;
 
     background: #191919;
+
     border-left: 2px solid #333;
 
-    padding: 15px;
+    padding: 14px;
 
     overflow-y: auto;
+
 }
+
 
 section {
-    margin-bottom: 20px;
+
+    margin-bottom: 18px;
+
 }
+
 
 section h2 {
+
+    margin: 0 0 10px;
+
     font-size: 17px;
-    margin: 0 0 11px;
+
 }
+
 
 section p {
+
+    margin: 6px 0;
+
     color: #bbb;
+
     font-size: 13px;
-    line-height: 1.4;
+
 }
+
 
 .car-button {
+
     width: 100%;
+
     display: flex;
+
     align-items: center;
-    gap: 10px;
+
+    gap: 9px;
 
     margin-bottom: 7px;
+
     text-align: left;
+
 }
+
 
 .car-button.selected {
+
     outline: 2px solid #e10600;
+
     background: #3a2020;
+
 }
+
 
 .car-color {
-    width: 24px;
+
+    width: 25px;
+
     height: 12px;
-    border-radius: 4px;
+
     display: inline-block;
+
+    border-radius: 4px;
+
 }
 
-.car-color.red {
+
+.red {
     background: #e10600;
 }
 
-.car-color.blue {
-    background: #1683ff;
+.blue {
+    background: #1677ff;
 }
 
-.car-color.yellow {
+.yellow {
     background: #ffd000;
 }
 
-.car-color.black {
+.black {
     background: #111;
     border: 1px solid #777;
 }
 
+
 .stats {
+
     background: #222;
+
     border-radius: 10px;
-    padding: 13px;
+
+    padding: 12px;
+
 }
 
+
 .stat {
+
     display: flex;
+
     justify-content: space-between;
 
     padding: 7px 0;
 
     border-bottom: 1px solid #333;
+
 }
+
 
 .stat:last-child {
+
     border-bottom: 0;
+
 }
+
 
 .stat span {
+
     color: #999;
+
 }
+
 
 .stat strong {
+
     font-size: 14px;
+
 }
 
-.controls {
-    display: grid;
-    grid-template-columns: 45px 1fr;
-    gap: 7px;
 
-    align-items: center;
-}
+/* =========================================================
+   BOUTONS IPAD
+   ========================================================= */
 
-.controls div {
-    width: 38px;
-    height: 32px;
+.touch-controls {
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
 
-    background: #292929;
-    border-radius: 6px;
-
-    font-weight: bold;
-}
-
-.controls span {
-    color: #bbb;
-    font-size: 13px;
-}
-
-#status {
-    background: #222;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 0;
-}
-
-.overlay {
-    position: fixed;
     inset: 0;
 
+    pointer-events: none;
+
+    display: none;
+
+}
+
+
+.steering {
+
+    position: absolute;
+
+    left: 25px;
+
+    bottom: 25px;
+
     display: flex;
+
+    gap: 15px;
+
+}
+
+
+.pedals {
+
+    position: absolute;
+
+    right: 25px;
+
+    bottom: 25px;
+
+    display: flex;
+
+    gap: 15px;
+
+}
+
+
+.touch-button {
+
+    pointer-events: auto;
+
+    width: 75px;
+
+    height: 75px;
+
+    border-radius: 50%;
+
+    background: rgba(20, 20, 20, 0.72);
+
+    border: 2px solid rgba(255,255,255,0.5);
+
+    color: white;
+
+    font-size: 30px;
+
+    display: flex;
+
     align-items: center;
+
     justify-content: center;
 
-    background: rgba(0, 0, 0, 0.72);
+    touch-action: none;
 
-    z-index: 10;
 }
+
+
+.touch-button:active {
+
+    background: rgba(255,255,255,0.35);
+
+}
+
+
+.accelerate {
+
+    background: rgba(0,130,0,0.75);
+
+}
+
+
+.brake {
+
+    background: rgba(130,0,0,0.75);
+
+}
+
+
+/* =========================================================
+   OVERLAYS
+   ========================================================= */
+
+.overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 20;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: rgba(0,0,0,0.72);
+
+}
+
 
 .hidden {
+
     display: none;
+
 }
 
+
 .overlay-box {
-    width: 330px;
+
+    width: 320px;
 
     background: #1b1b1b;
+
     border: 2px solid #444;
+
     border-radius: 16px;
 
     padding: 30px;
 
     text-align: center;
 
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 }
+
 
 .overlay-box h2 {
+
     font-size: 30px;
+
 }
+
 
 .overlay-box p {
+
     color: #bbb;
+
 }
+
 
 .overlay-box button {
-    margin-top: 12px;
+
     width: 100%;
+
+    margin-top: 10px;
+
 }
+
 
 .lights {
+
     display: flex;
+
     justify-content: center;
-    gap: 12px;
+
+    gap: 10px;
+
 }
 
+
 .lights span {
-    width: 25px;
-    height: 25px;
+
+    width: 23px;
+
+    height: 23px;
 
     border-radius: 50%;
 
     background: #333;
+
     border: 2px solid #666;
+
 }
+
+
+/* =========================================================
+   IPAD
+   ========================================================= */
+
+@media (pointer: coarse) {
+
+    .touch-controls {
+
+        display: block;
+
+    }
+
+}
+
 
 @media (max-width: 800px) {
 
     header {
-        height: 70px;
+
+        height: 65px;
+
+        padding: 0 8px;
+
     }
 
-    header h1 {
-        font-size: 18px;
+
+    .title h1 {
+
+        font-size: 17px;
+
     }
 
-    header > div:first-child span {
+
+    .title p {
+
         display: none;
+
     }
+
+
+    .top-buttons {
+
+        gap: 4px;
+
+    }
+
 
     .top-buttons button {
+
         padding: 8px;
-        font-size: 11px;
+
+        font-size: 10px;
+
     }
+
 
     .layout {
-        height: calc(100vh - 70px);
+
+        height: calc(100vh - 65px);
+
     }
 
+
     aside {
-        width: 180px;
-        padding: 10px;
+
+        width: 155px;
+
+        padding: 8px;
+
     }
+
+
+    aside section h2 {
+
+        font-size: 14px;
+
+    }
+
+
+    aside p {
+
+        font-size: 11px;
+
+    }
+
+
+    .touch-button {
+
+        width: 65px;
+
+        height: 65px;
+
+        font-size: 25px;
+
+    }
+
+
+    .steering {
+
+        left: 15px;
+
+        bottom: 15px;
+
+    }
+
+
+    .pedals {
+
+        right: 15px;
+
+        bottom: 15px;
+
+    }
+
 }
-```
