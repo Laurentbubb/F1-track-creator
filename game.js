@@ -3,6 +3,12 @@
 
 /* =========================================================
    TURBO RACERS
+   Version corrigée
+========================================================= */
+
+
+/* =========================================================
+   SAUVEGARDE
 ========================================================= */
 
 const SAVE_KEY = "turboRacersSave_v1";
@@ -33,8 +39,9 @@ function loadSave() {
       ...structuredClone(defaultSave),
       ...JSON.parse(raw)
     };
+
   } catch (error) {
-    console.error(error);
+    console.error("Erreur de sauvegarde :", error);
     return structuredClone(defaultSave);
   }
 }
@@ -64,7 +71,9 @@ function clamp(value, min, max) {
 }
 
 function shuffle(array) {
-  return [...array].sort(() => Math.random() - 0.5);
+  return [...array].sort(
+    () => Math.random() - 0.5
+  );
 }
 
 
@@ -83,29 +92,38 @@ const screens = [
 ];
 
 function showScreen(id) {
-  screens.forEach(screenId => {
-    const element = $(screenId);
 
-    if (element) {
-      element.classList.add("hidden");
+  screens.forEach(screenId => {
+
+    const screen = $(screenId);
+
+    if (screen) {
+      screen.classList.add("hidden");
     }
+
   });
 
   const target = $(id);
 
   if (!target) {
-    console.error("Écran introuvable :", id);
+    console.error(
+      `Écran introuvable : ${id}`
+    );
     return;
   }
 
   target.classList.remove("hidden");
 
   /*
-    Important :
-    on remet la page en haut quand on change d'écran.
+    IMPORTANT :
+    On remet le scroll en haut à chaque changement
+    d'écran, mais l'écran reste scrollable.
   */
+  target.scrollTop = 0;
+
   if (id !== "gameScreen") {
-    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }
 }
 
@@ -115,6 +133,7 @@ function showScreen(id) {
 ========================================================= */
 
 function getAvatarFromForm() {
+
   return {
     name:
       $("avatarName").value.trim() || "Pilote",
@@ -150,36 +169,46 @@ function getAvatarFromForm() {
 
 
 function updateAvatarPreview() {
-  const avatar = getAvatarFromForm();
 
-  const hair = $("previewHair");
-  const glasses = $("previewGlasses");
-  const helmet = $("previewHelmet");
+  const avatar =
+    getAvatarFromForm();
 
-  if (!hair || !glasses || !helmet) {
-    return;
+  const hair =
+    $("previewHair");
+
+  const glasses =
+    $("previewGlasses");
+
+  const helmet =
+    $("previewHelmet");
+
+  if (hair) {
+
+    hair.style.background =
+      avatar.hairColor;
+
+    hair.className =
+      "hair " + avatar.hair;
   }
 
-  hair.style.background = avatar.hairColor;
+  if (glasses) {
 
-  hair.className =
-    "hair " + avatar.hair;
+    glasses.style.display =
+      avatar.glasses === "none"
+        ? "none"
+        : "block";
 
-  glasses.style.display =
-    avatar.glasses === "none"
-      ? "none"
-      : "block";
+    if (avatar.glasses === "round") {
+      glasses.style.borderRadius = "50%";
+    }
 
-  if (avatar.glasses === "round") {
-    glasses.style.borderRadius = "50%";
-  }
+    if (avatar.glasses === "sport") {
+      glasses.style.borderRadius = "4px";
+    }
 
-  if (avatar.glasses === "sport") {
-    glasses.style.borderRadius = "4px";
-  }
-
-  if (avatar.glasses === "square") {
-    glasses.style.borderRadius = "2px";
+    if (avatar.glasses === "square") {
+      glasses.style.borderRadius = "2px";
+    }
   }
 
   const helmetColors = {
@@ -191,13 +220,17 @@ function updateAvatarPreview() {
     gold: "#d4af37"
   };
 
-  helmet.style.background =
-    helmetColors[avatar.helmet] || "transparent";
+  if (helmet) {
 
-  helmet.style.display =
-    avatar.helmet === "none"
-      ? "none"
-      : "block";
+    helmet.style.background =
+      helmetColors[avatar.helmet] ||
+      "transparent";
+
+    helmet.style.display =
+      avatar.helmet === "none"
+        ? "none"
+        : "block";
+  }
 }
 
 
@@ -292,9 +325,11 @@ function renderMenuAvatar() {
   }
 
   container.innerHTML = `
-    <div class="hair"></div>
-    <div class="face"></div>
-    <div class="body"></div>
+    <div class="avatar large-avatar">
+      <div class="hair"></div>
+      <div class="face"></div>
+      <div class="body"></div>
+    </div>
   `;
 
   const hair =
@@ -316,8 +351,12 @@ $("raceBtn").addEventListener(
 $("garageBtn").addEventListener(
   "click",
   () => {
+
     renderShop();
-    showScreen("garageScreen");
+
+    showScreen(
+      "garageScreen"
+    );
   }
 );
 
@@ -325,8 +364,12 @@ $("garageBtn").addEventListener(
 $("customizeBtn").addEventListener(
   "click",
   () => {
+
     loadAvatarIntoForm();
-    showScreen("avatarScreen");
+
+    showScreen(
+      "avatarScreen"
+    );
   }
 );
 
@@ -334,8 +377,12 @@ $("customizeBtn").addEventListener(
 $("garageBackBtn").addEventListener(
   "click",
   () => {
+
     updateMenu();
-    showScreen("menuScreen");
+
+    showScreen(
+      "menuScreen"
+    );
   }
 );
 
@@ -353,12 +400,20 @@ $("resetBtn").addEventListener(
       return;
     }
 
-    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(
+      SAVE_KEY
+    );
 
     save =
-      structuredClone(defaultSave);
+      structuredClone(
+        defaultSave
+      );
 
-    showScreen("avatarScreen");
+    showScreen(
+      "avatarScreen"
+    );
+
+    updateAvatarPreview();
   }
 );
 
@@ -405,6 +460,7 @@ function loadAvatarIntoForm() {
 ========================================================= */
 
 const shopItems = [
+
   {
     id: "outfit_blue",
     name: "Tenue bleue",
@@ -470,7 +526,8 @@ function renderShop() {
   shopItems.forEach(item => {
 
     const owned =
-      save.unlockedItems.includes(item.id);
+      save.unlockedItems
+        .includes(item.id);
 
     const div =
       document.createElement("div");
@@ -493,14 +550,20 @@ function renderShop() {
       "click",
       () => {
 
-        if (save.points < item.price) {
+        if (
+          save.points <
+          item.price
+        ) {
+
           alert(
             "Tu n'as pas assez de points !"
           );
+
           return;
         }
 
-        save.points -= item.price;
+        save.points -=
+          item.price;
 
         save.unlockedItems.push(
           item.id
@@ -519,7 +582,7 @@ function renderShop() {
 
 
 /* =========================================================
-   PILOTES
+   NOMS DES PILOTES
 ========================================================= */
 
 const driverNames = [
@@ -720,7 +783,7 @@ const driverNames = [
 
 
 /* =========================================================
-   RIVAUX
+   GRANDS RIVAUX
 ========================================================= */
 
 const rivals = {
@@ -844,7 +907,6 @@ const rivals = {
     quote: "Le dernier rival sera révélé maintenant.",
     strength: 1.48
   }
-
 };
 
 
@@ -881,36 +943,40 @@ function createNormalDrivers() {
     shuffle(driverNames)
       .slice(0, 4);
 
-  return names.map((name, index) => {
+  return names.map(
+    (name, index) => {
 
-    return {
-      name,
-      isPlayer: false,
+      return {
+        name,
+        isPlayer: false,
 
-      x: 0,
-      y: 0,
+        x: 0,
+        y: 0,
 
-      angle: 0,
+        angle: 0,
 
-      speed: 0,
+        speed: 0,
 
-      baseSpeed:
-        2.5 + index * 0.08,
+        baseSpeed:
+          2.5 + index * 0.08,
 
-      progress: 0,
+        progress: 0,
 
-      finished: false,
+        finished: false,
 
-      aiSkill:
-        0.85 + Math.random() * 0.2
-    };
-  });
+        aiSkill:
+          0.85 +
+          Math.random() * 0.2
+      };
+    }
+  );
 }
 
 
 function createPlayer() {
 
   return {
+
     name:
       save.avatar.name,
 
@@ -933,7 +999,7 @@ function createPlayer() {
 
 
 /* =========================================================
-   DIFFICULTÉ
+   IA ADAPTATIVE
 ========================================================= */
 
 function calculatePlayerLevel() {
@@ -954,7 +1020,11 @@ function calculatePlayerLevel() {
     score += 1;
   }
 
-  return clamp(score, 1, 5);
+  return clamp(
+    score,
+    1,
+    5
+  );
 }
 
 
@@ -982,12 +1052,13 @@ function adaptAI(driver) {
 
   driver.aiSkill =
     difficulty *
-    (0.92 + Math.random() * 0.12);
+    (0.92 +
+    Math.random() * 0.12);
 }
 
 
 /* =========================================================
-   DÉMARRAGE
+   DÉMARRER UNE COURSE
 ========================================================= */
 
 function startNextRace() {
@@ -1014,8 +1085,6 @@ function startNextRace() {
 
 function startNormalRace() {
 
-  stopGameLoop();
-
   currentRace = {
 
     duel: false,
@@ -1024,7 +1093,7 @@ function startNormalRace() {
 
     elapsed: 0,
 
-    countdown: 3,
+    countdown: 0,
 
     started: true,
 
@@ -1042,14 +1111,18 @@ function startNormalRace() {
     .slice(1)
     .forEach(adaptAI);
 
+  previousTime = 0;
+
   prepareGameCanvas();
 
-  showScreen("gameScreen");
-
-  previousTime = performance.now();
+  showScreen(
+    "gameScreen"
+  );
 
   animationFrame =
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(
+      gameLoop
+    );
 }
 
 
@@ -1074,7 +1147,9 @@ function getRivalForCourse(course) {
 function startDuelIntro() {
 
   const rival =
-    getRivalForCourse(save.course);
+    getRivalForCourse(
+      save.course
+    );
 
   $("rivalName").textContent =
     rival.name;
@@ -1085,13 +1160,11 @@ function startDuelIntro() {
   $("duelPlayerName").textContent =
     save.avatar.name;
 
-  $("rivalReveal").classList.remove(
-    "hidden"
-  );
+  $("rivalReveal")
+    .classList.remove("hidden");
 
-  $("startDuelBtn").classList.remove(
-    "hidden"
-  );
+  $("startDuelBtn")
+    .classList.remove("hidden");
 
   showScreen(
     "duelIntroScreen"
@@ -1107,13 +1180,15 @@ $("startDuelBtn").addEventListener(
 
 function startDuelRace() {
 
-  stopGameLoop();
-
   const rival =
-    getRivalForCourse(save.course);
+    getRivalForCourse(
+      save.course
+    );
 
   const attempts =
-    save.duelAttempts[save.course] || 0;
+    save.duelAttempts[
+      save.course
+    ] || 0;
 
   currentRace = {
 
@@ -1121,13 +1196,14 @@ function startDuelRace() {
 
     rival,
 
-    duelAttempts: attempts,
+    duelAttempts:
+      attempts,
 
     totalLaps: 3,
 
     elapsed: 0,
 
-    countdown: 3,
+    countdown: 0,
 
     started: true,
 
@@ -1155,7 +1231,8 @@ function startDuelRace() {
         speed: 0,
 
         baseSpeed:
-          3.2 * rival.strength,
+          3.2 *
+          rival.strength,
 
         progress: 0,
 
@@ -1167,15 +1244,18 @@ function startDuelRace() {
     ]
   };
 
+  previousTime = 0;
+
   prepareGameCanvas();
 
-  showScreen("gameScreen");
-
-  previousTime =
-    performance.now();
+  showScreen(
+    "gameScreen"
+  );
 
   animationFrame =
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(
+      gameLoop
+    );
 }
 
 
@@ -1197,26 +1277,33 @@ let camera = {
 
 function resizeCanvas() {
 
+  const width =
+    window.innerWidth;
+
+  const height =
+    window.innerHeight;
+
   const dpr =
-    Math.max(
-      1,
-      Math.min(
-        2,
-        window.devicePixelRatio || 1
-      )
+    Math.min(
+      window.devicePixelRatio || 1,
+      2
     );
 
   canvas.width =
-    window.innerWidth * dpr;
+    Math.floor(
+      width * dpr
+    );
 
   canvas.height =
-    window.innerHeight * dpr;
+    Math.floor(
+      height * dpr
+    );
 
   canvas.style.width =
-    window.innerWidth + "px";
+    `${width}px`;
 
   canvas.style.height =
-    window.innerHeight + "px";
+    `${height}px`;
 
   ctx.setTransform(
     dpr,
@@ -1254,14 +1341,14 @@ function prepareGameCanvas() {
     (driver, index) => {
 
       driver.x =
-        400 - index * 55;
+        400 -
+        index * 55;
 
       driver.y =
-        300 + index * 30;
+        300 +
+        index * 30;
 
       driver.angle = 0;
-      driver.speed = 0;
-      driver.progress = 0;
     }
   );
 
@@ -1274,7 +1361,7 @@ function prepareGameCanvas() {
 
 
 /* =========================================================
-   SPECTATEURS
+   PISTE
 ========================================================= */
 
 function drawCrowd() {
@@ -1400,7 +1487,10 @@ function drawSpectator(
 
   ctx.save();
 
-  ctx.translate(x, y);
+  ctx.translate(
+    x,
+    y
+  );
 
   ctx.fillStyle =
     "#385070";
@@ -1457,8 +1547,15 @@ function drawSpectator(
 
     ctx.beginPath();
 
-    ctx.moveTo(12, 10);
-    ctx.lineTo(12, -15);
+    ctx.moveTo(
+      12,
+      10
+    );
+
+    ctx.lineTo(
+      12,
+      -15
+    );
 
     ctx.stroke();
 
@@ -1479,10 +1576,6 @@ function drawSpectator(
 }
 
 
-/* =========================================================
-   PISTE
-========================================================= */
-
 function drawTrack() {
 
   ctx.save();
@@ -1498,8 +1591,10 @@ function drawTrack() {
     "#237044";
 
   ctx.fillRect(
-    camera.x - window.innerWidth,
-    camera.y - window.innerHeight,
+    camera.x -
+      window.innerWidth,
+    camera.y -
+      window.innerHeight,
     window.innerWidth * 2,
     window.innerHeight * 2
   );
@@ -1508,7 +1603,10 @@ function drawTrack() {
 
   ctx.beginPath();
 
-  ctx.moveTo(0, 0);
+  ctx.moveTo(
+    0,
+    0
+  );
 
   ctx.bezierCurveTo(
     500,
@@ -1649,7 +1747,7 @@ function drawCar(
 
 
 /* =========================================================
-   CLAVIER
+   CONTRÔLES CLAVIER
 ========================================================= */
 
 window.addEventListener(
@@ -1660,28 +1758,28 @@ window.addEventListener(
       event.key.toLowerCase();
 
     if (
-      key === "arrowup" ||
+      event.key === "ArrowUp" ||
       key === "w"
     ) {
       keys.up = true;
     }
 
     if (
-      key === "arrowdown" ||
+      event.key === "ArrowDown" ||
       key === "s"
     ) {
       keys.down = true;
     }
 
     if (
-      key === "arrowleft" ||
+      event.key === "ArrowLeft" ||
       key === "a"
     ) {
       keys.left = true;
     }
 
     if (
-      key === "arrowright" ||
+      event.key === "ArrowRight" ||
       key === "d"
     ) {
       keys.right = true;
@@ -1698,28 +1796,28 @@ window.addEventListener(
       event.key.toLowerCase();
 
     if (
-      key === "arrowup" ||
+      event.key === "ArrowUp" ||
       key === "w"
     ) {
       keys.up = false;
     }
 
     if (
-      key === "arrowdown" ||
+      event.key === "ArrowDown" ||
       key === "s"
     ) {
       keys.down = false;
     }
 
     if (
-      key === "arrowleft" ||
+      event.key === "ArrowLeft" ||
       key === "a"
     ) {
       keys.left = false;
     }
 
     if (
-      key === "arrowright" ||
+      event.key === "ArrowRight" ||
       key === "d"
     ) {
       keys.right = false;
@@ -1745,7 +1843,8 @@ function updateJoystick(
 ) {
 
   const rect =
-    joystickElement.getBoundingClientRect();
+    joystickElement
+      .getBoundingClientRect();
 
   const centerX =
     rect.left +
@@ -1862,10 +1961,6 @@ function pressButton(
   callbackUp
 ) {
 
-  if (!element) {
-    return;
-  }
-
   element.addEventListener(
     "pointerdown",
     event => {
@@ -1921,7 +2016,7 @@ pressButton(
 
 
 /* =========================================================
-   PHYSIQUE
+   PHYSIQUE DU JOUEUR
 ========================================================= */
 
 function updatePlayer(
@@ -1951,7 +2046,8 @@ function updatePlayer(
   if (accelerating) {
 
     driver.speed +=
-      acceleration * delta;
+      acceleration *
+      delta;
 
   } else {
 
@@ -1965,7 +2061,8 @@ function updatePlayer(
   if (braking) {
 
     driver.speed -=
-      0.13 * delta;
+      0.13 *
+      delta;
   }
 
   driver.speed =
@@ -1986,8 +2083,10 @@ function updatePlayer(
   }
 
   if (
-    Math.abs(joystick.x) > 0.15
+    Math.abs(joystick.x) >
+    0.15
   ) {
+
     steering =
       joystick.x;
   }
@@ -1999,17 +2098,24 @@ function updatePlayer(
     delta;
 
   driver.x +=
-    Math.cos(driver.angle) *
+    Math.cos(
+      driver.angle
+    ) *
     driver.speed *
     delta;
 
   driver.y +=
-    Math.sin(driver.angle) *
+    Math.sin(
+      driver.angle
+    ) *
     driver.speed *
     delta;
 
   driver.progress +=
-    Math.max(0, driver.speed) *
+    Math.max(
+      0,
+      driver.speed
+    ) *
     delta *
     0.045;
 }
@@ -2034,7 +2140,8 @@ function updateAI(
   ) {
 
     driver.speed +=
-      0.05 * delta;
+      0.05 *
+      delta;
 
   } else {
 
@@ -2044,20 +2151,27 @@ function updateAI(
 
   const variation =
     Math.sin(
-      performance.now() / 800 +
+      performance.now() /
+      800 +
       driver.name.length
-    ) * 0.025;
+    ) *
+    0.025;
 
   driver.angle +=
-    variation * delta;
+    variation *
+    delta;
 
   driver.x +=
-    Math.cos(driver.angle) *
+    Math.cos(
+      driver.angle
+    ) *
     driver.speed *
     delta;
 
   driver.y +=
-    Math.sin(driver.angle) *
+    Math.sin(
+      driver.angle
+    ) *
     driver.speed *
     delta;
 
@@ -2131,7 +2245,8 @@ function checkRaceFinished() {
 
   const player =
     currentRace.drivers.find(
-      driver => driver.isPlayer
+      driver =>
+        driver.isPlayer
     );
 
   if (!player) {
@@ -2144,6 +2259,7 @@ function checkRaceFinished() {
   ) {
 
     finishRace();
+
     return;
   }
 
@@ -2219,7 +2335,14 @@ function finishRace() {
 
   currentRace.finished = true;
 
-  stopGameLoop();
+  if (animationFrame) {
+
+    cancelAnimationFrame(
+      animationFrame
+    );
+
+    animationFrame = null;
+  }
 
   const ranking =
     getRanking();
@@ -2229,6 +2352,11 @@ function finishRace() {
       driver =>
         driver.isPlayer
     ) + 1;
+
+  /*
+    Première course :
+    victoire obligatoire.
+  */
 
   if (
     save.course === 1 &&
@@ -2255,6 +2383,10 @@ function finishRace() {
   }
 
 
+  /* =========================
+     DUEL
+  ========================== */
+
   if (currentRace.duel) {
 
     finishDuel(
@@ -2265,12 +2397,17 @@ function finishRace() {
   }
 
 
+  /* =========================
+     COURSE NORMALE
+  ========================== */
+
   const reward =
     pointsForPosition(
       playerPosition
     );
 
-  save.points += reward;
+  save.points +=
+    reward;
 
   save.totalRaces++;
 
@@ -2344,18 +2481,22 @@ function showResults(
     (driver, index) => {
 
       const row =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       row.className =
         "result-row";
 
       if (driver.isPlayer) {
-        row.classList.add("player");
+        row.classList.add(
+          "player"
+        );
       }
 
       row.innerHTML = `
         <span>
-          ${positions[index] || "🏎️"}
+          ${positions[index] || `${index + 1}.`}
         </span>
 
         <strong>
@@ -2394,7 +2535,6 @@ $("continueBtn").addEventListener(
 
     if (save.course > 200) {
       save.course = 200;
-      saveGame();
     }
 
     showScreen(
@@ -2405,7 +2545,7 @@ $("continueBtn").addEventListener(
 
 
 /* =========================================================
-   DUEL
+   DUEL — RÉSULTAT
 ========================================================= */
 
 function finishDuel(
@@ -2416,7 +2556,9 @@ function finishDuel(
     save.course;
 
   const attempts =
-    save.duelAttempts[course] || 0;
+    save.duelAttempts[
+      course
+    ] || 0;
 
   save.duelAttempts[course] =
     attempts + 1;
@@ -2431,7 +2573,8 @@ function finishDuel(
 
   if (actualWin) {
 
-    save.points += 1000;
+    save.points +=
+      1000;
 
     save.duelWins++;
 
@@ -2443,26 +2586,28 @@ function finishDuel(
 
     saveGame();
 
-    $("duelResultTitle").textContent =
+    $("duelResultTitle")
+      .textContent =
       "🏆 RIVAL VAINCU !";
 
-    $("duelResultContent").innerHTML = `
-      <div class="results-animation">
-        🏆🔥🎉
-      </div>
+    $("duelResultContent")
+      .innerHTML = `
+        <div class="results-animation">
+          🏆🔥🎉
+        </div>
 
-      <h2>
-        ${currentRace.rival.name}
-      </h2>
+        <h2>
+          ${currentRace.rival.name}
+        </h2>
 
-      <p>
-        Tu as remporté le duel !
-      </p>
+        <p>
+          Tu as remporté le duel !
+        </p>
 
-      <p>
-        ⭐ <strong>+1000 points</strong>
-      </p>
-    `;
+        <p>
+          ⭐ <strong>+1000 points</strong>
+        </p>
+      `;
 
   } else {
 
@@ -2474,26 +2619,28 @@ function finishDuel(
 
     saveGame();
 
-    $("duelResultTitle").textContent =
+    $("duelResultTitle")
+      .textContent =
       "🏎️ Le rival gagne !";
 
-    $("duelResultContent").innerHTML = `
-      <div class="results-animation">
-        😤🏎️💨
-      </div>
+    $("duelResultContent")
+      .innerHTML = `
+        <div class="results-animation">
+          😤🏎️💨
+        </div>
 
-      <h2>
-        ${currentRace.rival.name}
-      </h2>
+        <h2>
+          ${currentRace.rival.name}
+        </h2>
 
-      <p>
-        Cette fois, le rival était trop fort.
-      </p>
+        <p>
+          Cette fois, le rival était trop fort.
+        </p>
 
-      <p>
-        Continue à t'entraîner !
-      </p>
-    `;
+        <p>
+          Continue à t'entraîner !
+        </p>
+      `;
   }
 
   showScreen(
@@ -2519,29 +2666,12 @@ $("duelContinueBtn").addEventListener(
    BOUCLE DU JEU
 ========================================================= */
 
-function stopGameLoop() {
-
-  if (animationFrame !== null) {
-
-    cancelAnimationFrame(
-      animationFrame
-    );
-
-    animationFrame = null;
-  }
-
-  previousTime = 0;
-}
-
-
 function gameLoop(time) {
 
   if (
     !currentRace ||
     currentRace.finished
   ) {
-
-    animationFrame = null;
     return;
   }
 
@@ -2549,7 +2679,7 @@ function gameLoop(time) {
     Math.min(
       32,
       time -
-        (previousTime || time)
+      (previousTime || time)
     );
 
   previousTime =
@@ -2572,10 +2702,6 @@ function gameLoop(time) {
       requestAnimationFrame(
         gameLoop
       );
-
-  } else {
-
-    animationFrame = null;
   }
 }
 
@@ -2585,6 +2711,10 @@ function gameLoop(time) {
 ========================================================= */
 
 function updateGame(delta) {
+
+  if (!currentRace) {
+    return;
+  }
 
   const player =
     currentRace.drivers[0];
@@ -2596,13 +2726,15 @@ function updateGame(delta) {
 
   currentRace.drivers
     .slice(1)
-    .forEach(driver => {
+    .forEach(
+      driver => {
 
-      updateAI(
-        driver,
-        delta
-      );
-    });
+        updateAI(
+          driver,
+          delta
+        );
+      }
+    );
 
   camera.x =
     player.x;
@@ -2629,38 +2761,47 @@ function drawGame() {
 
   drawCrowd();
 
-  currentRace.drivers
-    .forEach(
-      (driver, index) => {
+  currentRace.drivers.forEach(
+    (driver, index) => {
 
-        drawCar(
-          driver,
-          index
-        );
-      }
-    );
+      drawCar(
+        driver,
+        index
+      );
+    }
+  );
 }
 
 
 /* =========================================================
-   QUITTER LA COURSE
+   QUITTER UNE COURSE
 ========================================================= */
 
 $("leaveRaceBtn").addEventListener(
   "click",
   () => {
 
-    if (
-      !confirm(
+    const confirmation =
+      confirm(
         "Quitter cette course ?"
-      )
-    ) {
+      );
+
+    if (!confirmation) {
       return;
     }
 
     currentRace = null;
 
-    stopGameLoop();
+    if (animationFrame) {
+
+      cancelAnimationFrame(
+        animationFrame
+      );
+
+      animationFrame = null;
+    }
+
+    previousTime = 0;
 
     updateMenu();
 
@@ -2672,7 +2813,7 @@ $("leaveRaceBtn").addEventListener(
 
 
 /* =========================================================
-   DÉMARRAGE INITIAL
+   PREMIER DÉMARRAGE
 ========================================================= */
 
 if (save.avatar) {
