@@ -495,3 +495,18 @@ button {
     height: 72px;
   }
 }
+#createAvatarBtn {
+  display: block !important;
+  position: relative;
+  z-index: 9999;
+  width: 100%;
+  padding: 16px 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  background: #18c96e;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
