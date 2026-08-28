@@ -1,598 +1,629 @@
-```css
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-}
+  }
 
 html,
 body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #101827;
-  color: white;
+margin: 0;
+padding: 0;
+width: 100%;
+min-height: 100%;
+font-family: Arial, Helvetica, sans-serif;
+background: #101827;
+color: white;
 }
 
 body {
-  min-height: 100vh;
-  overflow-x: hidden;
+min-height: 100vh;
+overflow-x: hidden;
 }
 
 button,
 input,
 select {
-  font: inherit;
+font: inherit;
 }
 
 button {
-  cursor: pointer;
-  border: none;
-  touch-action: manipulation;
+cursor: pointer;
+border: none;
+touch-action: manipulation;
 }
 
 .hidden {
-  display: none !important;
+display: none !important;
 }
 
 /* =========================
-   ÉCRANS
+ÉCRANS
 ========================= */
 
 .screen {
-  width: 100%;
-  min-height: 100vh;
-  padding: 20px;
-  overflow-x: hidden;
-  overflow-y: auto;
+width: 100%;
+min-height: 100vh;
+padding: 20px;
+overflow-x: hidden;
+overflow-y: auto;
 }
 
-/*
-  Les écrans de jeu occupent tout l'écran
-  sans scroll.
-*/
 #gameScreen {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  overflow: hidden;
+position: fixed;
+inset: 0;
+width: 100%;
+height: 100%;
+min-height: 0;
+padding: 0;
+overflow: hidden;
 }
 
 /* =========================
-   PANELS
+PANELS
 ========================= */
 
 .panel {
-  width: min(950px, 100%);
-  margin: 0 auto;
-  padding: 25px;
-  border-radius: 25px;
-  background: #182235;
-  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+width: min(950px, 100%);
+margin: 0 auto;
+padding: 25px;
+border-radius: 25px;
+background: #182235;
+box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
 }
 
 h1 {
-  text-align: center;
-  font-size: clamp(30px, 6vw, 60px);
-  margin: 10px 0 20px;
+text-align: center;
+font-size: clamp(30px, 6vw, 60px);
+margin: 10px 0 20px;
 }
 
 h2 {
-  text-align: center;
+text-align: center;
 }
 
 /* =========================
-   BOUTONS
+BOUTONS
 ========================= */
 
 .primary-btn,
 .secondary-btn,
 .danger-btn {
-  width: 100%;
-  padding: 16px 20px;
-  margin-top: 12px;
-  border-radius: 14px;
-  font-weight: bold;
-  font-size: 18px;
+width: 100%;
+padding: 16px 20px;
+margin-top: 12px;
+border-radius: 14px;
+font-weight: bold;
+font-size: 18px;
 }
 
 .primary-btn {
-  background: #18c96e;
-  color: white;
+background: #18c96e;
+color: white;
 }
 
 .secondary-btn {
-  background: #2e405f;
-  color: white;
+background: #2e405f;
+color: white;
 }
 
 .danger-btn {
-  background: #9f3342;
-  color: white;
+background: #9f3342;
+color: white;
 }
 
 .primary-btn:active,
 .secondary-btn:active,
 .danger-btn:active {
-  transform: scale(0.98);
+transform: scale(0.98);
 }
 
 #createAvatarBtn {
-  display: block !important;
-  position: relative;
-  z-index: 9999;
-  width: 100%;
-  padding: 16px 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  border-radius: 14px;
-  background: #18c96e;
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
+display: block;
+position: relative;
+z-index: 100;
+width: 100%;
+padding: 16px 20px;
+margin-top: 20px;
+margin-bottom: 20px;
+border-radius: 14px;
+background: #18c96e;
+color: white;
+font-size: 18px;
+font-weight: bold;
 }
 
 /* =========================
-   AVATAR
+AVATAR
 ========================= */
 
 .avatar-preview {
-  height: 240px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+height: 240px;
+display: flex;
+justify-content: center;
+align-items: center;
 }
 
 .avatar {
-  width: 100px;
-  height: 170px;
-  position: relative;
+width: 100px;
+height: 170px;
+position: relative;
+flex-shrink: 0;
 }
 
 .large-avatar {
-  transform: scale(1.2);
-  transform-origin: center;
+transform: scale(1.2);
+transform-origin: center;
 }
 
 .face {
-  position: absolute;
-  width: 70px;
-  height: 75px;
-  left: 15px;
-  top: 25px;
-  background: #f0c19b;
-  border-radius: 45%;
-  border: 3px solid #151515;
+position: absolute;
+width: 70px;
+height: 75px;
+left: 15px;
+top: 25px;
+background: #f0c19b;
+border-radius: 45%;
+border: 3px solid #151515;
 }
 
 .hair {
-  position: absolute;
-  z-index: 5;
-  width: 75px;
-  height: 45px;
-  left: 12px;
-  top: 10px;
-  border-radius: 50% 50% 30% 30%;
-  background: #24170f;
-  color: transparent;
+position: absolute;
+z-index: 5;
+width: 75px;
+height: 45px;
+left: 12px;
+top: 10px;
+border-radius: 50% 50% 30% 30%;
+background: #24170f;
+color: transparent;
+pointer-events: none;
 }
 
 .body {
-  position: absolute;
-  width: 85px;
-  height: 75px;
-  left: 7px;
-  top: 100px;
-  border-radius: 25px 25px 10px 10px;
-  background: white;
-  border: 3px solid #151515;
+position: absolute;
+width: 85px;
+height: 75px;
+left: 7px;
+top: 100px;
+border-radius: 25px 25px 10px 10px;
+background: white;
+border: 3px solid #151515;
 }
 
 .helmet {
-  position: absolute;
-  z-index: 6;
-  left: 10px;
-  top: 8px;
-  width: 80px;
-  height: 48px;
-  border-radius: 50% 50% 20% 20%;
-  pointer-events: none;
+position: absolute;
+z-index: 6;
+left: 10px;
+top: 8px;
+width: 80px;
+height: 48px;
+border-radius: 50% 50% 20% 20%;
+pointer-events: none;
 }
 
 .glasses {
-  position: absolute;
-  z-index: 8;
-  left: 8px;
-  top: 28px;
-  width: 55px;
-  height: 15px;
-  border: 4px solid #111;
-  border-radius: 8px;
-  display: none;
+position: absolute;
+z-index: 8;
+left: 8px;
+top: 28px;
+width: 55px;
+height: 15px;
+border: 4px solid #111;
+border-radius: 8px;
+display: none;
+pointer-events: none;
 }
 
+/* =========================
+FORMULAIRE AVATAR
+========================= */
+
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
+display: grid;
+grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+gap: 15px;
+width: 100%;
 }
 
 .form-grid label {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  font-weight: bold;
+display: flex;
+flex-direction: column;
+gap: 7px;
+min-width: 0;
+width: 100%;
+font-weight: bold;
+}
+
+/*
+Le nom prend toujours toute la largeur.
+Ainsi "Nom du pilote" ne peut plus se
+mélanger avec "Apparence".
+*/
+
+.form-grid label:first-child {
+grid-column: 1 / -1;
 }
 
 .form-grid input,
 .form-grid select {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 2px solid #34445e;
-  background: #0f1725;
-  color: white;
+display: block;
+width: 100%;
+min-width: 0;
+height: 46px;
+padding: 10px 12px;
+border-radius: 10px;
+border: 2px solid #34445e;
+background: #0f1725;
+color: white;
+outline: none;
+}
+
+.form-grid input:focus,
+.form-grid select:focus {
+border-color: #18c96e;
 }
 
 /* =========================
-   MENU
+MENU
 ========================= */
 
 .menu-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 900px;
-  margin: 0 auto;
+display: flex;
+justify-content: space-between;
+align-items: center;
+max-width: 900px;
+margin: 0 auto;
 }
 
 .menu-header h1 {
-  text-align: left;
-  margin-bottom: 5px;
+text-align: left;
+margin-bottom: 5px;
 }
 
 #welcomeText {
-  margin-top: 0;
-  color: #aebbd1;
+margin-top: 0;
+color: #aebbd1;
 }
 
 .points-box {
-  background: #283953;
-  padding: 15px 20px;
-  border-radius: 15px;
-  font-size: 20px;
+background: #283953;
+padding: 15px 20px;
+border-radius: 15px;
+font-size: 20px;
 }
 
 .menu-avatar-area {
-  height: 260px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+height: 260px;
+display: flex;
+justify-content: center;
+align-items: center;
 }
 
 .menu-buttons,
 .progress-box {
-  width: min(500px, 100%);
-  margin: 0 auto;
+width: min(500px, 100%);
+margin: 0 auto;
 }
 
 .progress-box {
-  margin-top: 20px;
-  padding: 20px;
-  background: #182235;
-  border-radius: 18px;
-  text-align: center;
+margin-top: 20px;
+padding: 20px;
+background: #182235;
+border-radius: 18px;
+text-align: center;
 }
 
 /* =========================
-   GARAGE
+GARAGE
 ========================= */
 
 .shop-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin: 20px 0;
+display: grid;
+grid-template-columns: repeat(2, minmax(0, 1fr));
+gap: 15px;
+margin: 20px 0;
 }
 
 .shop-item {
-  background: #101827;
-  border-radius: 15px;
-  padding: 18px;
-  text-align: center;
+background: #101827;
+border-radius: 15px;
+padding: 18px;
+text-align: center;
+min-width: 0;
 }
 
 .shop-item h3 {
-  margin-top: 0;
+margin-top: 0;
 }
 
 .shop-item button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  background: #18c96e;
-  color: white;
+width: 100%;
+padding: 12px;
+border-radius: 10px;
+background: #18c96e;
+color: white;
 }
 
 .shop-item button:disabled {
-  opacity: 0.6;
-  cursor: default;
+opacity: 0.6;
+cursor: default;
 }
 
 /* =========================
-   JEU
+JEU
 ========================= */
 
 .game-screen {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #111;
+width: 100%;
+height: 100%;
+position: relative;
+overflow: hidden;
+background: #111;
 }
 
 #gameCanvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  touch-action: none;
+display: block;
+width: 100%;
+height: 100%;
+touch-action: none;
 }
 
 .hud {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  right: 15px;
-  display: flex;
-  justify-content: space-between;
-  pointer-events: none;
-  font-weight: bold;
-  font-size: 17px;
-  z-index: 10;
+position: absolute;
+top: 15px;
+left: 15px;
+right: 15px;
+display: flex;
+justify-content: space-between;
+pointer-events: none;
+font-weight: bold;
+font-size: 17px;
+z-index: 10;
 }
 
 .hud-left {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+display: flex;
+flex-direction: column;
+gap: 8px;
 }
 
 .position-box,
 .lap-box {
-  padding: 10px 15px;
-  border-radius: 12px;
-  background: rgba(10, 15, 25, 0.75);
+padding: 10px 15px;
+border-radius: 12px;
+background: rgba(10, 15, 25, 0.75);
 }
 
 #touchControls {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 20;
+position: absolute;
+inset: 0;
+pointer-events: none;
+z-index: 20;
 }
 
 .joystick {
-  position: absolute;
-  left: 25px;
-  bottom: 25px;
-  width: 145px;
-  height: 145px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 3px solid rgba(255, 255, 255, 0.35);
-  pointer-events: auto;
-  touch-action: none;
+position: absolute;
+left: 25px;
+bottom: 25px;
+width: 145px;
+height: 145px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.15);
+border: 3px solid rgba(255, 255, 255, 0.35);
+pointer-events: auto;
+touch-action: none;
 }
 
 .joystick-knob {
-  position: absolute;
-  width: 65px;
-  height: 65px;
-  left: 37px;
-  top: 37px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.75);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-  pointer-events: none;
+position: absolute;
+width: 65px;
+height: 65px;
+left: 37px;
+top: 37px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.75);
+box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+pointer-events: none;
 }
 
 .action-buttons {
-  position: absolute;
-  right: 25px;
-  bottom: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  pointer-events: auto;
+position: absolute;
+right: 25px;
+bottom: 25px;
+display: flex;
+flex-direction: column;
+gap: 15px;
+pointer-events: auto;
 }
 
 .action-buttons button {
-  width: 85px;
-  height: 85px;
-  border-radius: 50%;
-  font-size: 30px;
-  font-weight: bold;
-  color: white;
-  background: rgba(30, 200, 110, 0.75);
+width: 85px;
+height: 85px;
+border-radius: 50%;
+font-size: 30px;
+font-weight: bold;
+color: white;
+background: rgba(30, 200, 110, 0.75);
+user-select: none;
+-webkit-user-select: none;
 }
 
 #brakeBtn {
-  background: rgba(200, 60, 60, 0.75);
+background: rgba(200, 60, 60, 0.75);
 }
 
 .leave-btn {
-  position: absolute;
-  right: 20px;
-  top: 70px;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
-  z-index: 30;
+position: absolute;
+right: 20px;
+top: 70px;
+width: 45px;
+height: 45px;
+border-radius: 50%;
+background: rgba(0, 0, 0, 0.55);
+color: white;
+z-index: 30;
 }
 
 /* =========================
-   RÉSULTATS
+RÉSULTATS
 ========================= */
 
 #resultsScreen {
-  display: block;
-  overflow-y: auto;
-  overflow-x: hidden;
+display: block;
+overflow-y: auto;
+overflow-x: hidden;
 }
 
 #resultsScreen .panel {
-  margin: 0 auto;
-  max-height: none;
+margin: 0 auto;
+max-height: none;
 }
 
 .results-panel {
-  text-align: center;
+text-align: center;
 }
 
 .results-animation {
-  min-height: 130px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 80px;
+min-height: 130px;
+display: flex;
+justify-content: center;
+align-items: center;
+font-size: 80px;
 }
 
 .result-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 14px;
-  margin: 8px 0;
-  border-radius: 12px;
-  background: #101827;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+padding: 14px;
+margin: 8px 0;
+border-radius: 12px;
+background: #101827;
 }
 
 .result-row.player {
-  background: #284968;
-  border: 2px solid #18c96e;
+background: #284968;
+border: 2px solid #18c96e;
 }
 
 .reward-box {
-  margin-top: 20px;
-  padding: 15px;
-  border-radius: 15px;
-  background: #263753;
-  font-size: 20px;
+margin-top: 20px;
+padding: 15px;
+border-radius: 15px;
+background: #263753;
+font-size: 20px;
 }
 
 #continueBtn {
-  display: block;
-  width: 100%;
-  min-height: 55px;
-  margin-top: 20px;
-  margin-bottom: 30px;
+display: block;
+width: 100%;
+min-height: 55px;
+margin-top: 20px;
+margin-bottom: 30px;
 }
 
 /* =========================
-   DUEL
+DUEL
 ========================= */
 
 .duel-panel {
-  text-align: center;
+text-align: center;
 }
 
 .duel-warning {
-  font-size: 25px;
-  font-weight: bold;
-  margin-bottom: 20px;
+font-size: 25px;
+font-weight: bold;
+margin-bottom: 20px;
 }
 
 .duel-subtitle {
-  color: #aebbd1;
-  font-size: 20px;
+color: #aebbd1;
+font-size: 20px;
 }
 
 .rival-reveal {
-  margin-top: 25px;
+margin-top: 25px;
 }
 
 .rival-reveal h2 {
-  font-size: 35px;
+font-size: 35px;
 }
 
 .rival-reveal p {
-  color: #b7c4d8;
-  font-style: italic;
+color: #b7c4d8;
+font-style: italic;
 }
 
 .versus {
-  font-size: 40px;
-  font-weight: bold;
-  margin: 20px;
+font-size: 40px;
+font-weight: bold;
+margin: 20px;
 }
 
 /* =========================
-   MOBILE
+MOBILE
 ========================= */
 
 @media (max-width: 700px) {
-  .screen {
-    padding: 15px;
-  }
 
-  .panel {
-    padding: 18px;
-    border-radius: 20px;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .shop-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .menu-header {
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .menu-header h1 {
-    font-size: 32px;
-  }
-
-  .points-box {
-    padding: 10px;
-    font-size: 16px;
-  }
-
-  .joystick {
-    width: 125px;
-    height: 125px;
-  }
-
-  .joystick-knob {
-    width: 58px;
-    height: 58px;
-    left: 30px;
-    top: 30px;
-  }
-
-  .action-buttons {
-    right: 15px;
-    bottom: 15px;
-  }
-
-  .action-buttons button {
-    width: 72px;
-    height: 72px;
-  }
-
-  .result-row {
-    font-size: 14px;
-  }
+.screen {
+padding: 15px;
 }
-```
+
+.panel {
+padding: 18px;
+border-radius: 20px;
+}
+
+.form-grid {
+grid-template-columns: 1fr;
+}
+
+.form-grid label:first-child {
+grid-column: auto;
+}
+
+.shop-grid {
+grid-template-columns: 1fr;
+}
+
+.menu-header {
+align-items: flex-start;
+gap: 10px;
+}
+
+.menu-header h1 {
+font-size: 32px;
+}
+
+.points-box {
+padding: 10px;
+font-size: 16px;
+}
+
+.joystick {
+width: 125px;
+height: 125px;
+}
+
+.joystick-knob {
+width: 58px;
+height: 58px;
+left: 30px;
+top: 30px;
+}
+
+.action-buttons {
+right: 15px;
+bottom: 15px;
+}
+
+.action-buttons button {
+width: 72px;
+height: 72px;
+}
+
+.result-row {
+font-size: 14px;
+}
+}
