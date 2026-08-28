@@ -1,3 +1,4 @@
+```css
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -6,13 +7,17 @@
 html,
 body {
   margin: 0;
+  padding: 0;
   width: 100%;
   min-height: 100%;
   font-family: Arial, Helvetica, sans-serif;
   background: #101827;
   color: white;
+}
+
+body {
+  min-height: 100vh;
   overflow-x: hidden;
-  overflow-y: auto;
 }
 
 button,
@@ -38,39 +43,23 @@ button {
 .screen {
   width: 100%;
   min-height: 100vh;
-  height: auto;
   padding: 20px;
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: auto;
 }
 
-#avatarScreen,
-#menuScreen,
-#garageScreen,
-#resultsScreen,
-#duelIntroScreen,
-#duelResultScreen {
-  min-height: 100vh;
-  height: auto;
-}
-
-#resultsScreen {
-  display: block;
-  overflow: visible;
-}
-
-#resultsScreen .panel {
-  width: min(950px, 100%);
-  margin: 0 auto 40px;
-  max-height: none;
-}
-
-#continueBtn {
-  display: block;
+/*
+  Les écrans de jeu occupent tout l'écran
+  sans scroll.
+*/
+#gameScreen {
+  position: fixed;
+  inset: 0;
   width: 100%;
-  min-height: 55px;
-  margin-top: 20px;
-  margin-bottom: 30px;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 /* =========================
@@ -79,16 +68,12 @@ button {
 
 .panel {
   width: min(950px, 100%);
-  margin: auto;
+  margin: 0 auto;
   padding: 25px;
   border-radius: 25px;
   background: #182235;
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
 }
-
-/* =========================
-   TITRES
-========================= */
 
 h1 {
   text-align: center;
@@ -149,7 +134,6 @@ h2 {
   color: white;
   font-size: 18px;
   font-weight: bold;
-  cursor: pointer;
 }
 
 /* =========================
@@ -246,6 +230,7 @@ h2 {
 
 .form-grid input,
 .form-grid select {
+  width: 100%;
   padding: 12px;
   border-radius: 10px;
   border: 2px solid #34445e;
@@ -262,7 +247,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
   max-width: 900px;
-  margin: auto;
+  margin: 0 auto;
 }
 
 .menu-header h1 {
@@ -292,7 +277,7 @@ h2 {
 .menu-buttons,
 .progress-box {
   width: min(500px, 100%);
-  margin: auto;
+  margin: 0 auto;
 }
 
 .progress-box {
@@ -333,17 +318,21 @@ h2 {
   color: white;
 }
 
+.shop-item button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* =========================
    JEU
 ========================= */
 
 .game-screen {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   background: #111;
-  padding: 0;
 }
 
 #gameCanvas {
@@ -363,6 +352,7 @@ h2 {
   pointer-events: none;
   font-weight: bold;
   font-size: 17px;
+  z-index: 10;
 }
 
 .hud-left {
@@ -382,6 +372,7 @@ h2 {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 20;
 }
 
 .joystick {
@@ -406,6 +397,7 @@ h2 {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.75);
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
 }
 
 .action-buttons {
@@ -441,11 +433,23 @@ h2 {
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.55);
   color: white;
+  z-index: 30;
 }
 
 /* =========================
    RÉSULTATS
 ========================= */
+
+#resultsScreen {
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#resultsScreen .panel {
+  margin: 0 auto;
+  max-height: none;
+}
 
 .results-panel {
   text-align: center;
@@ -463,6 +467,7 @@ h2 {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 14px;
   margin: 8px 0;
   border-radius: 12px;
@@ -480,6 +485,14 @@ h2 {
   border-radius: 15px;
   background: #263753;
   font-size: 20px;
+}
+
+#continueBtn {
+  display: block;
+  width: 100%;
+  min-height: 55px;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 /* =========================
@@ -521,10 +534,19 @@ h2 {
 }
 
 /* =========================
-   RESPONSIVE
+   MOBILE
 ========================= */
 
 @media (max-width: 700px) {
+  .screen {
+    padding: 15px;
+  }
+
+  .panel {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -535,10 +557,16 @@ h2 {
 
   .menu-header {
     align-items: flex-start;
+    gap: 10px;
   }
 
   .menu-header h1 {
     font-size: 32px;
+  }
+
+  .points-box {
+    padding: 10px;
+    font-size: 16px;
   }
 
   .joystick {
@@ -553,13 +581,18 @@ h2 {
     top: 30px;
   }
 
+  .action-buttons {
+    right: 15px;
+    bottom: 15px;
+  }
+
   .action-buttons button {
     width: 72px;
     height: 72px;
   }
 
-  .panel {
-    padding: 18px;
-    border-radius: 18px;
+  .result-row {
+    font-size: 14px;
   }
 }
+```
