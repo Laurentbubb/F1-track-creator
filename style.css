@@ -529,3 +529,36 @@ button {
 #resultsScreen .panel {
   margin: 20px auto;
 }
+.screen {
+  width: 100%;
+  min-height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+}
+
+#avatarScreen,
+#menuScreen,
+#garageScreen,
+#resultsScreen,
+#duelIntroScreen,
+#duelResultScreen {
+  min-height: 100vh;
+}
+
+#resultsScreen {
+  display: block;
+}
+
+#resultsScreen .panel {
+  margin: 0 auto;
+  max-height: none;
+}
+
+#continueBtn {
+  display: block;
+  width: 100%;
+  min-height: 55px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
