@@ -5016,10 +5016,8 @@ createAccountBtn?.addEventListener("click", async () => {
     }
 
     console.log("Compte créé :", data);
-
     showLoginMessage("✅ Compte créé !");
 
-    // Connecte automatiquement l'utilisateur si Supabase le permet
     if (data.session) {
       showScreen("menuScreen");
     }
@@ -5059,10 +5057,8 @@ loginBtn?.addEventListener("click", async () => {
     }
 
     console.log("Connexion réussie :", data);
-
     showLoginMessage("✅ Connexion réussie !");
 
-    // Aller au menu
     showScreen("menuScreen");
 
   } catch (error) {
@@ -5070,4 +5066,3 @@ loginBtn?.addEventListener("click", async () => {
     showLoginMessage("❌ Une erreur est survenue.");
   }
 });
-```
