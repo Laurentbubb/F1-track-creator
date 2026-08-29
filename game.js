@@ -4516,6 +4516,102 @@ if (settingsBtn) {
   }
 
   /* =====================================================
+     BOUTIQUE
+  ===================================================== */
+
+  const shopBtn =
+    $("shopBtn");
+
+  if (shopBtn) {
+    shopBtn.type =
+      "button";
+
+    shopBtn.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
+
+        renderGarage();
+
+        showScreen(
+          "shopScreen"
+        );
+      }
+    );
+  }
+
+
+  const shopBackBtn =
+    $("shopBackBtn");
+
+  if (shopBackBtn) {
+    shopBackBtn.type =
+      "button";
+
+    shopBackBtn.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
+
+        updateMenu();
+
+        showScreen(
+          "menuScreen"
+        );
+      }
+    );
+  }
+
+
+  /* =====================================================
+     INVENTAIRE
+  ===================================================== */
+
+  const inventoryBtn =
+    $("inventoryBtn");
+
+  if (inventoryBtn) {
+    inventoryBtn.type =
+      "button";
+
+    inventoryBtn.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
+
+        renderInventory();
+
+        showScreen(
+          "inventoryScreen"
+        );
+      }
+    );
+  }
+
+
+  const inventoryBackBtn =
+    $("inventoryBackBtn");
+
+  if (inventoryBackBtn) {
+    inventoryBackBtn.type =
+      "button";
+
+    inventoryBackBtn.addEventListener(
+      "click",
+      event => {
+        event.preventDefault();
+
+        updateMenu();
+
+        showScreen(
+          "menuScreen"
+        );
+      }
+    );
+  }
+```
+
+  /* =====================================================
      ÉDITEUR
   ===================================================== */
 
