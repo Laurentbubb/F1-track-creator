@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
@@ -11,383 +12,862 @@
 <body>
 <div id="app">
 
-  <!-- CRÉATION / PERSONNALISATION AVATAR -->
+  <!-- =========================
+       CRÉATION / PERSONNALISATION AVATAR
+  ========================= -->
+
   <section id="avatarScreen" class="screen">
 
-    <div class="panel avatar-panel">
+```
+<div class="panel avatar-panel">
 
-      <h1>🏎️ TURBO RACERS</h1>
-      <h2 id="avatarHeading">Crée ton pilote</h2>
+  <h1>🏎️ TURBO RACERS</h1>
 
-      <div class="avatar-preview">
-        <div id="previewAvatar" class="avatar">
-          <div id="previewHair" class="hair"></div>
-          <div id="previewFace" class="face"></div>
-          <div id="previewGlasses" class="glasses"></div>
-          <div id="previewHelmet" class="helmet"></div>
-          <div id="previewMask" class="avatar-mask"></div>
-          <div id="previewBody" class="body"></div>
-        </div>
-      </div>
+  <h2 id="avatarHeading">
+    Crée ton pilote
+  </h2>
 
-      <div class="form-grid">
+  <div class="avatar-preview">
 
-        <label>
-          Nom du pilote
-          <input id="avatarName" type="text" maxlength="18" placeholder="Ton nom">
-        </label>
+    <div id="previewAvatar" class="avatar">
 
-        <label>
-          Apparence
-          <select id="avatarGender">
-            <option value="A">Pilote A</option>
-            <option value="B">Pilote B</option>
-          </select>
-        </label>
+      <div id="previewHair" class="hair"></div>
 
-        <label>
-          Âge
-          <select id="avatarAge">
-            <option value="child">Jeune</option>
-            <option value="teen" selected>Adolescent</option>
-            <option value="adult">Adulte</option>
-          </select>
-        </label>
+      <div id="previewFace" class="face"></div>
 
-        <label>
-          Taille
-          <select id="avatarHeight">
-            <option value="small">Petite</option>
-            <option value="medium" selected>Moyenne</option>
-            <option value="tall">Grande</option>
-          </select>
-        </label>
+      <div id="previewGlasses" class="glasses"></div>
 
-        <label>
-          Coupe
-          <select id="avatarHair">
-            <option value="short">Courte</option>
-            <option value="spiky">Ébouriffée</option>
-            <option value="long">Longue</option>
-            <option value="curly">Bouclée</option>
-          </select>
-        </label>
+      <div id="previewHelmet" class="helmet"></div>
 
-        <label>
-          Couleur cheveux
-          <select id="avatarHairColor">
-            <option value="#24170f">Brun</option>
-            <option value="#111111">Noir</option>
-            <option value="#d7a64b">Blond</option>
-            <option value="#a84b2a">Roux</option>
-            <option value="#6b4a35">Châtain</option>
-          </select>
-        </label>
+      <div id="previewMask" class="avatar-mask"></div>
 
-        <label>
-          Lunettes
-          <select id="avatarGlasses">
-            <option value="none">Aucune</option>
-            <option value="round">Rondes</option>
-            <option value="sport">Sport</option>
-            <option value="square">Carrées</option>
-          </select>
-        </label>
-
-        <label>
-          Casque
-          <select id="avatarHelmet">
-            <option value="none">Aucun</option>
-            <option value="white">Blanc</option>
-            <option value="red">Rouge</option>
-            <option value="blue">Bleu</option>
-            <option value="black">Noir</option>
-            <option value="gold">Doré</option>
-          </select>
-        </label>
-
-        <label>
-          Masque
-          <select id="avatarMask">
-            <option value="none">Aucun</option>
-            <option value="white">Blanc</option>
-            <option value="black">Noir</option>
-            <option value="blue">Bleu</option>
-            <option value="red">Rouge</option>
-          </select>
-        </label>
-
-      </div>
-
-      <button id="createAvatarBtn" class="primary-btn">
-        🏁 Créer mon pilote
-      </button>
-
-      <button id="avatarCancelBtn" class="secondary-btn hidden">
-        ← Retour au menu
-      </button>
+      <div id="previewBody" class="body"></div>
 
     </div>
+
+  </div>
+
+
+  <div class="form-grid">
+
+    <label>
+      Nom du pilote
+
+      <input
+        id="avatarName"
+        type="text"
+        maxlength="18"
+        placeholder="Ton nom"
+      >
+    </label>
+
+
+    <label>
+      Apparence
+
+      <select id="avatarGender">
+
+        <option value="A">
+          Pilote A
+        </option>
+
+        <option value="B">
+          Pilote B
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Âge
+
+      <select id="avatarAge">
+
+        <option value="child">
+          Jeune
+        </option>
+
+        <option value="teen" selected>
+          Adolescent
+        </option>
+
+        <option value="adult">
+          Adulte
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Taille
+
+      <select id="avatarHeight">
+
+        <option value="small">
+          Petite
+        </option>
+
+        <option value="medium" selected>
+          Moyenne
+        </option>
+
+        <option value="tall">
+          Grande
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Coupe
+
+      <select id="avatarHair">
+
+        <option value="short">
+          Courte
+        </option>
+
+        <option value="spiky">
+          Ébouriffée
+        </option>
+
+        <option value="long">
+          Longue
+        </option>
+
+        <option value="curly">
+          Bouclée
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Couleur cheveux
+
+      <select id="avatarHairColor">
+
+        <option value="#24170f">
+          Brun
+        </option>
+
+        <option value="#111111">
+          Noir
+        </option>
+
+        <option value="#d7a64b">
+          Blond
+        </option>
+
+        <option value="#a84b2a">
+          Roux
+        </option>
+
+        <option value="#6b4a35">
+          Châtain
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Lunettes
+
+      <select id="avatarGlasses">
+
+        <option value="none">
+          Aucune
+        </option>
+
+        <option value="round">
+          Rondes
+        </option>
+
+        <option value="sport">
+          Sport
+        </option>
+
+        <option value="square">
+          Carrées
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Casque
+
+      <select id="avatarHelmet">
+
+        <option value="none">
+          Aucun
+        </option>
+
+        <option value="white">
+          Blanc
+        </option>
+
+        <option value="red">
+          Rouge
+        </option>
+
+        <option value="blue">
+          Bleu
+        </option>
+
+        <option value="black">
+          Noir
+        </option>
+
+        <option value="gold">
+          Doré
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <label>
+      Masque
+
+      <select id="avatarMask">
+
+        <option value="none">
+          Aucun
+        </option>
+
+        <option value="white">
+          Blanc
+        </option>
+
+        <option value="black">
+          Noir
+        </option>
+
+        <option value="blue">
+          Bleu
+        </option>
+
+        <option value="red">
+          Rouge
+        </option>
+
+      </select>
+
+    </label>
+
+  </div>
+
+
+  <button
+    id="createAvatarBtn"
+    class="primary-btn"
+  >
+    🏁 Créer mon pilote
+  </button>
+
+
+  <button
+    id="avatarCancelBtn"
+    class="secondary-btn hidden"
+  >
+    ← Retour au menu
+  </button>
+
+</div>
+```
+
   </section>
 
+  <!-- =========================
+       MENU PRINCIPAL
+  ========================= -->
 
-  <!-- MENU PRINCIPAL -->
   <section id="menuScreen" class="screen hidden">
 
-    <div class="menu-header">
+```
+<div class="menu-header">
 
-      <div>
-        <h1>🏎️ Turbo Racers</h1>
-        <p id="welcomeText"></p>
-      </div>
+  <div>
 
-      <div class="points-box">
-        ⭐ <span id="menuPoints">0</span>
-      </div>
+    <h1>
+      🏎️ Turbo Racers
+    </h1>
 
-    </div>
+    <p id="welcomeText"></p>
 
-    <div class="menu-avatar-area">
-
-      <div id="menuAvatar" class="avatar large-avatar"></div>
-
-    </div>
-
-    <div class="menu-buttons">
-
-      <button id="createTrackBtn" class="primary-btn">
-        ✏️ Créer mon circuit
-      </button>
-
-      <button id="raceBtn" class="secondary-btn">
-        🏁 Courir sur mon circuit
-      </button>
-
-      <button id="garageBtn" class="secondary-btn">
-        🚗 Garage
-      </button>
-
-      <button id="customizeBtn" class="secondary-btn">
-        👤 Mon avatar
-      </button>
-
-      <button id="resetBtn" class="danger-btn">
-        ♻️ Réinitialiser la sauvegarde
-      </button>
-
-    </div>
-
-    <div class="progress-box">
-
-      <h3>Progression</h3>
-
-      <p>
-        Course :
-        <strong id="courseNumber">1</strong> / 200
-      </p>
-
-      <p>
-        Meilleure position :
-        <strong id="bestPosition">-</strong>
-      </p>
-
-      <p>
-        Meilleur chrono :
-        <strong id="bestTime">-</strong>
-      </p>
-
-    </div>
-
-  </section>
+  </div>
 
 
-  <!-- CRÉATEUR DE CIRCUIT -->
-  <section id="editorScreen" class="screen hidden editor-screen">
+  <div class="points-box">
 
-    <div class="editor-topbar">
+    ⭐
+    <span id="menuPoints">
+      0
+    </span>
 
-      <div>
-        <h1>✏️ Créateur de circuit</h1>
+  </div>
 
-        <p>
-          Dessine une boucle fermée.
-          Le jeu transforme ton dessin en vraie piste.
-        </p>
-      </div>
+</div>
 
-      <button id="editorBackBtn" class="secondary-btn small-btn">
-        ← Menu
-      </button>
 
-    </div>
+<div class="menu-avatar-area">
 
-    <div class="editor-workspace">
+  <div
+    id="menuAvatar"
+    class="avatar large-avatar"
+  ></div>
 
-      <canvas id="editorCanvas"></canvas>
+</div>
 
-      <div id="editorHint" class="editor-hint">
-        Maintiens le doigt ou le clic et dessine ton circuit.
-      </div>
 
-      <div class="editor-tools">
+<div class="menu-buttons">
 
-        <button id="undoTrackBtn">
-          ↩️ Annuler
-        </button>
+  <button
+    id="createTrackBtn"
+    class="primary-btn"
+  >
+    ✏️ Créer mon circuit
+  </button>
 
-        <button id="redoTrackBtn">
-          ↪️ Rétablir
-        </button>
 
-        <button id="clearTrackBtn">
-          🗑️ Effacer
-        </button>
+  <button
+    id="raceBtn"
+    class="secondary-btn"
+  >
+    🏁 Courir sur mon circuit
+  </button>
 
-        <button id="sampleTrackBtn">
-          🎲 Exemple
-        </button>
 
-        <label class="width-control">
-          Largeur
-          <input
-            id="trackWidthInput"
-            type="range"
-            min="70"
-            max="180"
-            value="110"
-          >
-        </label>
+  <button
+    id="garageBtn"
+    class="secondary-btn"
+  >
+    🚗 Garage
+  </button>
 
-        <button id="testTrackBtn" class="primary-btn">
-          ▶️ Tester le circuit
-        </button>
 
-      </div>
+  <button
+    id="customizeBtn"
+    class="secondary-btn"
+  >
+    👤 Mon avatar
+  </button>
 
-    </div>
+
+  <!-- PARAMÈTRES -->
+
+  <button
+    id="settingsBtn"
+    class="secondary-btn"
+  >
+    ⚙️ Paramètres
+  </button>
+
+
+  <button
+    id="resetBtn"
+    class="danger-btn"
+  >
+    ♻️ Réinitialiser la sauvegarde
+  </button>
+
+</div>
+
+
+<div class="progress-box">
+
+  <h3>
+    Progression
+  </h3>
+
+
+  <p>
+    Course :
+    <strong id="courseNumber">
+      1
+    </strong>
+    / 200
+  </p>
+
+
+  <p>
+    Meilleure position :
+    <strong id="bestPosition">
+      -
+    </strong>
+  </p>
+
+
+  <p>
+    Meilleur chrono :
+    <strong id="bestTime">
+      -
+    </strong>
+  </p>
+
+</div>
+```
 
   </section>
 
+  <!-- =========================
+       PARAMÈTRES
+  ========================= -->
 
-  <!-- GARAGE -->
-  <section id="garageScreen" class="screen hidden">
+  <section
+    id="settingsScreen"
+    class="screen hidden"
+  >
 
-    <div class="panel">
+```
+<div class="panel">
 
-      <h1>🚗 Garage</h1>
+  <h1>
+    ⚙️ Paramètres
+  </h1>
 
-      <p>
-        Tes points :
-        ⭐ <strong id="garagePoints">0</strong>
-      </p>
 
-      <div id="shopItems" class="shop-grid"></div>
+  <h2>
+    Personnalise ton expérience
+  </h2>
 
-      <button id="garageBackBtn" class="secondary-btn">
-        ← Retour
-      </button>
 
-    </div>
+  <div class="form-grid">
+
+
+    <!-- LANGUE -->
+
+    <label>
+
+      🌍 Langue
+
+      <select id="languageSelect">
+
+        <option value="fr">
+          🇫🇷 Français
+        </option>
+
+        <option value="en">
+          🇬🇧 English
+        </option>
+
+        <option value="es">
+          🇪🇸 Español
+        </option>
+
+        <option value="it">
+          🇮🇹 Italiano
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <!-- MUSIQUE -->
+
+    <label>
+
+      🎵 Musique
+
+      <select id="musicSelect">
+
+        <option value="on">
+          🔊 Activée
+        </option>
+
+        <option value="off">
+          🔇 Désactivée
+        </option>
+
+      </select>
+
+    </label>
+
+
+    <!-- EFFETS SONORES -->
+
+    <label>
+
+      🔊 Effets sonores
+
+      <select id="soundSelect">
+
+        <option value="on">
+          🔊 Activés
+        </option>
+
+        <option value="off">
+          🔇 Désactivés
+        </option>
+
+      </select>
+
+    </label>
+
+  </div>
+
+
+  <button
+    id="saveSettingsBtn"
+    class="primary-btn"
+  >
+    💾 Enregistrer
+  </button>
+
+
+  <button
+    id="settingsBackBtn"
+    class="secondary-btn"
+  >
+    ← Retour au menu
+  </button>
+
+</div>
+```
 
   </section>
 
+  <!-- =========================
+       CRÉATEUR DE CIRCUIT
+  ========================= -->
 
-  <!-- COURSE -->
-  <section id="gameScreen" class="game-screen hidden">
+  <section
+    id="editorScreen"
+    class="screen hidden editor-screen"
+  >
 
-    <canvas id="gameCanvas"></canvas>
+```
+<div class="editor-topbar">
 
-    <div class="hud">
+  <div>
 
-      <div class="hud-left">
+    <h1>
+      ✏️ Créateur de circuit
+    </h1>
 
-        <div>
-          🏁 Course
-          <span id="hudCourse">1</span>
-        </div>
+    <p>
+      Dessine une boucle fermée.
+      Le jeu transforme ton dessin en vraie piste.
+    </p>
 
-        <div>
-          ⭐ <span id="hudPoints">0</span>
-        </div>
-
-        <div>
-          ⏱️ <span id="hudTime">0.00</span>s
-        </div>
-
-      </div>
-
-      <div class="position-box">
-        <span id="hudPosition">1</span> / 5
-      </div>
-
-      <div class="lap-box">
-        Tour
-        <span id="hudLap">1</span>/3
-      </div>
-
-    </div>
+  </div>
 
 
-    <!-- CONTRÔLES -->
-    <div id="touchControls">
+  <button
+    id="editorBackBtn"
+    class="secondary-btn small-btn"
+  >
+    ← Menu
+  </button>
 
-      <div id="joystick" class="joystick">
-        <div id="joystickKnob" class="joystick-knob"></div>
-      </div>
+</div>
 
-      <div class="action-buttons">
 
-        <button id="accelerateBtn">
-          ▲
-        </button>
+<div class="editor-workspace">
 
-        <button id="brakeBtn">
-          ▼
-        </button>
+  <canvas id="editorCanvas"></canvas>
 
-      </div>
 
-    </div>
+  <div
+    id="editorHint"
+    class="editor-hint"
+  >
+    Maintiens le doigt ou le clic
+    et dessine ton circuit.
+  </div>
 
-    <button id="leaveRaceBtn" class="leave-btn">
-      ✕
+
+  <div class="editor-tools">
+
+
+    <button id="undoTrackBtn">
+      ↩️ Annuler
     </button>
 
+
+    <button id="redoTrackBtn">
+      ↪️ Rétablir
+    </button>
+
+
+    <button id="clearTrackBtn">
+      🗑️ Effacer
+    </button>
+
+
+    <button id="sampleTrackBtn">
+      🎲 Exemple
+    </button>
+
+
+    <label class="width-control">
+
+      Largeur
+
+      <input
+        id="trackWidthInput"
+        type="range"
+        min="70"
+        max="180"
+        value="110"
+      >
+
+    </label>
+
+
+    <button
+      id="testTrackBtn"
+      class="primary-btn"
+    >
+      ▶️ Tester le circuit
+    </button>
+
+  </div>
+
+</div>
+```
+
   </section>
 
+  <!-- =========================
+       GARAGE
+  ========================= -->
 
-  <!-- RÉSULTATS -->
-  <section id="resultsScreen" class="screen hidden">
+  <section
+    id="garageScreen"
+    class="screen hidden"
+  >
 
-    <div class="panel results-panel">
+```
+<div class="panel">
 
-      <h1 id="resultsTitle">
-        🏁 Course terminée !
-      </h1>
+  <h1>
+    🚗 Garage
+  </h1>
 
-      <div id="resultsAnimation" class="results-animation">
-        🏆
-      </div>
 
-      <div id="resultsList"></div>
+  <p>
+    Tes points :
+    ⭐
+    <strong id="garagePoints">
+      0
+    </strong>
+  </p>
 
-      <div class="reward-box">
 
-        <p id="rewardText"></p>
+  <div
+    id="shopItems"
+    class="shop-grid"
+  ></div>
 
-        <p id="timeResult"></p>
 
-      </div>
+  <button
+    id="garageBackBtn"
+    class="secondary-btn"
+  >
+    ← Retour
+  </button>
 
-      <button id="continueBtn" class="primary-btn">
-        Continuer →
-      </button>
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       COURSE
+  ========================= -->
+
+  <section
+    id="gameScreen"
+    class="game-screen hidden"
+  >
+
+```
+<canvas id="gameCanvas"></canvas>
+
+
+<div class="hud">
+
+
+  <div class="hud-left">
+
+
+    <div>
+
+      🏁 Course
+      <span id="hudCourse">
+        1
+      </span>
 
     </div>
+
+
+    <div>
+
+      ⭐
+      <span id="hudPoints">
+        0
+      </span>
+
+    </div>
+
+
+    <div>
+
+      ⏱️
+      <span id="hudTime">
+        0.00
+      </span>
+      s
+
+    </div>
+
+  </div>
+
+
+  <div class="position-box">
+
+    <span id="hudPosition">
+      1
+    </span>
+
+    / 5
+
+  </div>
+
+
+  <div class="lap-box">
+
+    Tour
+
+    <span id="hudLap">
+      1
+    </span>
+
+    / 3
+
+  </div>
+
+</div>
+
+
+<!-- CONTRÔLES DE COURSE -->
+
+<div id="touchControls">
+
+
+  <div
+    id="joystick"
+    class="joystick"
+  >
+
+    <div
+      id="joystickKnob"
+      class="joystick-knob"
+    ></div>
+
+  </div>
+
+
+  <div class="action-buttons">
+
+
+    <button id="accelerateBtn">
+      ▲
+    </button>
+
+
+    <button id="brakeBtn">
+      ▼
+    </button>
+
+  </div>
+
+</div>
+
+
+<button
+  id="leaveRaceBtn"
+  class="leave-btn"
+>
+  ✕
+</button>
+```
+
+  </section>
+
+  <!-- =========================
+       RÉSULTATS
+  ========================= -->
+
+  <section
+    id="resultsScreen"
+    class="screen hidden"
+  >
+
+```
+<div class="panel results-panel">
+
+
+  <h1 id="resultsTitle">
+    🏁 Course terminée !
+  </h1>
+
+
+  <div
+    id="resultsAnimation"
+    class="results-animation"
+  >
+    🏆
+  </div>
+
+
+  <div id="resultsList"></div>
+
+
+  <div class="reward-box">
+
+
+    <p id="rewardText"></p>
+
+
+    <p id="timeResult"></p>
+
+  </div>
+
+
+  <button
+    id="continueBtn"
+    class="primary-btn"
+  >
+    Continuer →
+  </button>
+
+</div>
+```
 
   </section>
 
 </div>
+
+<!-- =========================
+     JAVASCRIPT DU JEU
+========================= -->
 
 <script src="game.js"></script>
 
