@@ -1,629 +1,724 @@
+```css
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
-  }
+}
 
 html,
 body {
-margin: 0;
-padding: 0;
-width: 100%;
-min-height: 100%;
-font-family: Arial, Helvetica, sans-serif;
-background: #101827;
-color: white;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #101827;
+  color: white;
 }
 
 body {
-min-height: 100vh;
-overflow-x: hidden;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 button,
 input,
 select {
-font: inherit;
+  font: inherit;
 }
 
 button {
-cursor: pointer;
-border: none;
-touch-action: manipulation;
+  cursor: pointer;
+  border: none;
+  touch-action: manipulation;
 }
 
 .hidden {
-display: none !important;
+  display: none !important;
 }
 
 /* =========================
-ÉCRANS
+   ÉCRANS
 ========================= */
 
 .screen {
-width: 100%;
-min-height: 100vh;
-padding: 20px;
-overflow-x: hidden;
-overflow-y: auto;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
-
-#gameScreen {
-position: fixed;
-inset: 0;
-width: 100%;
-height: 100%;
-min-height: 0;
-padding: 0;
-overflow: hidden;
-}
-
-/* =========================
-PANELS
-========================= */
 
 .panel {
-width: min(950px, 100%);
-margin: 0 auto;
-padding: 25px;
-border-radius: 25px;
-background: #182235;
-box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+  width: min(950px, 100%);
+  margin: 0 auto;
+  padding: 25px;
+  border-radius: 25px;
+  background: #182235;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
 }
 
 h1 {
-text-align: center;
-font-size: clamp(30px, 6vw, 60px);
-margin: 10px 0 20px;
+  text-align: center;
+  font-size: clamp(30px, 6vw, 60px);
+  margin: 10px 0 20px;
 }
 
 h2 {
-text-align: center;
+  text-align: center;
 }
 
 /* =========================
-BOUTONS
+   BOUTONS
 ========================= */
 
 .primary-btn,
 .secondary-btn,
 .danger-btn {
-width: 100%;
-padding: 16px 20px;
-margin-top: 12px;
-border-radius: 14px;
-font-weight: bold;
-font-size: 18px;
+  width: 100%;
+  padding: 16px 20px;
+  margin-top: 12px;
+  border-radius: 14px;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 .primary-btn {
-background: #18c96e;
-color: white;
+  background: #18c96e;
+  color: white;
 }
 
 .secondary-btn {
-background: #2e405f;
-color: white;
+  background: #2e405f;
+  color: white;
 }
 
 .danger-btn {
-background: #9f3342;
-color: white;
+  background: #9f3342;
+  color: white;
 }
 
 .primary-btn:active,
 .secondary-btn:active,
 .danger-btn:active {
-transform: scale(0.98);
+  transform: scale(0.98);
 }
 
-#createAvatarBtn {
-display: block;
-position: relative;
-z-index: 100;
-width: 100%;
-padding: 16px 20px;
-margin-top: 20px;
-margin-bottom: 20px;
-border-radius: 14px;
-background: #18c96e;
-color: white;
-font-size: 18px;
-font-weight: bold;
+.small-btn {
+  width: auto;
+  padding: 11px 15px;
+  margin: 0;
+  font-size: 14px;
 }
 
 /* =========================
-AVATAR
+   AVATAR
 ========================= */
 
 .avatar-preview {
-height: 240px;
-display: flex;
-justify-content: center;
-align-items: center;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .avatar {
-width: 100px;
-height: 170px;
-position: relative;
-flex-shrink: 0;
+  width: 100px;
+  height: 170px;
+  position: relative;
+  flex-shrink: 0;
 }
 
 .large-avatar {
-transform: scale(1.2);
-transform-origin: center;
+  transform: scale(1.35);
+  transform-origin: center;
 }
 
 .face {
-position: absolute;
-width: 70px;
-height: 75px;
-left: 15px;
-top: 25px;
-background: #f0c19b;
-border-radius: 45%;
-border: 3px solid #151515;
+  position: absolute;
+  width: 70px;
+  height: 75px;
+  left: 15px;
+  top: 25px;
+  background: #f0c19b;
+  border-radius: 45%;
+  border: 3px solid #151515;
+  z-index: 2;
 }
 
 .hair {
-position: absolute;
-z-index: 5;
-width: 75px;
-height: 45px;
-left: 12px;
-top: 10px;
-border-radius: 50% 50% 30% 30%;
-background: #24170f;
-color: transparent;
-pointer-events: none;
+  position: absolute;
+  z-index: 5;
+  width: 75px;
+  height: 45px;
+  left: 12px;
+  top: 10px;
+  border-radius: 50% 50% 30% 30%;
+  background: #24170f;
+  pointer-events: none;
+}
+
+.hair.spiky {
+  clip-path: polygon(
+    0 100%,
+    0 30%,
+    15% 45%,
+    25% 5%,
+    38% 40%,
+    52% 0,
+    62% 40%,
+    78% 10%,
+    88% 45%,
+    100% 25%,
+    100% 100%
+  );
+}
+
+.hair.long {
+  height: 65px;
+  border-radius: 45% 45% 35% 35%;
+}
+
+.hair.curly {
+  border-radius: 45%;
+  box-shadow:
+    8px 5px 0 #24170f,
+    -8px 7px 0 #24170f,
+    0 13px 0 #24170f;
 }
 
 .body {
-position: absolute;
-width: 85px;
-height: 75px;
-left: 7px;
-top: 100px;
-border-radius: 25px 25px 10px 10px;
-background: white;
-border: 3px solid #151515;
+  position: absolute;
+  width: 85px;
+  height: 75px;
+  left: 7px;
+  top: 100px;
+  border-radius: 25px 25px 10px 10px;
+  background: #eee;
+  border: 3px solid #151515;
+  z-index: 1;
 }
 
 .helmet {
-position: absolute;
-z-index: 6;
-left: 10px;
-top: 8px;
-width: 80px;
-height: 48px;
-border-radius: 50% 50% 20% 20%;
-pointer-events: none;
+  position: absolute;
+  z-index: 6;
+  left: 10px;
+  top: 8px;
+  width: 80px;
+  height: 48px;
+  border-radius: 50% 50% 20% 20%;
+  pointer-events: none;
 }
 
 .glasses {
-position: absolute;
-z-index: 8;
-left: 8px;
-top: 28px;
-width: 55px;
-height: 15px;
-border: 4px solid #111;
-border-radius: 8px;
-display: none;
-pointer-events: none;
+  position: absolute;
+  z-index: 8;
+  left: 8px;
+  top: 28px;
+  width: 55px;
+  height: 15px;
+  border: 4px solid #111;
+  border-radius: 8px;
+  display: none;
+  pointer-events: none;
+}
+
+.avatar-mask {
+  position: absolute;
+  z-index: 9;
+  left: 20px;
+  top: 61px;
+  width: 60px;
+  height: 22px;
+  border-radius: 5px;
+  display: none;
+  pointer-events: none;
 }
 
 /* =========================
-FORMULAIRE AVATAR
+   FORMULAIRE AVATAR
 ========================= */
 
 .form-grid {
-display: grid;
-grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-gap: 15px;
-width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
 }
 
 .form-grid label {
-display: flex;
-flex-direction: column;
-gap: 7px;
-min-width: 0;
-width: 100%;
-font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  width: 100%;
+  font-weight: bold;
 }
 
-/*
-Le nom prend toujours toute la largeur.
-Ainsi "Nom du pilote" ne peut plus se
-mélanger avec "Apparence".
-*/
-
 .form-grid label:first-child {
-grid-column: 1 / -1;
+  grid-column: 1 / -1;
 }
 
 .form-grid input,
 .form-grid select {
-display: block;
-width: 100%;
-min-width: 0;
-height: 46px;
-padding: 10px 12px;
-border-radius: 10px;
-border: 2px solid #34445e;
-background: #0f1725;
-color: white;
-outline: none;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 46px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 2px solid #34445e;
+  background: #0f1725;
+  color: white;
+  outline: none;
 }
 
 .form-grid input:focus,
 .form-grid select:focus {
-border-color: #18c96e;
+  border-color: #18c96e;
 }
 
 /* =========================
-MENU
+   MENU
 ========================= */
 
 .menu-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-max-width: 900px;
-margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .menu-header h1 {
-text-align: left;
-margin-bottom: 5px;
+  text-align: left;
+  margin-bottom: 5px;
 }
 
-#welcomeText {
-margin-top: 0;
-color: #aebbd1;
+.menu-header p {
+  color: #aebbd1;
 }
 
 .points-box {
-background: #283953;
-padding: 15px 20px;
-border-radius: 15px;
-font-size: 20px;
+  background: #283953;
+  padding: 15px 20px;
+  border-radius: 15px;
+  font-size: 20px;
 }
 
 .menu-avatar-area {
-height: 260px;
-display: flex;
-justify-content: center;
-align-items: center;
+  height: 260px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .menu-buttons,
 .progress-box {
-width: min(500px, 100%);
-margin: 0 auto;
+  width: min(500px, 100%);
+  margin: 0 auto;
 }
 
 .progress-box {
-margin-top: 20px;
-padding: 20px;
-background: #182235;
-border-radius: 18px;
-text-align: center;
+  margin-top: 20px;
+  padding: 20px;
+  background: #182235;
+  border-radius: 18px;
+  text-align: center;
 }
 
 /* =========================
-GARAGE
+   GARAGE
 ========================= */
 
 .shop-grid {
-display: grid;
-grid-template-columns: repeat(2, minmax(0, 1fr));
-gap: 15px;
-margin: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  margin: 20px 0;
 }
 
 .shop-item {
-background: #101827;
-border-radius: 15px;
-padding: 18px;
-text-align: center;
-min-width: 0;
+  background: #101827;
+  border-radius: 15px;
+  padding: 18px;
+  text-align: center;
 }
 
 .shop-item h3 {
-margin-top: 0;
+  margin-top: 0;
 }
 
 .shop-item button {
-width: 100%;
-padding: 12px;
-border-radius: 10px;
-background: #18c96e;
-color: white;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #18c96e;
+  color: white;
 }
 
 .shop-item button:disabled {
-opacity: 0.6;
-cursor: default;
+  opacity: 0.6;
+  cursor: default;
 }
 
 /* =========================
-JEU
+   JEU
 ========================= */
 
 .game-screen {
-width: 100%;
-height: 100%;
-position: relative;
-overflow: hidden;
-background: #111;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: #111;
 }
 
 #gameCanvas {
-display: block;
-width: 100%;
-height: 100%;
-touch-action: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
 }
 
 .hud {
-position: absolute;
-top: 15px;
-left: 15px;
-right: 15px;
-display: flex;
-justify-content: space-between;
-pointer-events: none;
-font-weight: bold;
-font-size: 17px;
-z-index: 10;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  font-weight: bold;
+  font-size: 17px;
+  z-index: 10;
 }
 
 .hud-left {
-display: flex;
-flex-direction: column;
-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .position-box,
 .lap-box {
-padding: 10px 15px;
-border-radius: 12px;
-background: rgba(10, 15, 25, 0.75);
+  padding: 10px 15px;
+  border-radius: 12px;
+  background: rgba(10, 15, 25, 0.75);
 }
 
 #touchControls {
-position: absolute;
-inset: 0;
-pointer-events: none;
-z-index: 20;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
 }
 
 .joystick {
-position: absolute;
-left: 25px;
-bottom: 25px;
-width: 145px;
-height: 145px;
-border-radius: 50%;
-background: rgba(255, 255, 255, 0.15);
-border: 3px solid rgba(255, 255, 255, 0.35);
-pointer-events: auto;
-touch-action: none;
+  position: absolute;
+  left: 25px;
+  bottom: 25px;
+  width: 145px;
+  height: 145px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  pointer-events: auto;
+  touch-action: none;
 }
 
 .joystick-knob {
-position: absolute;
-width: 65px;
-height: 65px;
-left: 37px;
-top: 37px;
-border-radius: 50%;
-background: rgba(255, 255, 255, 0.75);
-box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-pointer-events: none;
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  left: 37px;
+  top: 37px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
 }
 
 .action-buttons {
-position: absolute;
-right: 25px;
-bottom: 25px;
-display: flex;
-flex-direction: column;
-gap: 15px;
-pointer-events: auto;
+  position: absolute;
+  right: 25px;
+  bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  pointer-events: auto;
 }
 
 .action-buttons button {
-width: 85px;
-height: 85px;
-border-radius: 50%;
-font-size: 30px;
-font-weight: bold;
-color: white;
-background: rgba(30, 200, 110, 0.75);
-user-select: none;
--webkit-user-select: none;
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+  background: rgba(30, 200, 110, 0.75);
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 #brakeBtn {
-background: rgba(200, 60, 60, 0.75);
+  background: rgba(200, 60, 60, 0.75);
 }
 
 .leave-btn {
-position: absolute;
-right: 20px;
-top: 70px;
-width: 45px;
-height: 45px;
-border-radius: 50%;
-background: rgba(0, 0, 0, 0.55);
-color: white;
-z-index: 30;
+  position: absolute;
+  right: 20px;
+  top: 70px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: white;
+  z-index: 30;
 }
 
 /* =========================
-RÉSULTATS
+   RÉSULTATS
 ========================= */
 
-#resultsScreen {
-display: block;
-overflow-y: auto;
-overflow-x: hidden;
-}
-
-#resultsScreen .panel {
-margin: 0 auto;
-max-height: none;
-}
-
 .results-panel {
-text-align: center;
+  text-align: center;
 }
 
 .results-animation {
-min-height: 130px;
-display: flex;
-justify-content: center;
-align-items: center;
-font-size: 80px;
+  min-height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 80px;
 }
 
 .result-row {
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 10px;
-padding: 14px;
-margin: 8px 0;
-border-radius: 12px;
-background: #101827;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px;
+  margin: 8px 0;
+  border-radius: 12px;
+  background: #101827;
 }
 
 .result-row.player {
-background: #284968;
-border: 2px solid #18c96e;
+  background: #284968;
+  border: 2px solid #18c96e;
 }
 
 .reward-box {
-margin-top: 20px;
-padding: 15px;
-border-radius: 15px;
-background: #263753;
-font-size: 20px;
-}
-
-#continueBtn {
-display: block;
-width: 100%;
-min-height: 55px;
-margin-top: 20px;
-margin-bottom: 30px;
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 15px;
+  background: #263753;
+  font-size: 18px;
 }
 
 /* =========================
-DUEL
+   CRÉATEUR DE CIRCUIT
 ========================= */
 
-.duel-panel {
-text-align: center;
+.editor-screen {
+  padding: 0;
+  overflow: hidden;
+  background: #0b1220;
 }
 
-.duel-warning {
-font-size: 25px;
-font-weight: bold;
-margin-bottom: 20px;
+.editor-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: #182235;
+  position: relative;
+  z-index: 5;
 }
 
-.duel-subtitle {
-color: #aebbd1;
-font-size: 20px;
+.editor-topbar h1 {
+  text-align: left;
+  font-size: 28px;
+  margin: 0;
 }
 
-.rival-reveal {
-margin-top: 25px;
+.editor-topbar p {
+  margin: 5px 0 0;
+  color: #aebbd1;
 }
 
-.rival-reveal h2 {
-font-size: 35px;
+.editor-workspace {
+  position: relative;
+  height: calc(100vh - 120px);
+  min-height: 500px;
+  overflow: hidden;
+  background: #245f3d;
 }
 
-.rival-reveal p {
-color: #b7c4d8;
-font-style: italic;
+#editorCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
 }
 
-.versus {
-font-size: 40px;
-font-weight: bold;
-margin: 20px;
+.editor-hint {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 14px;
+  background: rgba(10, 15, 25, 0.78);
+  border-radius: 12px;
+  pointer-events: none;
+  text-align: center;
+  max-width: 90%;
+}
+
+.editor-tools {
+  position: absolute;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(10, 15, 25, 0.9);
+}
+
+.editor-tools button {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #2e405f;
+  color: white;
+  font-weight: bold;
+}
+
+.editor-tools .primary-btn {
+  width: auto;
+  margin: 0;
+  background: #18c96e;
+}
+
+.width-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #182235;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.width-control input {
+  width: 130px;
 }
 
 /* =========================
-MOBILE
+   MOBILE
 ========================= */
 
 @media (max-width: 700px) {
 
-.screen {
-padding: 15px;
-}
+  .screen {
+    padding: 15px;
+  }
 
-.panel {
-padding: 18px;
-border-radius: 20px;
-}
+  .panel {
+    padding: 18px;
+  }
 
-.form-grid {
-grid-template-columns: 1fr;
-}
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 
-.form-grid label:first-child {
-grid-column: auto;
-}
+  .form-grid label:first-child {
+    grid-column: auto;
+  }
 
-.shop-grid {
-grid-template-columns: 1fr;
-}
+  .shop-grid {
+    grid-template-columns: 1fr;
+  }
 
-.menu-header {
-align-items: flex-start;
-gap: 10px;
-}
+  .menu-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
 
-.menu-header h1 {
-font-size: 32px;
-}
+  .menu-header h1 {
+    font-size: 32px;
+  }
 
-.points-box {
-padding: 10px;
-font-size: 16px;
-}
+  .points-box {
+    padding: 10px;
+    font-size: 16px;
+  }
 
-.joystick {
-width: 125px;
-height: 125px;
-}
+  .joystick {
+    width: 125px;
+    height: 125px;
+  }
 
-.joystick-knob {
-width: 58px;
-height: 58px;
-left: 30px;
-top: 30px;
-}
+  .joystick-knob {
+    width: 58px;
+    height: 58px;
+    left: 30px;
+    top: 30px;
+  }
 
-.action-buttons {
-right: 15px;
-bottom: 15px;
-}
+  .action-buttons {
+    right: 15px;
+    bottom: 15px;
+  }
 
-.action-buttons button {
-width: 72px;
-height: 72px;
-}
+  .action-buttons button {
+    width: 72px;
+    height: 72px;
+  }
 
-.result-row {
-font-size: 14px;
+  .editor-topbar h1 {
+    font-size: 22px;
+  }
+
+  .editor-topbar p {
+    font-size: 13px;
+  }
+
+  .editor-workspace {
+    height: calc(100vh - 105px);
+  }
+
+  .editor-tools {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .editor-tools button {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .width-control {
+    order: 5;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .width-control input {
+    flex: 1;
+  }
+
+  .editor-tools .primary-btn {
+    order: 6;
+    width: 100%;
+  }
 }
-}
+```
