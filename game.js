@@ -1,7 +1,7 @@
   "use strict";
-const supabase = window.supabase;
-console.log("Supabase chargé :", !!supabase);
 
+const supabaseClient = window.supabase;
+console.log("Supabase chargé :", !!supabaseClient);
 /* =========================================================
    TURBO RACERS
    VERSION CORRIGÉE + AVATAR AMÉLIORÉ
@@ -5006,7 +5006,7 @@ if (createAccountBtn) {
     try {
       const email = username.toLowerCase() + "@turboracers.local";
 
-      const result = await supabase.auth.signUp({
+      const result = await supabaseClient.auth.signInWithPassword
         email: email,
         password: password
       });
