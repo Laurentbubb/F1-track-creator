@@ -1106,12 +1106,12 @@ function renderAvatar(
   });
 if (eyeLeft) {
   eyeLeft.style.left =
-    "35px";
+    "22px";
 }
 
 if (eyeRight) {
   eyeRight.style.left =
-    "58px";
+    "45px";
 }
 
   /* =====================================================
