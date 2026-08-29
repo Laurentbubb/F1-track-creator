@@ -140,7 +140,8 @@ h2 {
   position: absolute;
   width: 70px;
   height: 75px;
-  left: 15px;
+  left: 50%;
+  transform: translateX(-50%);
   top: 25px;
   background: #f0c19b;
   border-radius: 45%;
