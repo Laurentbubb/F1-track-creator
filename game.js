@@ -5040,3 +5040,74 @@ if (
 } else {
   init();
 }
+// ===== CONNEXION / INSCRIPTION SUPABASE =====
+
+const loginBtn = document.getElementById("loginBtn");
+const createAccountBtn = document.getElementById("createAccountBtn");
+const loginUsername = document.getElementById("loginUsername");
+const loginPassword = document.getElementById("loginPassword");
+const loginMessage = document.getElementById("loginMessage");
+
+function showLoginMessage(message) {
+  if (loginMessage) {
+    loginMessage.textContent = message;
+  }
+}
+
+createAccountBtn?.addEventListener("click", async () => {
+  const username = loginUsername.value.trim();
+  const password = loginPassword.value;
+
+  if (!username || !password) {
+    showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
+    return;
+  }
+
+  showLoginMessage("⏳ Création du compte...");
+
+  try {
+    const { error } = await supabase.auth.signUp({
+      email: `${username.toLowerCase()}@turboracers.local`,
+      password: password
+    });
+
+    if (error) {
+      showLoginMessage("❌ " + error.message);
+      return;
+    }
+
+    showLoginMessage("✅ Compte créé !");
+  } catch (error) {
+    showLoginMessage("❌ Une erreur est survenue.");
+    console.error(error);
+  }
+});
+
+loginBtn?.addEventListener("click", async () => {
+  const username = loginUsername.value.trim();
+  const password = loginPassword.value;
+
+  if (!username || !password) {
+    showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
+    return;
+  }
+
+  showLoginMessage("⏳ Connexion...");
+
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: `${username.toLowerCase()}@turboracers.local`,
+      password: password
+    });
+
+    if (error) {
+      showLoginMessage("❌ Pseudo ou code incorrect.");
+      return;
+    }
+
+    showLoginMessage("✅ Connexion réussie !");
+  } catch (error) {
+    showLoginMessage("❌ Une erreur est survenue.");
+    console.error(error);
+  }
+});
