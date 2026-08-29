@@ -873,3 +873,41 @@ h2 {
   left: 50% !important;
   transform: translateX(-50%) !important;
 }
+.avatar-face {
+  position: absolute !important;
+  left: 15px !important;
+  top: 27px !important;
+  width: 70px !important;
+  height: 76px !important;
+  transform: none !important;
+  box-sizing: border-box;
+}
+
+.avatar-eye {
+  position: absolute !important;
+  top: 27px !important;
+  width: 7px !important;
+  height: 7px !important;
+}
+
+.avatar-eye-left {
+  left: 17px !important;
+}
+
+.avatar-eye-right {
+  left: 46px !important;
+}
+
+.avatar-nose {
+  position: absolute !important;
+  left: 32px !important;
+  top: 40px !important;
+  transform: none !important;
+}
+
+.avatar-mouth {
+  position: absolute !important;
+  left: 25px !important;
+  top: 56px !important;
+  transform: none !important;
+}
