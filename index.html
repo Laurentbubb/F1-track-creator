@@ -292,140 +292,148 @@
 
   </section>
 
-  <!-- =========================
-       MENU PRINCIPAL
-  ========================= -->
+<!-- =========================
+     MENU PRINCIPAL
+========================= -->
 
-  <section id="menuScreen" class="screen hidden">
+<section id="menuScreen" class="screen hidden">
 
-```
-<div class="menu-header">
+  <div class="menu-header">
 
-  <div>
+    <div>
+      <h1>
+        🏎️ Turbo Racers
+      </h1>
 
-    <h1>
-      🏎️ Turbo Racers
-    </h1>
+      <p id="welcomeText"></p>
+    </div>
 
-    <p id="welcomeText"></p>
+    <div class="points-box">
+      ⭐
+      <span id="menuPoints">
+        0
+      </span>
+    </div>
+
+  </div>
+
+
+  <div class="menu-avatar-area">
+
+    <div
+      id="menuAvatar"
+      class="avatar large-avatar"
+    ></div>
 
   </div>
 
 
-  <div class="points-box">
+  <div class="menu-buttons">
 
-    ⭐
-    <span id="menuPoints">
-      0
-    </span>
+    <button
+      id="createTrackBtn"
+      class="primary-btn"
+    >
+      ✏️ Créer mon circuit
+    </button>
+
+
+    <button
+      id="raceBtn"
+      class="secondary-btn"
+    >
+      🏁 Courir sur mon circuit
+    </button>
+
+
+    <button
+      id="garageBtn"
+      class="secondary-btn"
+    >
+      🚗 Garage
+    </button>
+
+
+    <button
+      id="customizeBtn"
+      class="secondary-btn"
+    >
+      👤 Mon avatar
+    </button>
+
+
+    <button
+      id="shopBtn"
+      class="secondary-btn"
+    >
+      🛒 Boutique
+    </button>
+
+
+    <button
+      id="inventoryBtn"
+      class="secondary-btn"
+    >
+      🎒 Inventaire
+    </button>
+
+
+    <button
+      id="settingsBtn"
+      class="secondary-btn"
+    >
+      ⚙️ Paramètres
+    </button>
+
+
+    <button
+      id="resetBtn"
+      class="danger-btn"
+    >
+      ♻️ Réinitialiser la sauvegarde
+    </button>
 
   </div>
 
-</div>
+
+  <div class="progress-box">
+
+    <h3>
+      Progression
+    </h3>
 
 
-<div class="menu-avatar-area">
-
-  <div
-    id="menuAvatar"
-    class="avatar large-avatar"
-  ></div>
-
-</div>
-
-
-<div class="menu-buttons">
-
-  <button
-    id="createTrackBtn"
-    class="primary-btn"
-  >
-    ✏️ Créer mon circuit
-  </button>
+    <p>
+      Course :
+      <strong id="courseNumber">
+        1
+      </strong>
+      / 200
+    </p>
 
 
-  <button
-    id="raceBtn"
-    class="secondary-btn"
-  >
-    🏁 Courir sur mon circuit
-  </button>
+    <p>
+      Meilleure position :
+      <strong id="bestPosition">
+        -
+      </strong>
+    </p>
 
 
-  <button
-    id="garageBtn"
-    class="secondary-btn"
-  >
-    🚗 Garage
-  </button>
+    <p>
+      Meilleur chrono :
+      <strong id="bestTime">
+        -
+      </strong>
+    </p>
 
+  </div>
 
-  <button
-    id="customizeBtn"
-    class="secondary-btn"
-  >
-    👤 Mon avatar
-  </button>
-<button id="settingsBtn" class="secondary-btn">
-  ⚙️ Paramètres
-</button>
-
-  <!-- PARAMÈTRES -->
-
-  <button
-    id="settingsBtn"
-    class="secondary-btn"
-  >
-    ⚙️ Paramètres
-  </button>
-
-
-  <button
-    id="resetBtn"
-    class="danger-btn"
-  >
-    ♻️ Réinitialiser la sauvegarde
-  </button>
-
-</div>
-
-
-<div class="progress-box">
-
-  <h3>
-    Progression
-  </h3>
-
-
-  <p>
-    Course :
-    <strong id="courseNumber">
-      1
-    </strong>
-    / 200
-  </p>
-
-
-  <p>
-    Meilleure position :
-    <strong id="bestPosition">
-      -
-    </strong>
-  </p>
-
-
-  <p>
-    Meilleur chrono :
-    <strong id="bestTime">
-      -
-    </strong>
-  </p>
-
-</div>
+</section>
 ```
 
-  </section>
 
+ 
   <!-- =========================
        PARAMÈTRES
   ========================= -->
