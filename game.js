@@ -4968,6 +4968,7 @@ if (
 } else {
   init();
 }
+
 // ===== CONNEXION / INSCRIPTION SUPABASE =====
 
 const loginBtn = document.getElementById("loginBtn");
@@ -4982,38 +4983,59 @@ function showLoginMessage(message) {
   }
 }
 
+// ===== CRÉER UN COMPTE =====
+
 createAccountBtn?.addEventListener("click", async () => {
-  const username = loginUsername.value.trim();
-  const password = loginPassword.value;
+  const username = loginUsername?.value.trim();
+  const password = loginPassword?.value;
 
   if (!username || !password) {
     showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
     return;
   }
 
+  if (password.length < 6) {
+    showLoginMessage("⚠️ Le code doit contenir au moins 6 caractères.");
+    return;
+  }
+
   showLoginMessage("⏳ Création du compte...");
 
   try {
-    const { error } = await supabase.auth.signUp({
-      email: `${username.toLowerCase()}@turboracers.local`,
+    const email = `${username.toLowerCase()}@turboracers.local`;
+
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
       password: password
     });
 
     if (error) {
+      console.error("Erreur inscription :", error);
       showLoginMessage("❌ " + error.message);
       return;
     }
 
+    console.log("Compte créé :", data);
+
     showLoginMessage("✅ Compte créé !");
+
+    // Connecte automatiquement l'utilisateur si Supabase le permet
+    if (data.session) {
+      showScreen("menuScreen");
+    }
+
   } catch (error) {
+    console.error("Erreur :", error);
     showLoginMessage("❌ Une erreur est survenue.");
-    console.error(error);
   }
 });
 
+
+// ===== SE CONNECTER =====
+
 loginBtn?.addEventListener("click", async () => {
-  const username = loginUsername.value.trim();
-  const password = loginPassword.value;
+  const username = loginUsername?.value.trim();
+  const password = loginPassword?.value;
 
   if (!username || !password) {
     showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
@@ -5023,19 +5045,29 @@ loginBtn?.addEventListener("click", async () => {
   showLoginMessage("⏳ Connexion...");
 
   try {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: `${username.toLowerCase()}@turboracers.local`,
+    const email = `${username.toLowerCase()}@turboracers.local`;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
       password: password
     });
 
     if (error) {
-      showLoginMessage("❌ Pseudo ou code incorrect.");
+      console.error("Erreur connexion :", error);
+      showLoginMessage("❌ " + error.message);
       return;
     }
 
+    console.log("Connexion réussie :", data);
+
     showLoginMessage("✅ Connexion réussie !");
+
+    // Aller au menu
+    showScreen("menuScreen");
+
   } catch (error) {
+    console.error("Erreur :", error);
     showLoginMessage("❌ Une erreur est survenue.");
-    console.error(error);
   }
 });
+```
