@@ -2711,9 +2711,18 @@ function startRace() {
         i * 6,
 
       speed:
-        0.65 +
-        Math.random() *
-          0.22,
+  (
+    0.65 +
+    Math.random() * 0.22
+  ) *
+  (
+    {
+      easy: 0.20,
+      medium: 0.50,
+      hard: 0.75,
+      veryHard: 1.00
+    }[save.difficulty] || 0.20
+  ),
 
       lap: 1,
 
