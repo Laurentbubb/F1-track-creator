@@ -2947,7 +2947,7 @@ function keepCarOnTrack() {
     ) || 110;
 
   const allowed =
-    width * 0.55;
+    width * 0.75;
 
   if (
     nearest.distance >
