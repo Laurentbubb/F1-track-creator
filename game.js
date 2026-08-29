@@ -2532,53 +2532,102 @@ function updateCar() {
       car.maxSpeed
     );
 
-  let steering = 0;
+  /* =========================
+   CONDUITE AVEC AIDE
+========================= */
 
-  if (keys.left) {
-    steering -= 1;
-  }
+let steering = 0;
 
-  if (keys.right) {
-    steering += 1;
-  }
+// Clavier
+if (keys.left) {
+  steering -= 1;
+}
 
-  if (
-    joystickState.active
-  ) {
-    steering +=
-      joystickState.x;
-  }
+if (keys.right) {
+  steering += 1;
+}
 
-  steering =
-    clamp(
-      steering,
-      -1,
-      1
-    );
+// Joystick
+if (joystickState.active) {
+  steering += joystickState.x;
+}
+
+steering = clamp(steering, -1, 1);
+
+
+/*
+  ============================
+  PARAMÈTRES DE CONDUITE
+  ============================
+
+  steeringStrength :
+  facilité pour tourner.
+
+  steeringAssist :
+  aide automatique qui stabilise
+  légèrement la voiture.
+
+  steeringSmoothing :
+  évite que la voiture tourne
+  brutalement.
+*/
+
+const steeringStrength = 0.040;
+const steeringAssist = 0.012;
+const steeringSmoothing = 0.18;
+
+
+// Direction progressive
+if (typeof car.steeringAngle !== "number") {
+  car.steeringAngle = 0;
+}
+
+car.steeringAngle +=
+  (steering - car.steeringAngle) *
+  steeringSmoothing;
+
+
+// Force de rotation adaptée
+// à la vitesse
+const speedFactor =
+  Math.min(
+    1,
+    Math.abs(car.speed) / 1.5 + 0.25
+  );
+
+
+// Rotation principale
+car.angle +=
+  car.steeringAngle *
+  steeringStrength *
+  speedFactor;
+
+
+// Petite aide automatique
+// pour rendre la voiture plus stable
+if (
+  Math.abs(car.speed) > 0.15 &&
+  Math.abs(steering) < 0.15
+) {
 
   car.angle +=
-    steering *
-    0.055 *
-    Math.min(
-      1,
-      Math.abs(car.speed) /
-        2 +
-        0.2
-    );
+    car.steeringAngle *
+    steeringAssist;
+}
 
-  car.x +=
-    Math.cos(
-      car.angle
-    ) *
-    car.speed;
 
-  car.y +=
-    Math.sin(
-      car.angle
-    ) *
-    car.speed;
+// Déplacement
+car.x +=
+  Math.cos(car.angle) *
+  car.speed;
 
-  keepCarOnTrack();
+car.y +=
+  Math.sin(car.angle) *
+  car.speed;
+
+
+// Vérification du circuit
+keepCarOnTrack();
 }
 
 function keepCarOnTrack() {
