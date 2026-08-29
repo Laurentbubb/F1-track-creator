@@ -3140,6 +3140,65 @@ function getPosition() {
 
 function checkRaceProgress() {
   const track =
+    normalizeTrack(save.track);
+
+  if (!track || track.length < 5) {
+    return;
+  }
+
+  const nearest =
+    nearestTrackPoint(
+      car.x,
+      car.y,
+      track
+    );
+
+  const index = nearest.index;
+
+  // Le joueur doit d'abord parcourir une partie
+  // du circuit avant que le passage de la ligne
+  // d'arrivée puisse être compté.
+  const checkpoint =
+    Math.floor(track.length * 0.20);
+
+  if (index > checkpoint) {
+    hasPassedFirstCheckpoint = true;
+  }
+
+  // Zone de détection de la ligne d'arrivée
+  const finishZone =
+    Math.max(
+      5,
+      Math.floor(track.length * 0.08)
+    );
+
+  if (
+    hasPassedFirstCheckpoint &&
+    index <= finishZone &&
+    car.speed > 0.3
+  ) {
+    const now = performance.now();
+
+    // Empêche de compter plusieurs fois
+    // le même passage.
+    if (
+      now - car._lastStartPass > 3000
+    ) {
+      car._lastStartPass = now;
+
+      hasPassedFirstCheckpoint = false;
+
+      if (currentLap < 3) {
+        currentLap++;
+      } else {
+        finishRace();
+      }
+    }
+  }
+
+  lastTrackIndex = index;
+}
+  const track =
     normalizeTrack(
       save.track
     );
