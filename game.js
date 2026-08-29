@@ -1,4 +1,4 @@
- "use strict";
+  "use strict";
 const supabase = window.supabase;
 console.log("Supabase chargé :", !!supabase);
 
@@ -3284,78 +3284,6 @@ function checkRaceProgress() {
   }
 
   lastTrackIndex = index;
-}
-  const track =
-    normalizeTrack(
-      save.track
-    );
-
-  if (
-    !track ||
-    track.length < 5
-  ) {
-    return;
-  }
-
-  const nearest =
-    nearestTrackPoint(
-      car.x,
-      car.y,
-      track
-    );
-
-  const index =
-    nearest.index;
-
-  const checkpoint =
-    track.length * 0.20;
-
-  if (
-    index >
-    checkpoint
-  ) {
-    hasPassedFirstCheckpoint =
-      true;
-  }
-
-  if (
-    hasPassedFirstCheckpoint &&
-    index <
-      Math.max(
-        3,
-        track.length * 0.04
-      ) &&
-    car.speed > 0.5
-  ) {
-    const now =
-      performance.now();
-
-    if (
-      now -
-        car._lastStartPass >
-      3000
-    ) {
-      car._lastStartPass =
-        now;
-
-      hasPassedFirstCheckpoint =
-        false;
-
-      if (
-        currentLap < 3
-      ) {
-        currentLap++;
-      } else if (
-        currentLap === 3 &&
-        raceElapsed > 5
-      ) {
-        finishRace();
-      }
-    }
-  }
-
-  lastTrackIndex =
-    index;
 }
 
 /* =========================================================
