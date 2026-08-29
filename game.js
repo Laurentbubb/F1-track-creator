@@ -26,7 +26,9 @@ const DEFAULT_SAVE = {
   bestPosition: null,
   bestTime: null,
 
-  ownedItems: ["default"],
+ difficulty: "easy",
+ 
+ ownedItems: ["default"],
   track: [],
   trackWidth: 110
 };
