@@ -851,3 +851,25 @@ h2 {
   border-radius: 50%;
   z-index: 4;
 }
+.avatar-face {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.avatar-eye-left {
+  left: 18px !important;
+}
+
+.avatar-eye-right {
+  right: 18px !important;
+}
+
+.avatar-nose {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
+
+.avatar-mouth {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+}
