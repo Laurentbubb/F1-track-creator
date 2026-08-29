@@ -4042,7 +4042,21 @@ function setupButtons() {
       }
     );
   }
+const settingsBtn =
+  $("settingsBtn");
 
+if (settingsBtn) {
+  settingsBtn.type =
+    "button";
+
+  settingsBtn.addEventListener(
+    "click",
+    event => {
+      event.preventDefault();
+      openSettings();
+    }
+  );
+}
   /* =====================================================
      GARAGE
   ===================================================== */
