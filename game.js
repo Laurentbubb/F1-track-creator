@@ -5006,11 +5006,9 @@ if (createAccountBtn) {
     try {
       const email = username.toLowerCase() + "@turboracers.local";
 
-     const result = await supabaseClient.auth.signUp({
-  email: email,
-  password: password
+      const result = await supabaseClient.auth.signUp({
+  email: email
 });
-
       if (result.error) {
         console.error("Erreur inscription :", result.error);
         showLoginMessage("❌ " + result.error.message);
