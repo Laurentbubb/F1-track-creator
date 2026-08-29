@@ -793,3 +793,61 @@ h2 {
     width: 100%;
   }
 }
+/* =========================
+   VISAGE DE L'AVATAR
+========================= */
+
+.avatar-face {
+  position: absolute;
+  width: 70px;
+  height: 75px;
+  left: 50%;
+  top: 25px;
+  transform: translateX(-50%);
+  background: #f0c19b;
+  border-radius: 45%;
+  border: 3px solid #151515;
+  z-index: 2;
+}
+
+.avatar-eye {
+  position: absolute;
+  width: 9px;
+  height: 12px;
+  top: 25px;
+  background: #151515;
+  border-radius: 50%;
+  z-index: 4;
+}
+
+.avatar-eye-left {
+  left: 17px;
+}
+
+.avatar-eye-right {
+  right: 17px;
+}
+
+.avatar-nose {
+  position: absolute;
+  width: 7px;
+  height: 10px;
+  left: 50%;
+  top: 39px;
+  transform: translateX(-50%);
+  background: #d99d76;
+  border-radius: 50%;
+  z-index: 4;
+}
+
+.avatar-mouth {
+  position: absolute;
+  width: 22px;
+  height: 8px;
+  left: 50%;
+  top: 54px;
+  transform: translateX(-50%);
+  border-bottom: 3px solid #151515;
+  border-radius: 50%;
+  z-index: 4;
+}
