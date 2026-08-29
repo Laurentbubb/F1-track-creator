@@ -1,9 +1,8 @@
-```javascript
 "use strict";
 
 /* =========================================================
    TURBO RACERS
-   VERSION CORRIGÉE
+   VERSION CORRIGÉE + AVATAR AMÉLIORÉ
 ========================================================= */
 
 const SAVE_KEY = "turboRacersSaveV2";
@@ -189,7 +188,8 @@ function loadSave() {
       return clone(DEFAULT_SAVE);
     }
 
-    const loaded = JSON.parse(raw);
+    const loaded =
+      JSON.parse(raw);
 
     return {
       ...clone(DEFAULT_SAVE),
@@ -201,12 +201,16 @@ function loadSave() {
       },
 
       ownedItems:
-        Array.isArray(loaded.ownedItems)
+        Array.isArray(
+          loaded.ownedItems
+        )
           ? loaded.ownedItems
           : ["default"],
 
       track:
-        Array.isArray(loaded.track)
+        Array.isArray(
+          loaded.track
+        )
           ? loaded.track
           : []
     };
@@ -243,6 +247,25 @@ function showScreen(id) {
 
   target.classList.remove("hidden");
   currentScreen = id;
+
+  /*
+     Quand on revient sur un écran,
+     on remet à jour ce qui doit l'être.
+  */
+
+  if (id === "menuScreen") {
+    updateMenu();
+  }
+
+  if (id === "garageScreen") {
+    renderGarage();
+  }
+
+  if (id === "editorScreen") {
+    requestAnimationFrame(() => {
+      resizeEditorCanvas();
+    });
+  }
 }
 
 /* =========================================================
@@ -294,7 +317,8 @@ function getAvatarFromForm() {
 }
 
 function fillAvatarForm() {
-  const a = save.avatar;
+  const a =
+    save.avatar || {};
 
   if ($("avatarName")) {
     $("avatarName").value =
@@ -323,7 +347,8 @@ function fillAvatarForm() {
 
   if ($("avatarHairColor")) {
     $("avatarHairColor").value =
-      a.hairColor || "#24170f";
+      a.hairColor ||
+      "#24170f";
   }
 
   if ($("avatarGlasses")) {
@@ -343,224 +368,274 @@ function fillAvatarForm() {
 }
 
 /* =========================================================
+   STYLE AVATAR ROBUSTE
+   Le JS définit maintenant lui-même les principales
+   propriétés visuelles afin que l'avatar fonctionne
+   même si le CSS existant est incomplet.
+========================================================= */
+
+function styleAvatarElement(
+  element
+) {
+  if (!element) return;
+
+  element.style.position =
+    "absolute";
+
+  element.style.boxSizing =
+    "border-box";
+
+  element.style.pointerEvents =
+    "none";
+}
+
+function setAvatarBaseStyle(
+  element
+) {
+  if (!element) return;
+
+  element.style.position =
+    "relative";
+
+  element.style.width =
+    "100px";
+
+  element.style.height =
+    "150px";
+
+  element.style.margin =
+    "0 auto";
+
+  element.style.transformOrigin =
+    "center bottom";
+
+  element.style.display =
+    "block";
+
+  element.style.boxSizing =
+    "border-box";
+
+  element.style.overflow =
+    "visible";
+}
+
+/* =========================================================
    RENDU AVATAR
 ========================================================= */
 
-function renderAvatar(element, avatar) {
+function renderAvatar(
+  element,
+  avatar
+) {
   if (!element) return;
 
+  avatar =
+    avatar || clone(
+      DEFAULT_SAVE.avatar
+    );
+
   element.innerHTML = `
+    <div class="avatar-shadow"></div>
+    <div class="avatar-body"></div>
+    <div class="avatar-neck"></div>
+    <div class="avatar-face">
+      <div class="avatar-ear avatar-ear-left"></div>
+      <div class="avatar-ear avatar-ear-right"></div>
+      <div class="avatar-eye avatar-eye-left"></div>
+      <div class="avatar-eye avatar-eye-right"></div>
+      <div class="avatar-nose"></div>
+      <div class="avatar-mouth"></div>
+    </div>
     <div class="hair"></div>
-    <div class="face"></div>
     <div class="glasses"></div>
     <div class="helmet"></div>
     <div class="avatar-mask"></div>
-    <div class="body"></div>
+    <div class="avatar-collar"></div>
   `;
 
-  const hair =
-    element.querySelector(".hair");
+  setAvatarBaseStyle(
+    element
+  );
 
-  const face =
-    element.querySelector(".face");
-
-  const glasses =
-    element.querySelector(".glasses");
-
-  const helmet =
-    element.querySelector(".helmet");
-
-  const mask =
-    element.querySelector(".avatar-mask");
+  const shadow =
+    element.querySelector(
+      ".avatar-shadow"
+    );
 
   const body =
-    element.querySelector(".body");
+    element.querySelector(
+      ".avatar-body"
+    );
+
+  const neck =
+    element.querySelector(
+      ".avatar-neck"
+    );
+
+  const face =
+    element.querySelector(
+      ".avatar-face"
+    );
+
+  const hair =
+    element.querySelector(
+      ".hair"
+    );
+
+  const glasses =
+    element.querySelector(
+      ".glasses"
+    );
+
+  const helmet =
+    element.querySelector(
+      ".helmet"
+    );
+
+  const mask =
+    element.querySelector(
+      ".avatar-mask"
+    );
+
+  const collar =
+    element.querySelector(
+      ".avatar-collar"
+    );
+
+  const eyeLeft =
+    element.querySelector(
+      ".avatar-eye-left"
+    );
+
+  const eyeRight =
+    element.querySelector(
+      ".avatar-eye-right"
+    );
+
+  const nose =
+    element.querySelector(
+      ".avatar-nose"
+    );
+
+  const mouth =
+    element.querySelector(
+      ".avatar-mouth"
+    );
+
+  const earLeft =
+    element.querySelector(
+      ".avatar-ear-left"
+    );
+
+  const earRight =
+    element.querySelector(
+      ".avatar-ear-right"
+    );
 
   if (
-    !hair ||
+    !body ||
     !face ||
+    !hair ||
     !glasses ||
     !helmet ||
-    !mask ||
-    !body
+    !mask
   ) {
+    console.error(
+      "Impossible de construire l'avatar."
+    );
+
     return;
   }
 
   /* =====================================================
-     TAILLE
+     DIMENSIONS SELON LA TAILLE
   ===================================================== */
 
-  element.style.transform = "";
+  let scale = 1;
 
   if (avatar.height === "small") {
-    element.style.transform =
-      "scale(0.9)";
+    scale = 0.88;
+  } else if (
+    avatar.height === "tall"
+  ) {
+    scale = 1.12;
   }
 
-  if (avatar.height === "tall") {
-    element.style.transform =
-      "scale(1.15)";
+  element.style.transform =
+    `scale(${scale})`;
+
+  /* =====================================================
+     COULEUR DE PEAU
+  ===================================================== */
+
+  const skinColors = {
+    A: "#f0c19b",
+    B: "#d99b76",
+    C: "#c47f5c"
+  };
+
+  const skin =
+    skinColors[
+      avatar.gender
+    ] ||
+    "#f0c19b";
+
+  /* =====================================================
+     AGE
+  ===================================================== */
+
+  let faceWidth = 70;
+  let faceHeight = 76;
+  let faceTop = 27;
+
+  if (
+    avatar.age === "child"
+  ) {
+    faceWidth = 61;
+    faceHeight = 65;
+    faceTop = 30;
   }
 
-  if (avatar.height === "medium") {
-    element.style.transform =
-      "scale(1)";
+  if (
+    avatar.age === "adult"
+  ) {
+    faceWidth = 74;
+    faceHeight = 79;
+    faceTop = 26;
   }
 
   /* =====================================================
-     VISAGE
+     OMBRE
   ===================================================== */
 
-  face.style.backgroundColor =
-    avatar.gender === "B"
-      ? "#d99b76"
-      : "#f0c19b";
+  if (shadow) {
+    shadow.style.position =
+      "absolute";
 
-  if (avatar.age === "child") {
-    face.style.width = "64px";
-    face.style.height = "68px";
-    face.style.left = "18px";
-  } else if (avatar.age === "adult") {
-    face.style.width = "74px";
-    face.style.height = "78px";
-    face.style.left = "13px";
-  } else {
-    face.style.width = "70px";
-    face.style.height = "75px";
-    face.style.left = "15px";
-  }
+    shadow.style.left =
+      "15px";
 
-  /* =====================================================
-     CHEVEUX
-  ===================================================== */
-
-  hair.className = "hair";
-
-  hair.style.backgroundColor =
-    avatar.hairColor ||
-    "#24170f";
-
-  hair.style.boxShadow = "none";
-
-  if (avatar.hair === "spiky") {
-    hair.classList.add("spiky");
-  }
-
-  if (avatar.hair === "long") {
-    hair.classList.add("long");
-  }
-
-  if (avatar.hair === "curly") {
-    hair.classList.add("curly");
-
-    const color =
-      avatar.hairColor ||
-      "#24170f";
-
-    hair.style.boxShadow = `
-      8px 5px 0 ${color},
-      -8px 7px 0 ${color},
-      0 13px 0 ${color}
-    `;
-  }
-
-  /* =====================================================
-     LUNETTES
-  ===================================================== */
-
-  glasses.style.display =
-    avatar.glasses === "none"
-      ? "none"
-      : "block";
-
-  glasses.style.transform =
-    "none";
-
-  glasses.style.width =
-    "55px";
-
-  glasses.style.height =
-    "15px";
-
-  glasses.style.borderRadius =
-    "8px";
-
-  if (avatar.glasses === "round") {
-    glasses.style.width =
-      "55px";
-
-    glasses.style.height =
-      "25px";
-
-    glasses.style.borderRadius =
-      "50%";
-  }
-
-  if (avatar.glasses === "sport") {
-    glasses.style.width =
-      "65px";
-
-    glasses.style.borderRadius =
-      "4px";
-
-    glasses.style.transform =
-      "skewX(-10deg)";
-  }
-
-  if (avatar.glasses === "square") {
-    glasses.style.width =
-      "58px";
-
-    glasses.style.borderRadius =
+    shadow.style.bottom =
       "2px";
+
+    shadow.style.width =
+      "70px";
+
+    shadow.style.height =
+      "15px";
+
+    shadow.style.borderRadius =
+      "50%";
+
+    shadow.style.background =
+      "rgba(0,0,0,0.20)";
+
+    shadow.style.filter =
+      "blur(3px)";
   }
 
   /* =====================================================
-     CASQUE
-  ===================================================== */
-
-  helmet.style.display =
-    avatar.helmet === "none"
-      ? "none"
-      : "block";
-
-  const helmetColors = {
-    white: "#eeeeee",
-    red: "#e53935",
-    blue: "#1976d2",
-    black: "#111111",
-    gold: "#d7a64b"
-  };
-
-  helmet.style.backgroundColor =
-    helmetColors[
-      avatar.helmet
-    ] || "#eeeeee";
-
-  /* =====================================================
-     MASQUE
-  ===================================================== */
-
-  mask.style.display =
-    avatar.mask === "none"
-      ? "none"
-      : "block";
-
-  const maskColors = {
-    white: "#eeeeee",
-    black: "#111111",
-    blue: "#1976d2",
-    red: "#e53935"
-  };
-
-  mask.style.backgroundColor =
-    maskColors[
-      avatar.mask
-    ] || "#111111";
-
-  /* =====================================================
-     TENUE
+     CORPS
   ===================================================== */
 
   const outfit =
@@ -570,16 +645,728 @@ function renderAvatar(element, avatar) {
         avatar.outfit
     );
 
-  body.style.backgroundColor =
-    outfit
-      ? outfit.color
-      : "#eeeeee";
+  const outfitColor =
+    outfit?.color ||
+    "#eeeeee";
+
+  styleAvatarElement(
+    body
+  );
+
+  body.style.left =
+    "17px";
+
+  body.style.top =
+    "94px";
+
+  body.style.width =
+    "66px";
+
+  body.style.height =
+    "50px";
+
+  body.style.background =
+    outfitColor;
+
+  body.style.border =
+    "3px solid rgba(0,0,0,0.25)";
 
   body.style.borderRadius =
-    avatar.gender === "B"
-      ? "20px 20px 12px 12px"
-      : "25px 25px 10px 10px";
+    "24px 24px 12px 12px";
+
+  body.style.boxShadow =
+    "inset 0 -5px 0 rgba(0,0,0,0.10)";
+
+  /* =====================================================
+     COU
+  ===================================================== */
+
+  styleAvatarElement(
+    neck
+  );
+
+  neck.style.left =
+    "41px";
+
+  neck.style.top =
+    "87px";
+
+  neck.style.width =
+    "18px";
+
+  neck.style.height =
+    "16px";
+
+  neck.style.background =
+    skin;
+
+  neck.style.borderRadius =
+    "0 0 8px 8px";
+
+  /* =====================================================
+     VISAGE
+  ===================================================== */
+
+  styleAvatarElement(
+    face
+  );
+
+  face.style.left =
+    `${(100 - faceWidth) / 2}px`;
+
+  face.style.top =
+    `${faceTop}px`;
+
+  face.style.width =
+    `${faceWidth}px`;
+
+  face.style.height =
+    `${faceHeight}px`;
+
+  face.style.background =
+    skin;
+
+  face.style.border =
+    "3px solid rgba(0,0,0,0.18)";
+
+  face.style.borderRadius =
+    "45% 45% 48% 48%";
+
+  face.style.zIndex =
+    "5";
+
+  face.style.boxShadow =
+    "0 3px 5px rgba(0,0,0,0.12)";
+
+  /* =====================================================
+     OREILLES
+  ===================================================== */
+
+  [
+    earLeft,
+    earRight
+  ].forEach(ear => {
+    if (!ear) return;
+
+    styleAvatarElement(
+      ear
+    );
+
+    ear.style.top =
+      "29px";
+
+    ear.style.width =
+      "10px";
+
+    ear.style.height =
+      "22px";
+
+    ear.style.background =
+      skin;
+
+    ear.style.border =
+      "2px solid rgba(0,0,0,0.12)";
+
+    ear.style.borderRadius =
+      "50%";
+  });
+
+  if (earLeft) {
+    earLeft.style.left =
+      `${(100 - faceWidth) / 2 - 5}px`;
+  }
+
+  if (earRight) {
+    earRight.style.left =
+      `${(100 + faceWidth) / 2 - 5}px`;
+  }
+
+  /* =====================================================
+     YEUX
+  ===================================================== */
+
+  [
+    eyeLeft,
+    eyeRight
+  ].forEach(eye => {
+    if (!eye) return;
+
+    styleAvatarElement(
+      eye
+    );
+
+    eye.style.top =
+      "54px";
+
+    eye.style.width =
+      "7px";
+
+    eye.style.height =
+      "7px";
+
+    eye.style.background =
+      "#1a1a1a";
+
+    eye.style.borderRadius =
+      "50%";
+
+    eye.style.zIndex =
+      "7";
+  });
+
+  if (eyeLeft) {
+    eyeLeft.style.left =
+      "35px";
+  }
+
+  if (eyeRight) {
+    eyeRight.style.left =
+      "58px";
+  }
+
+  /* =====================================================
+     NEZ
+  ===================================================== */
+
+  if (nose) {
+    styleAvatarElement(
+      nose
+    );
+
+    nose.style.left =
+      "47px";
+
+    nose.style.top =
+      "61px";
+
+    nose.style.width =
+      "6px";
+
+    nose.style.height =
+      "9px";
+
+    nose.style.borderRight =
+      "2px solid rgba(0,0,0,0.18)";
+
+    nose.style.borderBottom =
+      "2px solid rgba(0,0,0,0.18)";
+
+    nose.style.borderRadius =
+      "0 0 5px 0";
+
+    nose.style.zIndex =
+      "7";
+  }
+
+  /* =====================================================
+     BOUCHE
+  ===================================================== */
+
+  if (mouth) {
+    styleAvatarElement(
+      mouth
+    );
+
+    mouth.style.left =
+      "40px";
+
+    mouth.style.top =
+      "77px";
+
+    mouth.style.width =
+      "20px";
+
+    mouth.style.height =
+      "6px";
+
+    mouth.style.borderBottom =
+      "2px solid rgba(90,30,30,0.55)";
+
+    mouth.style.borderRadius =
+      "50%";
+
+    mouth.style.zIndex =
+      "7";
+  }
+
+  /* =====================================================
+     CHEVEUX
+  ===================================================== */
+
+  styleAvatarElement(
+    hair
+  );
+
+  const hairColor =
+    avatar.hairColor ||
+    "#24170f";
+
+  hair.style.background =
+    hairColor;
+
+  hair.style.zIndex =
+    "8";
+
+  hair.style.left =
+    `${(100 - faceWidth) / 2 - 1}px`;
+
+  hair.style.top =
+    `${faceTop - 4}px`;
+
+  hair.style.width =
+    `${faceWidth + 2}px`;
+
+  hair.style.height =
+    "29px";
+
+  hair.style.borderRadius =
+    "48% 48% 35% 35%";
+
+  hair.style.boxShadow =
+    "0 3px 2px rgba(0,0,0,0.15)";
+
+  /*
+     SHORT
+  */
+
+  if (
+    avatar.hair === "short" ||
+    !avatar.hair
+  ) {
+    hair.style.height =
+      "27px";
+
+    hair.style.borderRadius =
+      "48% 48% 25% 25%";
+  }
+
+  /*
+     SPIKY
+  */
+
+  if (
+    avatar.hair === "spiky"
+  ) {
+    hair.style.height =
+      "34px";
+
+    hair.style.clipPath =
+      "polygon(0% 100%, 0% 35%, 10% 45%, 18% 5%, 28% 40%, 42% 0%, 52% 38%, 67% 8%, 78% 42%, 92% 12%, 100% 45%, 100% 100%)";
+
+    hair.style.borderRadius =
+      "0";
+  }
+
+  /*
+     LONG
+  */
+
+  if (
+    avatar.hair === "long"
+  ) {
+    hair.style.height =
+      "55px";
+
+    hair.style.borderRadius =
+      "45% 45% 25% 25%";
+
+    hair.style.boxShadow = `
+      0 0 0 0 ${hairColor},
+      -6px 25px 0 ${hairColor},
+      6px 25px 0 ${hairColor}
+    `;
+  }
+
+  /*
+     CURLY
+  */
+
+  if (
+    avatar.hair === "curly"
+  ) {
+    hair.style.height =
+      "37px";
+
+    hair.style.borderRadius =
+      "50%";
+
+    hair.style.boxShadow = `
+      8px 4px 0 ${hairColor},
+      -8px 6px 0 ${hairColor},
+      7px 17px 0 ${hairColor},
+      -7px 19px 0 ${hairColor},
+      0 25px 0 ${hairColor}
+    `;
+  }
+
+  /* =====================================================
+     LUNETTES
+  ===================================================== */
+
+  styleAvatarElement(
+    glasses
+  );
+
+  glasses.style.zIndex =
+    "12";
+
+  if (
+    !avatar.glasses ||
+    avatar.glasses === "none"
+  ) {
+    glasses.style.display =
+      "none";
+  } else {
+    glasses.style.display =
+      "block";
+
+    glasses.innerHTML = "";
+
+    const leftLens =
+      document.createElement(
+        "span"
+      );
+
+    const rightLens =
+      document.createElement(
+        "span"
+      );
+
+    const bridge =
+      document.createElement(
+        "span"
+      );
+
+    [leftLens, rightLens, bridge]
+      .forEach(child => {
+        child.style.position =
+          "absolute";
+        child.style.boxSizing =
+          "border-box";
+      });
+
+    const lensColor =
+      "#20242b";
+
+    leftLens.style.left =
+      "2px";
+
+    rightLens.style.right =
+      "2px";
+
+    leftLens.style.top =
+      "0";
+
+    rightLens.style.top =
+      "0";
+
+    leftLens.style.width =
+      "24px";
+
+    rightLens.style.width =
+      "24px";
+
+    leftLens.style.height =
+      "19px";
+
+    rightLens.style.height =
+      "19px";
+
+    leftLens.style.border =
+      `3px solid ${lensColor}`;
+
+    rightLens.style.border =
+      `3px solid ${lensColor}`;
+
+    leftLens.style.background =
+      "rgba(120,200,255,0.20)";
+
+    rightLens.style.background =
+      "rgba(120,200,255,0.20)";
+
+    bridge.style.left =
+      "25px";
+
+    bridge.style.top =
+      "7px";
+
+    bridge.style.width =
+      "14px";
+
+    bridge.style.height =
+      "3px";
+
+    bridge.style.background =
+      lensColor;
+
+    if (
+      avatar.glasses === "round"
+    ) {
+      leftLens.style.borderRadius =
+        "50%";
+
+      rightLens.style.borderRadius =
+        "50%";
+
+      leftLens.style.width =
+        "22px";
+
+      rightLens.style.width =
+        "22px";
+
+      leftLens.style.height =
+        "22px";
+
+      rightLens.style.height =
+        "22px";
+    }
+
+    if (
+      avatar.glasses === "square"
+    ) {
+      leftLens.style.borderRadius =
+        "4px";
+
+      rightLens.style.borderRadius =
+        "4px";
+    }
+
+    if (
+      avatar.glasses === "sport"
+    ) {
+      leftLens.style.width =
+        "27px";
+
+      rightLens.style.width =
+        "27px";
+
+      leftLens.style.height =
+        "16px";
+
+      rightLens.style.height =
+        "16px";
+
+      leftLens.style.borderRadius =
+        "5px";
+
+      rightLens.style.borderRadius =
+        "5px";
+
+      leftLens.style.transform =
+        "skewX(-8deg)";
+
+      rightLens.style.transform =
+        "skewX(8deg)";
+    }
+
+    glasses.style.left =
+      "27px";
+
+    glasses.style.top =
+      `${faceTop + 27}px`;
+
+    glasses.style.width =
+      "48px";
+
+    glasses.style.height =
+      "24px";
+
+    glasses.appendChild(
+      leftLens
+    );
+
+    glasses.appendChild(
+      rightLens
+    );
+
+    glasses.appendChild(
+      bridge
+    );
+  }
+
+  /* =====================================================
+     CASQUE
+  ===================================================== */
+
+  styleAvatarElement(
+    helmet
+  );
+
+  helmet.style.zIndex =
+    "20";
+
+  if (
+    !avatar.helmet ||
+    avatar.helmet === "none"
+  ) {
+    helmet.style.display =
+      "none";
+  } else {
+    helmet.style.display =
+      "block";
+
+    const helmetColors = {
+      white: "#eeeeee",
+      red: "#e53935",
+      blue: "#1976d2",
+      black: "#111111",
+      gold: "#d7a64b"
+    };
+
+    helmet.style.background =
+      helmetColors[
+        avatar.helmet
+      ] ||
+      "#eeeeee";
+
+    helmet.style.left =
+      `${(100 - faceWidth) / 2 - 4}px`;
+
+    helmet.style.top =
+      `${faceTop - 9}px`;
+
+    helmet.style.width =
+      `${faceWidth + 8}px`;
+
+    helmet.style.height =
+      "43px";
+
+    helmet.style.borderRadius =
+      "52% 52% 20% 20%";
+
+    helmet.style.border =
+      "3px solid rgba(0,0,0,0.25)";
+
+    helmet.style.boxShadow =
+      "inset 0 -7px 0 rgba(0,0,0,0.12)";
+
+    /*
+       Visière
+    */
+
+    const visor =
+      document.createElement(
+        "div"
+      );
+
+    visor.style.position =
+      "absolute";
+
+    visor.style.left =
+      "9px";
+
+    visor.style.right =
+      "9px";
+
+    visor.style.bottom =
+      "4px";
+
+    visor.style.height =
+      "12px";
+
+    visor.style.borderRadius =
+      "3px 3px 10px 10px";
+
+    visor.style.background =
+      "rgba(20,30,40,0.75)";
+
+    helmet.appendChild(
+      visor
+    );
+  }
+
+  /* =====================================================
+     MASQUE
+  ===================================================== */
+
+  styleAvatarElement(
+    mask
+  );
+
+  mask.style.zIndex =
+    "13";
+
+  if (
+    !avatar.mask ||
+    avatar.mask === "none"
+  ) {
+    mask.style.display =
+      "none";
+  } else {
+    mask.style.display =
+      "block";
+
+    const maskColors = {
+      white: "#eeeeee",
+      black: "#111111",
+      blue: "#1976d2",
+      red: "#e53935"
+    };
+
+    mask.style.background =
+      maskColors[
+        avatar.mask
+      ] ||
+      "#111111";
+
+    mask.style.left =
+      `${(100 - faceWidth) / 2 + 5}px`;
+
+    mask.style.top =
+      `${faceTop + 47}px`;
+
+    mask.style.width =
+      `${faceWidth - 10}px`;
+
+    mask.style.height =
+      "22px";
+
+    mask.style.borderRadius =
+      "7px 7px 12px 12px";
+
+    mask.style.border =
+      "2px solid rgba(0,0,0,0.20)";
+  }
+
+  /* =====================================================
+     COL
+  ===================================================== */
+
+  if (collar) {
+    styleAvatarElement(
+      collar
+    );
+
+    collar.style.left =
+      "28px";
+
+    collar.style.top =
+      "91px";
+
+    collar.style.width =
+      "44px";
+
+    collar.style.height =
+      "9px";
+
+    collar.style.background =
+      "rgba(0,0,0,0.18)";
+
+    collar.style.borderRadius =
+      "50%";
+  }
+
+  /*
+     Petit effet visuel supplémentaire
+  */
+
+  element.style.filter =
+    "drop-shadow(0 4px 3px rgba(0,0,0,0.18))";
 }
+
+/* =========================================================
+   APERÇU EN DIRECT
+========================================================= */
 
 function updateAvatarPreview() {
   const avatar =
@@ -648,7 +1435,8 @@ function createAvatar() {
   const avatar =
     getAvatarFromForm();
 
-  save.avatar = clone(avatar);
+  save.avatar =
+    clone(avatar);
 
   if (!save.avatar.name) {
     save.avatar.name =
@@ -657,7 +1445,8 @@ function createAvatar() {
 
   saveGame();
 
-  editingAvatarFromMenu = false;
+  editingAvatarFromMenu =
+    false;
 
   if ($("avatarHeading")) {
     $("avatarHeading").textContent =
@@ -749,80 +1538,88 @@ function renderGarage() {
 
   container.innerHTML = "";
 
-  SHOP_ITEMS.forEach(item => {
-    const owned =
-      save.ownedItems.includes(
-        item.id
-      );
+  SHOP_ITEMS.forEach(
+    item => {
+      const owned =
+        save.ownedItems.includes(
+          item.id
+        );
 
-    const equipped =
-      save.avatar.outfit ===
-      item.id;
+      const equipped =
+        save.avatar.outfit ===
+        item.id;
 
-    const card =
-      document.createElement(
-        "div"
-      );
+      const card =
+        document.createElement(
+          "div"
+        );
 
-    card.className =
-      "shop-item";
+      card.className =
+        "shop-item";
 
-    let buttonText;
-
-    if (equipped) {
-      buttonText =
-        "✅ Équipée";
-    } else if (owned) {
-      buttonText =
-        "👕 Équiper";
-    } else {
-      buttonText =
-        `⭐ Acheter (${item.price})`;
-    }
-
-    card.innerHTML = `
-      <div style="font-size:45px">
-        ${item.emoji}
-      </div>
-
-      <h3>${item.name}</h3>
-
-      <p>
-        ${
-          item.price === 0
-            ? "Gratuite"
-            : `${item.price} ⭐`
-        }
-      </p>
-
-      <button data-item="${item.id}">
-        ${buttonText}
-      </button>
-    `;
-
-    const button =
-      card.querySelector(
-        "button"
-      );
-
-    if (button) {
-      button.addEventListener(
-        "click",
-        () => {
-          buyOrEquipItem(
-            item.id
-          );
-        }
-      );
+      let buttonText;
 
       if (equipped) {
-        button.disabled =
-          true;
+        buttonText =
+          "✅ Équipée";
+      } else if (owned) {
+        buttonText =
+          "👕 Équiper";
+      } else {
+        buttonText =
+          `⭐ Acheter (${item.price})`;
       }
-    }
 
-    container.appendChild(card);
-  });
+      card.innerHTML = `
+        <div style="font-size:45px">
+          ${item.emoji}
+        </div>
+
+        <h3>${item.name}</h3>
+
+        <p>
+          ${
+            item.price === 0
+              ? "Gratuite"
+              : `${item.price} ⭐`
+          }
+        </p>
+
+        <button
+          type="button"
+          data-item="${item.id}"
+        >
+          ${buttonText}
+        </button>
+      `;
+
+      const button =
+        card.querySelector(
+          "button"
+        );
+
+      if (button) {
+        button.addEventListener(
+          "click",
+          event => {
+            event.preventDefault();
+            buyOrEquipItem(
+              item.id
+            );
+          }
+        );
+
+        if (equipped) {
+          button.disabled =
+            true;
+        }
+      }
+
+      container.appendChild(
+        card
+      );
+    }
+  );
 }
 
 function buyOrEquipItem(id) {
@@ -878,6 +1675,13 @@ function resizeEditorCanvas() {
   const rect =
     editorCanvas.getBoundingClientRect();
 
+  if (
+    !rect.width ||
+    !rect.height
+  ) {
+    return;
+  }
+
   const ratio =
     window.devicePixelRatio ||
     1;
@@ -910,7 +1714,9 @@ function resizeEditorCanvas() {
   drawEditor();
 }
 
-function editorPointFromEvent(event) {
+function editorPointFromEvent(
+  event
+) {
   const rect =
     editorCanvas.getBoundingClientRect();
 
@@ -966,7 +1772,6 @@ function startDrawing(event) {
 
   drawing = true;
 
-  /* Sauvegarde avant modification */
   editorUndo.push(
     clone(editorPoints)
   );
@@ -980,7 +1785,9 @@ function startDrawing(event) {
       event
     );
 
-  editorPoints.push(point);
+  editorPoints.push(
+    point
+  );
 
   drawEditor();
 }
@@ -1052,6 +1859,13 @@ function drawEditor() {
   const rect =
     editorCanvas.getBoundingClientRect();
 
+  if (
+    !rect.width ||
+    !rect.height
+  ) {
+    return;
+  }
+
   editorCtx.clearRect(
     0,
     0,
@@ -1069,7 +1883,6 @@ function drawEditor() {
     rect.height
   );
 
-  /* Herbe */
   editorCtx.globalAlpha =
     0.12;
 
@@ -1183,7 +1996,6 @@ function drawTrackPath(
   context.lineJoin =
     "round";
 
-  /* Bordure */
   context.strokeStyle =
     "#111827";
 
@@ -1214,7 +2026,6 @@ function drawTrackPath(
 
   context.stroke();
 
-  /* Route */
   context.strokeStyle =
     "#4b5563";
 
@@ -1245,7 +2056,6 @@ function drawTrackPath(
 
   context.stroke();
 
-  /* Ligne centrale */
   context.strokeStyle =
     "rgba(255,255,255,0.45)";
 
@@ -1308,6 +2118,13 @@ function createSampleTrack() {
 
   const rect =
     editorCanvas.getBoundingClientRect();
+
+  if (
+    !rect.width ||
+    !rect.height
+  ) {
+    return;
+  }
 
   const cx =
     rect.width / 2;
@@ -1383,7 +2200,9 @@ function openEditor() {
   );
 
   editorPoints =
-    clone(save.track || []);
+    clone(
+      save.track || []
+    );
 
   editorUndo = [];
   editorRedo = [];
@@ -1408,7 +2227,7 @@ function openEditor() {
 }
 
 /* =========================================================
-   CIRCUIT → CANVAS COURSE
+   NORMALISATION CIRCUIT
 ========================================================= */
 
 function normalizeTrack(points) {
@@ -1434,17 +2253,19 @@ function normalizeTrack(points) {
     return points;
   }
 
-  return points.map(p => ({
-    x:
-      p.x /
-        editorRect.width *
-        rect.width,
+  return points.map(
+    p => ({
+      x:
+        p.x /
+          editorRect.width *
+          rect.width,
 
-    y:
-      p.y /
-        editorRect.height *
-        rect.height
-  }));
+      y:
+        p.y /
+          editorRect.height *
+          rect.height
+    })
+  );
 }
 
 /* =========================================================
@@ -1456,6 +2277,13 @@ function resizeGameCanvas() {
 
   const rect =
     canvas.getBoundingClientRect();
+
+  if (
+    !rect.width ||
+    !rect.height
+  ) {
+    return;
+  }
 
   const ratio =
     window.devicePixelRatio ||
@@ -1558,8 +2386,11 @@ function startRace() {
   const next =
     track[1];
 
-  car.x = start.x;
-  car.y = start.y;
+  car.x =
+    start.x;
+
+  car.y =
+    start.y;
 
   car.angle =
     Math.atan2(
@@ -1570,6 +2401,13 @@ function startRace() {
   car.speed = 0;
 
   opponents = [];
+
+  const opponentColors = [
+    "#e53935",
+    "#1976d2",
+    "#f59e0b",
+    "#a855f7"
+  ];
 
   for (
     let i = 0;
@@ -1588,15 +2426,14 @@ function startRace() {
 
       lap: 1,
 
-      color: [
-        "#e53935",
-        "#1976d2",
-        "#f59e0b",
-        "#a855f7"
-      ][i],
+      color:
+        opponentColors[i],
 
-      x: start.x,
-      y: start.y
+      x:
+        start.x,
+
+      y:
+        start.y
     });
   }
 
@@ -1623,9 +2460,10 @@ function gameLoop(now) {
       : performance.now();
 
   raceElapsed =
-    (currentTime -
-      raceStartTime) /
-    1000;
+    (
+      currentTime -
+      raceStartTime
+    ) / 1000;
 
   updateCar();
   updateOpponents();
@@ -1985,12 +2823,6 @@ function checkRaceProgress() {
   const index =
     nearest.index;
 
-  /*
-     On considère que le joueur
-     a réellement commencé le tour
-     après avoir dépassé 20% du circuit.
-  */
-
   const checkpoint =
     track.length * 0.20;
 
@@ -2001,12 +2833,6 @@ function checkRaceProgress() {
     hasPassedFirstCheckpoint =
       true;
   }
-
-  /*
-     Le tour ne peut être validé
-     qu'après avoir parcouru une
-     bonne partie du circuit.
-  */
 
   if (
     hasPassedFirstCheckpoint &&
@@ -2225,6 +3051,13 @@ function drawGame() {
   const rect =
     canvas.getBoundingClientRect();
 
+  if (
+    !rect.width ||
+    !rect.height
+  ) {
+    return;
+  }
+
   ctx.clearRect(
     0,
     0,
@@ -2232,7 +3065,6 @@ function drawGame() {
     rect.height
   );
 
-  /* Herbe */
   ctx.fillStyle =
     "#24613d";
 
@@ -2398,7 +3230,6 @@ function drawCar(
     scale
   );
 
-  /* Ombre */
   ctx.fillStyle =
     "rgba(0,0,0,0.35)";
 
@@ -2416,7 +3247,6 @@ function drawCar(
 
   ctx.fill();
 
-  /* Corps */
   ctx.fillStyle =
     color;
 
@@ -2444,7 +3274,6 @@ function drawCar(
 
   ctx.fill();
 
-  /* Cockpit */
   ctx.fillStyle =
     "#111827";
 
@@ -2462,7 +3291,6 @@ function drawCar(
 
   ctx.fill();
 
-  /* Aileron */
   ctx.fillStyle =
     "#eeeeee";
 
@@ -2473,7 +3301,6 @@ function drawCar(
     26
   );
 
-  /* Roues */
   ctx.fillStyle =
     "#111111";
 
@@ -2571,9 +3398,7 @@ function setupKeyboard() {
           "arrowleft",
           "arrowright",
           " "
-        ].includes(
-          key
-        )
+        ].includes(key)
       ) {
         event.preventDefault();
       }
@@ -2877,6 +3702,122 @@ function setupActionButton(
 }
 
 /* =========================================================
+   BOUTON CONTINUER — VERSION RENFORCÉE
+========================================================= */
+
+function continueToNextCourse(
+  event
+) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  console.log(
+    "➡️ Bouton Continuer activé"
+  );
+
+  save.courseNumber =
+    Math.max(
+      1,
+      Number(
+        save.courseNumber || 1
+      )
+    ) + 1;
+
+  saveGame();
+
+  updateMenu();
+
+  showScreen(
+    "menuScreen"
+  );
+}
+
+function setupContinueButton() {
+  const continueBtn =
+    $("continueBtn");
+
+  if (continueBtn) {
+    continueBtn.type =
+      "button";
+
+    continueBtn.addEventListener(
+      "click",
+      continueToNextCourse
+    );
+
+    continueBtn.addEventListener(
+      "pointerup",
+      event => {
+        /*
+           Certains layouts / scripts
+           peuvent empêcher le click.
+           On ne déclenche pas ici une
+           deuxième fois : le click reste
+           la source principale.
+        */
+        event.stopPropagation();
+      }
+    );
+  } else {
+    console.warn(
+      "⚠️ continueBtn introuvable lors de l'initialisation."
+    );
+  }
+}
+
+/*
+   Délégation supplémentaire :
+   si le bouton est recréé plus tard
+   par un autre script, ça fonctionne
+   quand même.
+*/
+
+function setupContinueDelegation() {
+  document.addEventListener(
+    "click",
+    event => {
+      const target =
+        event.target.closest?.(
+          "#continueBtn"
+        );
+
+      if (!target) return;
+
+      /*
+         Si le listener direct existe,
+         il a déjà été exécuté.
+         On utilise un verrou très court
+         pour éviter le double déclenchement.
+      */
+
+      if (
+        target.dataset.continueHandled ===
+        "true"
+      ) {
+        return;
+      }
+
+      target.dataset.continueHandled =
+        "true";
+
+      setTimeout(
+        () => {
+          delete target.dataset
+            .continueHandled;
+        },
+        100
+      );
+
+      continueToNextCourse(
+        event
+      );
+    }
+  );
+}
+
+/* =========================================================
    BOUTONS
 ========================================================= */
 
@@ -2889,9 +3830,15 @@ function setupButtons() {
     $("createAvatarBtn");
 
   if (createAvatarBtn) {
+    createAvatarBtn.type =
+      "button";
+
     createAvatarBtn.addEventListener(
       "click",
-      createAvatar
+      event => {
+        event.preventDefault();
+        createAvatar();
+      }
     );
   }
 
@@ -2899,9 +3846,14 @@ function setupButtons() {
     $("avatarCancelBtn");
 
   if (avatarCancelBtn) {
+    avatarCancelBtn.type =
+      "button";
+
     avatarCancelBtn.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
         updateMenu();
 
         showScreen(
@@ -2911,7 +3863,10 @@ function setupButtons() {
     );
   }
 
-  /* Aperçu en direct */
+  /* =====================================================
+     APERÇU AVATAR
+  ===================================================== */
+
   const avatarFields = [
     "avatarName",
     "avatarGender",
@@ -2926,10 +3881,11 @@ function setupButtons() {
 
   avatarFields.forEach(
     id => {
-      const element = $(id);
+      const element =
+        $(id);
 
       if (!element) {
-        console.error(
+        console.warn(
           "Champ avatar introuvable :",
           id
         );
@@ -2957,9 +3913,15 @@ function setupButtons() {
     $("createTrackBtn");
 
   if (createTrackBtn) {
+    createTrackBtn.type =
+      "button";
+
     createTrackBtn.addEventListener(
       "click",
-      openEditor
+      event => {
+        event.preventDefault();
+        openEditor();
+      }
     );
   }
 
@@ -2967,9 +3929,15 @@ function setupButtons() {
     $("raceBtn");
 
   if (raceBtn) {
+    raceBtn.type =
+      "button";
+
     raceBtn.addEventListener(
       "click",
-      openRace
+      event => {
+        event.preventDefault();
+        openRace();
+      }
     );
   }
 
@@ -2977,9 +3945,14 @@ function setupButtons() {
     $("garageBtn");
 
   if (garageBtn) {
+    garageBtn.type =
+      "button";
+
     garageBtn.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
         renderGarage();
 
         showScreen(
@@ -2993,9 +3966,15 @@ function setupButtons() {
     $("customizeBtn");
 
   if (customizeBtn) {
+    customizeBtn.type =
+      "button";
+
     customizeBtn.addEventListener(
       "click",
-      openAvatarEditor
+      event => {
+        event.preventDefault();
+        openAvatarEditor();
+      }
     );
   }
 
@@ -3003,9 +3982,15 @@ function setupButtons() {
     $("resetBtn");
 
   if (resetBtn) {
+    resetBtn.type =
+      "button";
+
     resetBtn.addEventListener(
       "click",
-      resetGame
+      event => {
+        event.preventDefault();
+        resetGame();
+      }
     );
   }
 
@@ -3017,9 +4002,14 @@ function setupButtons() {
     $("garageBackBtn");
 
   if (garageBackBtn) {
+    garageBackBtn.type =
+      "button";
+
     garageBackBtn.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
         updateMenu();
 
         showScreen(
@@ -3037,9 +4027,14 @@ function setupButtons() {
     $("editorBackBtn");
 
   if (editorBackBtn) {
+    editorBackBtn.type =
+      "button";
+
     editorBackBtn.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
         save.track =
           clone(
             editorPoints
@@ -3066,9 +4061,15 @@ function setupButtons() {
     $("clearTrackBtn");
 
   if (clearTrackBtn) {
+    clearTrackBtn.type =
+      "button";
+
     clearTrackBtn.addEventListener(
       "click",
-      clearTrack
+      event => {
+        event.preventDefault();
+        clearTrack();
+      }
     );
   }
 
@@ -3076,9 +4077,15 @@ function setupButtons() {
     $("sampleTrackBtn");
 
   if (sampleTrackBtn) {
+    sampleTrackBtn.type =
+      "button";
+
     sampleTrackBtn.addEventListener(
       "click",
-      createSampleTrack
+      event => {
+        event.preventDefault();
+        createSampleTrack();
+      }
     );
   }
 
@@ -3086,9 +4093,15 @@ function setupButtons() {
     $("undoTrackBtn");
 
   if (undoTrackBtn) {
+    undoTrackBtn.type =
+      "button";
+
     undoTrackBtn.addEventListener(
       "click",
-      undoTrack
+      event => {
+        event.preventDefault();
+        undoTrack();
+      }
     );
   }
 
@@ -3096,9 +4109,15 @@ function setupButtons() {
     $("redoTrackBtn");
 
   if (redoTrackBtn) {
+    redoTrackBtn.type =
+      "button";
+
     redoTrackBtn.addEventListener(
       "click",
-      redoTrack
+      event => {
+        event.preventDefault();
+        redoTrack();
+      }
     );
   }
 
@@ -3123,9 +4142,14 @@ function setupButtons() {
     $("testTrackBtn");
 
   if (testTrackBtn) {
+    testTrackBtn.type =
+      "button";
+
     testTrackBtn.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
         if (
           editorPoints.length <
           5
@@ -3160,9 +4184,14 @@ function setupButtons() {
     $("leaveRaceBtn");
 
   if (leaveRaceBtn) {
+    leaveRaceBtn.type =
+      "button";
+
     leaveRaceBtn.addEventListener(
       "click",
-      () => {
+      event => {
+        event.preventDefault();
+
         if (
           confirm(
             "Quitter cette course ?"
@@ -3195,28 +4224,7 @@ function setupButtons() {
      CONTINUER
   ===================================================== */
 
-  const continueBtn =
-    $("continueBtn");
-
-  if (continueBtn) {
-    continueBtn.addEventListener(
-      "click",
-      () => {
-        save.courseNumber =
-          Number(
-            save.courseNumber || 1
-          ) + 1;
-
-        saveGame();
-
-        updateMenu();
-
-        showScreen(
-          "menuScreen"
-        );
-      }
-    );
-  }
+  setupContinueButton();
 
   /* =====================================================
      CONTRÔLES
@@ -3339,6 +4347,14 @@ function init() {
         "2d"
       );
 
+    /*
+       Empêche le navigateur de faire
+       défiler la page pendant le dessin.
+    */
+
+    editorCanvas.style.touchAction =
+      "none";
+
     editorCanvas.addEventListener(
       "pointerdown",
       startDrawing
@@ -3358,9 +4374,30 @@ function init() {
       "pointercancel",
       stopDrawing
     );
+
+    editorCanvas.addEventListener(
+      "pointerleave",
+      event => {
+        if (drawing) {
+          stopDrawing(
+            event
+          );
+        }
+      }
+    );
   }
 
   setupButtons();
+
+  /*
+     Important :
+     ce deuxième système permet de
+     retrouver #continueBtn même si
+     son HTML est recréé plus tard.
+  */
+
+  setupContinueDelegation();
+
   setupKeyboard();
   setupJoystick();
 
@@ -3385,14 +4422,27 @@ function init() {
       "menuScreen"
     );
   }
+
+  console.log(
+    "✅ Initialisation terminée"
+  );
 }
 
 /* =========================================================
    LANCEMENT
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  init
-);
-```
+if (
+  document.readyState ===
+  "loading"
+) {
+  document.addEventListener(
+    "DOMContentLoaded",
+    init,
+    {
+      once: true
+    }
+  );
+} else {
+  init();
+}
