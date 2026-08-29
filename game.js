@@ -1003,7 +1003,7 @@ function renderAvatar(
   );
 
   face.style.left =
-    `${(100 - faceWidth) / 2}px`;
+  "15px";
 
   face.style.top =
     `${faceTop}px`;
