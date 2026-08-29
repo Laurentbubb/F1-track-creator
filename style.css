@@ -146,11 +146,26 @@ h2 {
   border-radius: 45%;
   border: 3px solid #151515;
   z-index: 2;
-
-  /* Important :
-     les éléments du visage restent
-     à l'intérieur de la tête */
   overflow: hidden;
+}
+
+.face .eyes {
+  left: 50%;
+  top: 25px;
+  transform: translateX(-50%);
+}
+
+.face .nose {
+  left: 50%;
+  top: 38px;
+  transform: translateX(-50%);
+}
+
+.face .mouth {
+  left: 50%;
+  top: 52px;
+  transform: translateX(-50%);
+}
 }
 
 /* Yeux, nez et bouche */
