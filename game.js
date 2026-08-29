@@ -1,5 +1,6 @@
  "use strict";
 const supabase = window.supabase;
+console.log("Supabase chargé :", !!supabase);
 
 /* =========================================================
    TURBO RACERS
