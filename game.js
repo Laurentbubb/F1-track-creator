@@ -4973,6 +4973,8 @@ if (
 
 const loginBtn = document.getElementById("loginBtn");
 const createAccountBtn = document.getElementById("createAccountBtn");
+console.log("LOGIN BTN =", loginBtn);
+console.log("CREATE BTN =", createAccountBtn);
 const loginUsername = document.getElementById("loginUsername");
 const loginPassword = document.getElementById("loginPassword");
 const loginMessage = document.getElementById("loginMessage");
