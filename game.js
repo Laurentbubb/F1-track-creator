@@ -1,4 +1,5 @@
  "use strict";
+const supabase = window.supabase;
 
 /* =========================================================
    TURBO RACERS
