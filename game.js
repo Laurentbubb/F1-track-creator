@@ -1104,15 +1104,15 @@ function renderAvatar(
     eye.style.zIndex =
       "7";
   });
+if (eyeLeft) {
+  eyeLeft.style.left =
+    `${(100 - faceWidth) / 2 + faceWidth * 0.28}px`;
+}
 
-  if (eyeLeft) {
-    eyeLeft.style.left =
-      "35px";
-  }
-
-  if (eyeRight) {
-    eyeRight.style.left =
-      "58px";
+if (eyeRight) {
+  eyeRight.style.left =
+    `${(100 - faceWidth) / 2 + faceWidth * 0.65}px`;
+}
   }
 
   /* =====================================================
