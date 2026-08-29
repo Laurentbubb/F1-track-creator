@@ -1106,12 +1106,16 @@ function renderAvatar(
   });
 if (eyeLeft) {
   eyeLeft.style.left =
-    `${(100 - faceWidth) / 2 + faceWidth * 0.28}px`;
+    "35px";
 }
 
 if (eyeRight) {
   eyeRight.style.left =
-    `${(100 - faceWidth) / 2 + faceWidth * 0.65}px`;
+    "58px";
+}
+}
+
+
 }
   }
 
@@ -1124,9 +1128,8 @@ if (eyeRight) {
       nose
     );
 
-  nose.style.left =
-  `${(100 - faceWidth) / 2 + faceWidth * 0.50}px`; 
-
+ nose.style.left =
+  "47px";
     nose.style.top =
       "61px";
 
@@ -1158,8 +1161,8 @@ if (eyeRight) {
       mouth
     );
 
-    mouth.style.left =
-  `${(100 - faceWidth) / 2 + faceWidth * 0.50 - 10}px`;
+ mouth.style.left =
+  "40px";  
 
     mouth.style.top =
       "77px";
