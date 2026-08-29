@@ -4539,7 +4539,6 @@ if (settingsBtn) {
       }
     );
   }
-```
 
   /* =====================================================
      ÉDITEUR
@@ -4967,4 +4966,110 @@ if (
   );
 } else {
   init();
+}
+
+// ===== CONNEXION / INSCRIPTION SUPABASE =====
+
+const loginBtn = document.getElementById("loginBtn");
+const createAccountBtn = document.getElementById("createAccountBtn");
+const loginUsername = document.getElementById("loginUsername");
+const loginPassword = document.getElementById("loginPassword");
+const loginMessage = document.getElementById("loginMessage");
+
+function showLoginMessage(message) {
+  if (loginMessage) {
+    loginMessage.textContent = message;
+  }
+}
+
+// ===== CRÉER UN COMPTE =====
+
+if (createAccountBtn) {
+  createAccountBtn.addEventListener("click", async function (event) {
+    event.preventDefault();
+
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+
+    if (!username || !password) {
+      showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
+      return;
+    }
+
+    if (password.length < 6) {
+      showLoginMessage("⚠️ Le code doit contenir au moins 6 caractères.");
+      return;
+    }
+
+    showLoginMessage("⏳ Création du compte...");
+
+    try {
+      const email = username.toLowerCase() + "@turboracers.local";
+
+      const result = await supabase.auth.signUp({
+        email: email,
+        password: password
+      });
+
+      if (result.error) {
+        console.error("Erreur inscription :", result.error);
+        showLoginMessage("❌ " + result.error.message);
+        return;
+      }
+
+      console.log("Compte créé :", result.data);
+      showLoginMessage("✅ Compte créé !");
+
+      if (result.data.session) {
+        showScreen("menuScreen");
+      }
+
+    } catch (error) {
+      console.error("Erreur :", error);
+      showLoginMessage("❌ Une erreur est survenue.");
+    }
+  });
+}
+
+
+// ===== SE CONNECTER =====
+
+if (loginBtn) {
+  loginBtn.addEventListener("click", async function (event) {
+    event.preventDefault();
+
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+
+    if (!username || !password) {
+      showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
+      return;
+    }
+
+    showLoginMessage("⏳ Connexion...");
+
+    try {
+      const email = username.toLowerCase() + "@turboracers.local";
+
+      const result = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (result.error) {
+        console.error("Erreur connexion :", result.error);
+        showLoginMessage("❌ " + result.error.message);
+        return;
+      }
+
+      console.log("Connexion réussie :", result.data);
+      showLoginMessage("✅ Connexion réussie !");
+
+      showScreen("menuScreen");
+
+    } catch (error) {
+      console.error("Erreur :", error);
+      showLoginMessage("❌ Une erreur est survenue.");
+    }
+  });
 }
