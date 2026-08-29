@@ -1112,7 +1112,7 @@ if (eyeLeft) {
 if (eyeRight) {
   eyeRight.style.left =
     "58px";
-  }
+}
 
   /* =====================================================
      NEZ
