@@ -1124,8 +1124,8 @@ if (eyeRight) {
       nose
     );
 
-    nose.style.left =
-      "47px";
+  nose.style.left =
+  `${(100 - faceWidth) / 2 + faceWidth * 0.50}px`; 
 
     nose.style.top =
       "61px";
@@ -1159,7 +1159,7 @@ if (eyeRight) {
     );
 
     mouth.style.left =
-      "40px";
+  `${(100 - faceWidth) / 2 + faceWidth * 0.50 - 10}px`;
 
     mouth.style.top =
       "77px";
