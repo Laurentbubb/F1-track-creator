@@ -3029,9 +3029,13 @@ function updateOpponents() {
 
   opponents.forEach(
     opponent => {
-      opponent.progress +=
-        opponent.speed;
+      let botSpeed = opponent.speed;
 
+if (save.courseNumber <= 3) {
+  botSpeed *= 0.55;
+}
+
+opponent.progress += botSpeed;
       if (
         opponent.progress >=
         track.length
