@@ -2861,9 +2861,9 @@ steering = clamp(steering, -1, 1);
   brutalement.
 */
 
-const steeringStrength = 0.040;
-const steeringAssist = 0.012;
-const steeringSmoothing = 0.18;
+const steeringStrength = 0.050;
+const steeringAssist = 0.025;
+const steeringSmoothing = 0.25;
 
 
 // Direction progressive
