@@ -86,7 +86,298 @@ const joystickState = {
   x: 0,
   y: 0
 };
+/* =====================================================
+   PARAMÈTRES
+===================================================== */
 
+let currentLanguage = "fr";
+let musicEnabled = true;
+
+const translations = {
+  fr: {
+    settings: "⚙️ Paramètres",
+    language: "Langue",
+    music: "Musique",
+    musicOn: "Activée",
+    musicOff: "Désactivée",
+    close: "Fermer",
+    french: "Français",
+    english: "English",
+    italian: "Italiano",
+    spanish: "Español"
+  },
+
+  en: {
+    settings: "⚙️ Settings",
+    language: "Language",
+    music: "Music",
+    musicOn: "On",
+    musicOff: "Off",
+    close: "Close",
+    french: "French",
+    english: "English",
+    italian: "Italian",
+    spanish: "Spanish"
+  },
+
+  it: {
+    settings: "⚙️ Impostazioni",
+    language: "Lingua",
+    music: "Musica",
+    musicOn: "Attivata",
+    musicOff: "Disattivata",
+    close: "Chiudi",
+    french: "Francese",
+    english: "Inglese",
+    italian: "Italiano",
+    spanish: "Spagnolo"
+  },
+
+  es: {
+    settings: "⚙️ Ajustes",
+    language: "Idioma",
+    music: "Música",
+    musicOn: "Activada",
+    musicOff: "Desactivada",
+    close: "Cerrar",
+    french: "Francés",
+    english: "Inglés",
+    italian: "Italiano",
+    spanish: "Español"
+  }
+};
+
+function openSettings() {
+  let existing =
+    document.getElementById("settingsModal");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const t =
+    translations[currentLanguage];
+
+  const modal =
+    document.createElement("div");
+
+  modal.id =
+    "settingsModal";
+
+  modal.style.position =
+    "fixed";
+
+  modal.style.inset =
+    "0";
+
+  modal.style.background =
+    "rgba(0,0,0,0.75)";
+
+  modal.style.display =
+    "flex";
+
+  modal.style.alignItems =
+    "center";
+
+  modal.style.justifyContent =
+    "center";
+
+  modal.style.zIndex =
+    "9999";
+
+  modal.innerHTML = `
+    <div style="
+      width:min(500px,90%);
+      background:#182235;
+      padding:25px;
+      border-radius:20px;
+      box-shadow:0 15px 50px rgba(0,0,0,.5);
+    ">
+
+      <h2>${t.settings}</h2>
+
+      <label style="
+        display:block;
+        margin:20px 0 8px;
+        font-weight:bold;
+      ">
+        ${t.language}
+      </label>
+
+      <select id="settingsLanguage" style="
+        width:100%;
+        padding:12px;
+        border-radius:10px;
+        background:#0f1725;
+        color:white;
+        border:2px solid #34445e;
+      ">
+        <option value="fr">${t.french}</option>
+        <option value="en">${t.english}</option>
+        <option value="it">${t.italian}</option>
+        <option value="es">${t.spanish}</option>
+      </select>
+
+      <label style="
+        display:block;
+        margin:20px 0 8px;
+        font-weight:bold;
+      ">
+        ${t.music}
+      </label>
+
+      <select id="settingsMusic" style="
+        width:100%;
+        padding:12px;
+        border-radius:10px;
+        background:#0f1725;
+        color:white;
+        border:2px solid #34445e;
+      ">
+        <option value="on">${t.musicOn}</option>
+        <option value="off">${t.musicOff}</option>
+      </select>
+
+      <button id="closeSettingsBtn"
+        class="primary-btn"
+        style="margin-top:20px;">
+        ${t.close}
+      </button>
+
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  const languageSelect =
+    document.getElementById(
+      "settingsLanguage"
+    );
+
+  const musicSelect =
+    document.getElementById(
+      "settingsMusic"
+    );
+
+  languageSelect.value =
+    currentLanguage;
+
+  musicSelect.value =
+    musicEnabled
+      ? "on"
+      : "off";
+
+  languageSelect.addEventListener(
+    "change",
+    () => {
+      currentLanguage =
+        languageSelect.value;
+
+      saveSettings();
+
+      applyLanguage();
+
+      modal.remove();
+      openSettings();
+    }
+  );
+
+  musicSelect.addEventListener(
+    "change",
+    () => {
+      musicEnabled =
+        musicSelect.value === "on";
+
+      saveSettings();
+
+      updateMusic();
+    }
+  );
+
+  document
+    .getElementById(
+      "closeSettingsBtn"
+    )
+    .addEventListener(
+      "click",
+      () => {
+        modal.remove();
+      }
+    );
+}
+
+function saveSettings() {
+  localStorage.setItem(
+    "turboRacersSettings",
+    JSON.stringify({
+      language: currentLanguage,
+      music: musicEnabled
+    })
+  );
+}
+
+function loadSettings() {
+  try {
+    const raw =
+      localStorage.getItem(
+        "turboRacersSettings"
+      );
+
+    if (!raw) return;
+
+    const settings =
+      JSON.parse(raw);
+
+    if (
+      ["fr", "en", "it", "es"]
+        .includes(settings.language)
+    ) {
+      currentLanguage =
+        settings.language;
+    }
+
+    if (
+      typeof settings.music ===
+      "boolean"
+    ) {
+      musicEnabled =
+        settings.music;
+    }
+
+  } catch (error) {
+    console.error(
+      "Erreur chargement paramètres :",
+      error
+    );
+  }
+}
+
+function updateMusic() {
+  /*
+    Ici on pourra brancher la musique
+    de course plus tard.
+    Pour l'instant, ce réglage
+    mémorise simplement le choix.
+  */
+}
+
+function applyLanguage() {
+  const t =
+    translations[currentLanguage];
+
+  const settingsBtn =
+    document.getElementById(
+      "settingsBtn"
+    );
+
+  if (settingsBtn) {
+    settingsBtn.textContent =
+      t.settings;
+  }
+}
+
+loadSettings();
+applyLanguage();
 /* =========================================================
    GARAGE
 ========================================================= */
