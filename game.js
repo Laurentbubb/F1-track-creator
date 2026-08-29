@@ -384,50 +384,120 @@ applyLanguage();
    GARAGE
 ========================================================= */
 
+```js
 const SHOP_ITEMS = [
+
+  /* =========================
+     TENUES
+  ========================= */
+
   {
     id: "default",
+    category: "outfit",
     name: "Tenue classique",
     emoji: "🏎️",
     price: 0,
     color: "#eeeeee"
   },
+
   {
     id: "red",
-    name: "Combinaison rouge",
+    category: "outfit",
+    name: "Pilote rouge",
     emoji: "🔴",
     price: 100,
     color: "#e53935"
   },
+
   {
     id: "blue",
-    name: "Combinaison bleue",
+    category: "outfit",
+    name: "Pilote bleu",
     emoji: "🔵",
     price: 150,
     color: "#1976d2"
   },
+
   {
     id: "green",
-    name: "Combinaison verte",
+    category: "outfit",
+    name: "Pilote vert",
     emoji: "🟢",
     price: 200,
     color: "#18c96e"
   },
+
   {
     id: "gold",
-    name: "Combinaison dorée",
+    category: "outfit",
+    name: "Pilote doré",
     emoji: "⭐",
     price: 350,
     color: "#d7a64b"
   },
+
   {
     id: "black",
-    name: "Combinaison noire",
+    category: "outfit",
+    name: "Pilote noir",
     emoji: "⚫",
     price: 500,
     color: "#222222"
+  },
+
+  {
+    id: "racing_white",
+    category: "outfit",
+    name: "Racing blanc",
+    emoji: "🏁",
+    price: 650,
+    color: "#f5f5f5"
+  },
+
+  {
+    id: "racing_orange",
+    category: "outfit",
+    name: "Racing orange",
+    emoji: "🟠",
+    price: 750,
+    color: "#f57c00"
+  },
+
+
+  /* =========================
+     TENUES PREMIUM
+  ========================= */
+
+  {
+    id: "racing_purple",
+    category: "outfit",
+    name: "Racing violet",
+    emoji: "🟣",
+    price: 900,
+    color: "#8e44ad"
+  },
+
+  {
+    id: "racing_cyan",
+    category: "outfit",
+    name: "Racing cyan",
+    emoji: "🔷",
+    price: 1100,
+    color: "#00a9c7"
+  },
+
+  {
+    id: "champion",
+    category: "outfit",
+    name: "Tenue Champion",
+    emoji: "🏆",
+    price: 1500,
+    color: "#d4af37"
   }
+
 ];
+```
+
 
 /* =========================================================
    UTILITAIRES
