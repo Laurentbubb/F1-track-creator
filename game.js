@@ -4977,14 +4977,14 @@ if (createAccountBtn) {
     event.preventDefault();
 
     const username = loginUsername.value.trim();
-    const password = loginPassword.value;
+    const code = loginPassword.value;
 
-    if (!username || !password) {
+    if (!username || !code) {
       showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
       return;
     }
 
-    if (password.length < 6) {
+    if (code.length < 6) {
       showLoginMessage("⚠️ Le code doit contenir au moins 6 caractères.");
       return;
     }
@@ -4992,25 +4992,54 @@ if (createAccountBtn) {
     showLoginMessage("⏳ Création du compte...");
 
     try {
-      const email = username.toLowerCase() + "@turboracers.test";
-      
-      const result = await supabaseClient.auth.signUp({
-        email: email,
-        password: password
-      });
+      const { data, error } = await supabaseClient.functions.invoke(
+        "auth-username",
+        {
+          body: {
+            action: "signup",
+            username: username,
+            code: code
+          }
+        }
+      );
 
-      if (result.error) {
-        console.error("Erreur inscription :", result.error);
-        showLoginMessage("❌ " + result.error.message);
+      if (error) {
+        console.error("Erreur inscription :", error);
+        showLoginMessage("❌ Impossible de créer le compte.");
         return;
       }
 
-      console.log("Compte créé :", result.data);
+      if (data?.error) {
+        console.error("Erreur inscription :", data.error);
+        showLoginMessage("❌ " + data.error);
+        return;
+      }
+
+      console.log("Compte créé :", data);
+
+      // Enregistre la session reçue de l'Edge Function
+      if (data?.session) {
+        const { error: sessionError } =
+          await supabaseClient.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token
+          });
+
+        if (sessionError) {
+          console.error(
+            "Erreur session :",
+            sessionError
+          );
+          showLoginMessage(
+            "⚠️ Compte créé, mais connexion automatique impossible."
+          );
+          return;
+        }
+      }
+
       showLoginMessage("✅ Compte créé !");
 
-      if (result.data.session) {
-        showScreen("menuScreen");
-      }
+      showScreen("menuScreen");
 
     } catch (error) {
       console.error("Erreur :", error);
@@ -5027,9 +5056,9 @@ if (loginBtn) {
     event.preventDefault();
 
     const username = loginUsername.value.trim();
-    const password = loginPassword.value;
+    const code = loginPassword.value;
 
-    if (!username || !password) {
+    if (!username || !code) {
       showLoginMessage("⚠️ Remplis ton pseudo et ton code.");
       return;
     }
@@ -5037,20 +5066,51 @@ if (loginBtn) {
     showLoginMessage("⏳ Connexion...");
 
     try {
-     const email = username.toLowerCase() + "@turboracers.test";
+      const { data, error } = await supabaseClient.functions.invoke(
+        "auth-username",
+        {
+          body: {
+            action: "login",
+            username: username,
+            code: code
+          }
+        }
+      );
 
-      const result = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
-
-      if (result.error) {
-        console.error("Erreur connexion :", result.error);
-        showLoginMessage("❌ " + result.error.message);
+      if (error) {
+        console.error("Erreur connexion :", error);
+        showLoginMessage("❌ Pseudo ou code incorrect.");
         return;
       }
 
-      console.log("Connexion réussie :", result.data);
+      if (data?.error) {
+        console.error("Erreur connexion :", data.error);
+        showLoginMessage("❌ " + data.error);
+        return;
+      }
+
+      console.log("Connexion réussie :", data);
+
+      // Enregistre la session reçue de l'Edge Function
+      if (data?.session) {
+        const { error: sessionError } =
+          await supabaseClient.auth.setSession({
+            access_token: data.session.access_token,
+            refresh_token: data.session.refresh_token
+          });
+
+        if (sessionError) {
+          console.error(
+            "Erreur session :",
+            sessionError
+          );
+          showLoginMessage(
+            "❌ Impossible d'enregistrer la session."
+          );
+          return;
+        }
+      }
+
       showLoginMessage("✅ Connexion réussie !");
 
       showScreen("menuScreen");
