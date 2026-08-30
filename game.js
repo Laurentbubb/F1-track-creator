@@ -1,4 +1,4 @@
-  "use strict";
+f  "use strict";
 
 
 /* =========================================================
@@ -3284,7 +3284,7 @@ function checkRaceProgress() {
 
   // Dernier tour terminé.
   finishRace();
-}
+
   lastTrackIndex = index;
 }
 
