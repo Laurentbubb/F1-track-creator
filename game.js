@@ -2998,19 +2998,12 @@ car.y +=
 
 
 // Vérification du circuit
-keepCarOnTrack();
-}
 
 function keepCarOnTrack() {
   const track =
-    normalizeTrack(
-      save.track
-    );
+    normalizeTrack(save.track);
 
-  if (
-    !track ||
-    track.length < 5
-  ) {
+  if (!track || track.length < 5) {
     return;
   }
 
@@ -3022,36 +3015,18 @@ function keepCarOnTrack() {
     );
 
   const width =
-    Number(
-      save.trackWidth
-    ) || 110;
+    Number(save.trackWidth) || 110;
 
   const allowed =
     width * 0.75;
 
-  if (
-    nearest.distance >
-    allowed
-  ) {
-    car.speed *=
-      0.82;
-
-    const dx =
-      nearest.point.x -
-      car.x;
-
-    const dy =
-      nearest.point.y -
-      car.y;
-
-    car.x +=
-      dx * 0.025;
-
-    car.y +=
-      dy * 0.025;
+  if (nearest.distance > allowed) {
+    // On ralentit fortement hors piste,
+    // mais on ne téléporte/repousse plus la voiture.
+    car.speed *= 0.82;
   }
 }
-
+   
 function nearestTrackPoint(
   x,
   y,
