@@ -1,7 +1,6 @@
   "use strict";
 
-const supabaseClient = window.supabase;
-console.log("Supabase chargé :", !!supabaseClient);
+
 /* =========================================================
    TURBO RACERS
    VERSION CORRIGÉE + AVATAR AMÉLIORÉ
