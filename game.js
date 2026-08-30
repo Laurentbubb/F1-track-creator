@@ -3295,15 +3295,11 @@ function finishRace() {
   gameRunning = false;
 
   if (gameAnimation) {
-    cancelAnimationFrame(
-      gameAnimation
-    );
-
+    cancelAnimationFrame(gameAnimation);
     gameAnimation = null;
   }
 
-  const position =
-    getPosition();
+  const position = getPosition();
 
   const rewards = {
     1: 100,
@@ -3313,52 +3309,46 @@ function finishRace() {
     5: 5
   };
 
-  const reward =
-    rewards[position] ||
-    5;
+  const reward = rewards[position] || 5;
 
-  save.points +=
-    reward;
+  save.points += reward;
 
   if (
     !save.bestPosition ||
-    position <
-      save.bestPosition
+    position < save.bestPosition
   ) {
-    save.bestPosition =
-      position;
+    save.bestPosition = position;
   }
 
   if (
     !save.bestTime ||
-    raceElapsed <
-      save.bestTime
+    raceElapsed < save.bestTime
   ) {
-    save.bestTime =
-      raceElapsed;
+    save.bestTime = raceElapsed;
   }
 
   saveGame();
 
-  showResults(
-    position,
-    reward
-  );
+  // Affiche les résultats sans attendre.
+  showResults(position, reward);
 }
 
-function showResults(
-  position,
-  reward
-) {
-  if ($("resultsTitle")) {
-    $("resultsTitle").textContent =
+function showResults(position, reward) {
+  const title = $("resultsTitle");
+  const animation = $("resultsAnimation");
+  const list = $("resultsList");
+  const rewardText = $("rewardText");
+  const timeResult = $("timeResult");
+
+  if (title) {
+    title.textContent =
       position === 1
         ? "🏆 Victoire !"
         : "🏁 Course terminée !";
   }
 
-  if ($("resultsAnimation")) {
-    $("resultsAnimation").textContent =
+  if (animation) {
+    animation.textContent =
       position === 1
         ? "🏆"
         : position === 2
@@ -3366,10 +3356,14 @@ function showResults(
           : position === 3
             ? "🥉"
             : "🏎️";
-  }
 
-  const list =
-    $("resultsList");
+    // Relance l'animation CSS à chaque course.
+    animation.classList.remove("animate");
+
+    void animation.offsetWidth;
+
+    animation.classList.add("animate");
+  }
 
   if (list) {
     list.innerHTML = "";
@@ -3382,66 +3376,39 @@ function showResults(
       "Sam Racing"
     ];
 
-    for (
-      let i = 1;
-      i <= 5;
-      i++
-    ) {
-      const row =
-        document.createElement(
-          "div"
-        );
+    for (let i = 1; i <= 5; i++) {
+      const row = document.createElement("div");
 
       row.className =
         "result-row" +
-        (
-          i === position
-            ? " player"
-            : ""
-        );
+        (i === position ? " player" : "");
 
       const name =
         i === position
-          ? save.avatar.name ||
-            "Toi"
-          : names[
-              Math.min(
-                i,
-                names.length - 1
-              )
-            ];
+          ? (save.avatar?.name || "Toi")
+          : names[Math.min(i, names.length - 1)];
 
       row.innerHTML = `
         <strong>${i}.</strong>
         <span>${name}</span>
-        <span>
-          ${
-            i === position
-              ? "🏎️"
-              : ""
-          }
-        </span>
+        <span>${i === position ? "🏎️" : ""}</span>
       `;
 
-      list.appendChild(
-        row
-      );
+      list.appendChild(row);
     }
   }
 
-  if ($("rewardText")) {
-    $("rewardText").textContent =
+  if (rewardText) {
+    rewardText.textContent =
       `⭐ +${reward} points !`;
   }
 
-  if ($("timeResult")) {
-    $("timeResult").textContent =
-      `⏱️ Ton chrono : ${raceElapsed.toFixed(2)} s`;
+  if (timeResult) {
+    timeResult.textContent =
+      `⏱️ Ton chrono : ${Number(raceElapsed).toFixed(2)} s`;
   }
 
-  showScreen(
-    "resultsScreen"
-  );
+  showScreen("resultsScreen");
 }
 
 /* =========================================================
