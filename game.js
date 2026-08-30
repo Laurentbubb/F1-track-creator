@@ -2820,7 +2820,10 @@ function startRace() {
 }
 
 function gameLoop(now) {
-  if (!gameRunning) return;
+  if (!gameRunning || raceFinished) {
+    gameAnimation = null;
+    return;
+  }
 
   const currentTime =
     typeof now === "number"
@@ -2828,24 +2831,24 @@ function gameLoop(now) {
       : performance.now();
 
   raceElapsed =
-    (
-      currentTime -
-      raceStartTime
-    ) / 1000;
+    (currentTime - raceStartTime) / 1000;
 
   updateCar();
   updateOpponents();
   checkRaceProgress();
 
+  // La course peut venir de se terminer
+  // pendant checkRaceProgress().
+  if (raceFinished || !gameRunning) {
+    gameAnimation = null;
+    return;
+  }
+
   drawGame();
   updateHud();
 
-  if (!raceFinished) {
-    gameAnimation =
-      requestAnimationFrame(
-        gameLoop
-      );
-  }
+  gameAnimation =
+    requestAnimationFrame(gameLoop);
 }
 
 /* =========================================================
