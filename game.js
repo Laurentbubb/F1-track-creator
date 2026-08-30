@@ -3284,7 +3284,6 @@ function checkRaceProgress() {
 
   // Dernier tour terminé.
   finishRace();
-
   lastTrackIndex = index;
 }
 
