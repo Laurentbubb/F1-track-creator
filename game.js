@@ -4930,15 +4930,7 @@ function init() {
   updateAvatarPreview();
   updateMenu();
 
-  if (!save.avatar.name) {
-    showScreen(
-      "avatarScreen"
-    );
-  } else {
-    showScreen(
-      "menuScreen"
-    );
-  }
+  showScreen("loginScreen");
 
   console.log(
     "✅ Initialisation terminée"
