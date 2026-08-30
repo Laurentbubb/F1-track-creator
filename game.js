@@ -2997,10 +2997,12 @@ car.y +=
   car.speed;
 
 
-// Vérification du circuit
 
+// Vérification du circuit
+keepCarOnTrack();
+}
 function keepCarOnTrack() {
-  const track =
+
     normalizeTrack(save.track);
 
   if (!track || track.length < 5) {
