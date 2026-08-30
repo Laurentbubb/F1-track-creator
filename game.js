@@ -4992,8 +4992,8 @@ if (createAccountBtn) {
     showLoginMessage("⏳ Création du compte...");
 
     try {
-      const email = username.toLowerCase() + "@turboracers.com";
-
+      const email = username.toLowerCase() + "@turboracers.test";
+      
       const result = await supabaseClient.auth.signUp({
         email: email,
         password: password
@@ -5037,7 +5037,7 @@ if (loginBtn) {
     showLoginMessage("⏳ Connexion...");
 
     try {
-     const email = username.toLowerCase() + "@turboracers.com";
+     const email = username.toLowerCase() + "@turboracers.test";
 
       const result = await supabaseClient.auth.signInWithPassword({
         email: email,
