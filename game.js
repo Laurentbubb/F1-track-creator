@@ -3220,27 +3220,24 @@ function getPosition() {
 /* =========================================================
    TOURS
 ========================================================= */
-
 function checkRaceProgress() {
-  const track =
-    normalizeTrack(save.track);
+  const track = normalizeTrack(save.track);
 
   if (!track || track.length < 5) {
     return;
   }
 
-  const nearest =
-    nearestTrackPoint(
-      car.x,
-      car.y,
-      track
-    );
+  const nearest = nearestTrackPoint(
+    car.x,
+    car.y,
+    track
+  );
 
   const index = nearest.index;
 
-  // Le joueur doit d'abord parcourir une partie
-  // du circuit avant que le passage de la ligne
-  // d'arrivée puisse être compté.
+  // Le joueur doit avoir suffisamment avancé
+  // avant qu'un nouveau passage de la ligne
+  // puisse être détecté.
   const checkpoint =
     Math.floor(track.length * 0.20);
 
@@ -3248,7 +3245,7 @@ function checkRaceProgress() {
     hasPassedFirstCheckpoint = true;
   }
 
-  // Zone de détection de la ligne d'arrivée
+  // Zone de départ / arrivée.
   const finishZone =
     Math.max(
       5,
@@ -3256,29 +3253,35 @@ function checkRaceProgress() {
     );
 
   if (
-    hasPassedFirstCheckpoint &&
-    index <= finishZone &&
-    car.speed > 0.3
+    !hasPassedFirstCheckpoint ||
+    index > finishZone ||
+    car.speed <= 0.3
   ) {
-    const now = performance.now();
-
-    // Empêche de compter plusieurs fois
-    // le même passage.
-    if (
-      now - car._lastStartPass > 3000
-    ) {
-      car._lastStartPass = now;
-
-      hasPassedFirstCheckpoint = false;
-
-      if (currentLap < 3) {
-        currentLap++;
-      } else {
-        finishRace();
-      }
-    }
+    return;
   }
 
+  const now = performance.now();
+
+  // Évite plusieurs détections immédiates.
+  if (
+    now - (car._lastStartPass || 0) < 3000
+  ) {
+    return;
+  }
+
+  car._lastStartPass = now;
+  hasPassedFirstCheckpoint = false;
+
+  if (currentLap < 3) {
+    currentLap++;
+
+    // On reste dans la course.
+    return;
+  }
+
+  // Dernier tour terminé.
+  finishRace();
+}
   lastTrackIndex = index;
 }
 
