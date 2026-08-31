@@ -3211,29 +3211,28 @@ function checkRaceProgress() {
 
   const index = nearest.index;
 
+  // Mémorise que le joueur a bien parcouru
+  // une partie du circuit.
   const checkpoint =
     Math.floor(track.length * 0.20);
 
-  // Le joueur doit d'abord avoir dépassé
-  // une partie du circuit.
   if (index > checkpoint) {
     hasPassedFirstCheckpoint = true;
   }
 
-  /*
-    Détection robuste du passage de la ligne.
+  // Détection du passage de la ligne :
+  // on était dans la fin du circuit et
+  // on revient dans son début.
+  const finishStart =
+    Math.floor(track.length * 0.75);
 
-    La voiture peut passer directement, par exemple,
-    de l'index 99 à l'index 12 sans jamais être sur
-    les index 0 à 8.
+  const finishEnd =
+    Math.floor(track.length * 0.25);
 
-    On détecte donc le retour du dernier quart
-    du circuit vers le premier quart.
-  */
   const crossedFinishLine =
     hasPassedFirstCheckpoint &&
-    lastTrackIndex > track.length * 0.75 &&
-    index < track.length * 0.25 &&
+    lastTrackIndex >= finishStart &&
+    index <= finishEnd &&
     car.speed > 0.3;
 
   if (!crossedFinishLine) {
@@ -3241,9 +3240,9 @@ function checkRaceProgress() {
     return;
   }
 
+  // Anti-double détection
   const now = performance.now();
 
-  // Empêche plusieurs détections immédiates.
   if (
     now - (car._lastStartPass || 0) < 3000
   ) {
@@ -3254,14 +3253,19 @@ function checkRaceProgress() {
   car._lastStartPass = now;
   hasPassedFirstCheckpoint = false;
 
+  console.log(
+    "TOUR DETECTE",
+    currentLap
+  );
+
   if (currentLap < 3) {
     currentLap++;
     lastTrackIndex = index;
     return;
   }
 
-  // Dernier tour terminé.
   console.log("APPEL FINISH");
+
   finishRace();
 
   lastTrackIndex = index;
