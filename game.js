@@ -3002,10 +3002,10 @@ car.y +=
 keepCarOnTrack();
 }
 function keepCarOnTrack() {
-
+  const track =
     normalizeTrack(save.track);
-
-  if (!track || track.length < 5) {
+  
+   if (!track || track.length < 5) {
     return;
   }
 
