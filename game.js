@@ -3342,7 +3342,8 @@ console.log("APRES GET POSITION", position);
 }
 
 function showResults(position, reward) {
-  const title = $("resultsTitle");
+  console.log("RESULTS 1");
+   const title = $("resultsTitle");
   const animation = $("resultsAnimation");
   const list = $("resultsList");
   const rewardText = $("rewardText");
@@ -3415,8 +3416,9 @@ function showResults(position, reward) {
     timeResult.textContent =
       `⏱️ Ton chrono : ${Number(raceElapsed).toFixed(2)} s`;
   }
-
+console.log("RESULTS 2 AVANT SHOWSCREEN");
   showScreen("resultsScreen");
+console.log("RESULTS 3 APRES SHOWSCREEN");
 }
 
 /* =========================================================
