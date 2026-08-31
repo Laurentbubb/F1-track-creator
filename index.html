@@ -1019,7 +1019,69 @@ const supabaseClient = window.supabase.createClient(
   "sb_publishable_6CQUflFIYS7zKobbKlYC_A_svsgCGXg"
 );
 </script>
+<script>
 
+  /* =========================
+   SUPABASE — FONCTIONS SÉCURISÉES
+========================= */
+
+async function createRoomSecure() {
+  const { data, error } = await supabaseClient.rpc("create_room");
+
+  if (error) {
+    console.error("Erreur création salon :", error);
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function joinRoomSecure(roomId) {
+  const { data, error } = await supabaseClient.rpc(
+    "join_room",
+    {
+      p_room_id: roomId
+    }
+  );
+
+  if (error) {
+    console.error("Erreur rejoindre salon :", error);
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function updatePlayerRaceStateSecure(
+  roomId,
+  lap,
+  progress,
+  finished,
+  finishTime
+) {
+  const { data, error } = await supabaseClient.rpc(
+    "update_player_race_state",
+    {
+      p_room_id: roomId,
+      p_lap: lap,
+      p_progress: progress,
+      p_finished: finished,
+      p_finish_time: finishTime
+    }
+  );
+
+  if (error) {
+    console.error("Erreur progression course :", error);
+    throw error;
+  }
+
+  return data;
+}
+</script>
+
+<script src="game.js"></script>
 <script src="game.js"></script>
 
 </body>
