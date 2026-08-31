@@ -3002,10 +3002,7 @@ car.y +=
 keepCarOnTrack();
 }
 function keepCarOnTrack() {
-  const track =
-    normalizeTrack(save.track);
-  
-   if (!track || track.length < 5) {
+  if (!save.track || save.track.length < 5) {
     return;
   }
 
@@ -3013,7 +3010,7 @@ function keepCarOnTrack() {
     nearestTrackPoint(
       car.x,
       car.y,
-      track
+      save.track
     );
 
   const width =
@@ -3023,8 +3020,6 @@ function keepCarOnTrack() {
     width * 0.75;
 
   if (nearest.distance > allowed) {
-    // On ralentit fortement hors piste,
-    // mais on ne téléporte/repousse plus la voiture.
     car.speed *= 0.82;
   }
 }
