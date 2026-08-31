@@ -2902,7 +2902,8 @@ function updateCar() {
       -2.5,
       car.maxSpeed
     );
-
+  console.log("SPEED", car.speed);
+   
   /* =========================
    CONDUITE AVEC AIDE
 ========================= */
