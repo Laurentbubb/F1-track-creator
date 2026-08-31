@@ -3197,7 +3197,8 @@ function getPosition() {
    TOURS
 ========================================================= */
 function checkRaceProgress() {
-  const track = normalizeTrack(save.track);
+ console.log("CHECK LAP");
+   const track = normalizeTrack(save.track);
 
   if (!track || track.length < 5) {
     return;
@@ -3256,7 +3257,8 @@ function checkRaceProgress() {
   }
 
   // Dernier tour terminé.
-  finishRace();
+ console.log("APPEL FINISH");
+finishRace();
   lastTrackIndex = index;
 }
 
