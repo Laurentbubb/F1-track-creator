@@ -3197,7 +3197,7 @@ function getPosition() {
    TOURS
 ========================================================= */
 function checkRaceProgress() {
- console.log("CHECK LAP");
+ console.log("CHECK LAP VERSION 2");
    const track = normalizeTrack(save.track);
 
   if (!track || track.length < 5) {
