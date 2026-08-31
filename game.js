@@ -3020,8 +3020,8 @@ function keepCarOnTrack() {
     width * 0.75;
 
   if (nearest.distance > allowed) {
-    car.speed *= 0.82;
-  }
+  return;
+ } 
 }
    
 function nearestTrackPoint(
