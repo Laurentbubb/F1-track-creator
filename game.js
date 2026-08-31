@@ -3265,6 +3265,11 @@ function checkRaceProgress() {
 ========================================================= */
 
 function finishRace() {
+  console.log("FINISH RACE APPELEE");
+
+  if (raceFinished) {
+    return;
+  }
   if (raceFinished) {
     return;
   }
@@ -3305,10 +3310,11 @@ function finishRace() {
     save.bestTime = raceElapsed;
   }
 
-  saveGame();
+ saveGame();
 
-  // Affiche les résultats sans attendre.
-  showResults(position, reward);
+ console.log("AFFICHAGE RESULTATS");
+
+ showResults(position, reward); 
 }
 
 function showResults(position, reward) {
