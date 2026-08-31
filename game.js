@@ -3275,7 +3275,20 @@ function checkRaceProgress() {
 ========================================================= */
 
 function finishRace() {
-  console.log("FINISH RACE APPELEE");
+ console.log("FINISH 1");
+
+if (raceFinished) {
+  console.log("FINISH DEJA TERMINE");
+  return;
+}
+
+console.log("FINISH 2");
+
+raceFinished = true;
+gameRunning = false;
+
+console.log("FINISH 3"); 
+   console.log("FINISH RACE APPELEE");
 
   if (raceFinished) {
     return;
