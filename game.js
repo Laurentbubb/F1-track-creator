@@ -3228,7 +3228,14 @@ function checkRaceProgress() {
       5,
       Math.floor(track.length * 0.08)
     );
-
+console.log(
+  "LAP DEBUG",
+  "index:", index,
+  "finishZone:", finishZone,
+  "checkpoint:", checkpoint,
+  "passed:", hasPassedFirstCheckpoint,
+  "lap:", currentLap
+);
   if (
     !hasPassedFirstCheckpoint ||
     index > finishZone ||
