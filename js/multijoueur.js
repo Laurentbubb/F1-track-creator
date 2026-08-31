@@ -249,9 +249,64 @@ function disableMultiplayer() {
    CRÉATION D'UN SALON
 ========================================================= */
 
-async function createMultiplayerRoom(
-  track
-) {
+async function createMultiplayerRoom(track) {
+
+  enableMultiplayer();
+
+  if (!track || track.length < 5) {
+    throw new Error("Circuit invalide.");
+  }
+
+  const {
+    data: roomId,
+    error
+  } = await supabaseClient.rpc("create_room");
+
+  if (error) {
+    multiplayerLog(
+      "Erreur création salon :",
+      error
+    );
+
+    throw error;
+  }
+
+  if (!roomId) {
+    throw new Error(
+      "Supabase n'a pas retourné l'identifiant du salon."
+    );
+  }
+
+  /*
+    Pour l'instant, l'identifiant Supabase
+    devient l'identifiant du salon côté client.
+  */
+
+  multiplayer.roomCode =
+    String(roomId);
+
+  multiplayer.hostId =
+    multiplayer.playerId;
+
+  multiplayer.isHost =
+    true;
+
+  multiplayer.track =
+    cloneMultiplayerTrack(track);
+
+  multiplayer.trackVersion++;
+
+  addLocalPlayer();
+
+  onMultiplayerConnected();
+
+  multiplayerLog(
+    "Salon créé :",
+    roomId
+  );
+
+  return roomId;
+}
 
   enableMultiplayer();
 
@@ -352,9 +407,65 @@ function generateRoomCode() {
    REJOINDRE UN SALON
 ========================================================= */
 
-async function joinMultiplayerRoom(
-  roomCode
-) {
+async function joinMultiplayerRoom(roomCode) {
+
+  enableMultiplayer();
+
+  if (!roomCode) {
+    throw new Error(
+      "Code du salon manquant."
+    );
+  }
+
+  roomCode =
+    roomCode
+      .trim()
+      .toLowerCase();
+
+  multiplayerLog(
+    "Tentative de connexion au salon",
+    roomCode
+  );
+
+  const {
+    error
+  } = await supabaseClient.rpc(
+    "join_room",
+    {
+      p_room_id: roomCode
+    }
+  );
+
+  if (error) {
+
+    multiplayerLog(
+      "Erreur rejoindre salon :",
+      error
+    );
+
+    throw error;
+  }
+
+  multiplayer.roomCode =
+    roomCode;
+
+  multiplayer.isHost =
+    false;
+
+  multiplayer.hostId =
+    null;
+
+  addLocalPlayer();
+
+  onMultiplayerConnected();
+
+  multiplayerLog(
+    "Joueur ajouté au salon",
+    roomCode
+  );
+
+  return roomCode;
+}
 
   enableMultiplayer();
 
