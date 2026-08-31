@@ -3197,8 +3197,7 @@ function getPosition() {
    TOURS
 ========================================================= */
 function checkRaceProgress() {
- console.log("CHECK LAP VERSION 2");
-   const track = normalizeTrack(save.track);
+  const track = normalizeTrack(save.track);
 
   if (!track || track.length < 5) {
     return;
@@ -3212,44 +3211,43 @@ function checkRaceProgress() {
 
   const index = nearest.index;
 
-  // Le joueur doit avoir suffisamment avancé
-  // avant qu'un nouveau passage de la ligne
-  // puisse être détecté.
   const checkpoint =
     Math.floor(track.length * 0.20);
 
+  // Le joueur doit d'abord avoir dépassé
+  // une partie du circuit.
   if (index > checkpoint) {
     hasPassedFirstCheckpoint = true;
   }
 
-  // Zone de départ / arrivée.
-  const finishZone =
-    Math.max(
-      5,
-      Math.floor(track.length * 0.08)
-    );
-console.log(
-  "LAP DEBUG",
-  "index:", index,
-  "finishZone:", finishZone,
-  "checkpoint:", checkpoint,
-  "passed:", hasPassedFirstCheckpoint,
-  "lap:", currentLap
-);
-  if (
-    !hasPassedFirstCheckpoint ||
-    index > finishZone ||
-    car.speed <= 0.3
-  ) {
+  /*
+    Détection robuste du passage de la ligne.
+
+    La voiture peut passer directement, par exemple,
+    de l'index 99 à l'index 12 sans jamais être sur
+    les index 0 à 8.
+
+    On détecte donc le retour du dernier quart
+    du circuit vers le premier quart.
+  */
+  const crossedFinishLine =
+    hasPassedFirstCheckpoint &&
+    lastTrackIndex > track.length * 0.75 &&
+    index < track.length * 0.25 &&
+    car.speed > 0.3;
+
+  if (!crossedFinishLine) {
+    lastTrackIndex = index;
     return;
   }
 
   const now = performance.now();
 
-  // Évite plusieurs détections immédiates.
+  // Empêche plusieurs détections immédiates.
   if (
     now - (car._lastStartPass || 0) < 3000
   ) {
+    lastTrackIndex = index;
     return;
   }
 
@@ -3258,17 +3256,16 @@ console.log(
 
   if (currentLap < 3) {
     currentLap++;
-
-    // On reste dans la course.
+    lastTrackIndex = index;
     return;
   }
 
   // Dernier tour terminé.
- console.log("APPEL FINISH");
-finishRace();
+  console.log("APPEL FINISH");
+  finishRace();
+
   lastTrackIndex = index;
 }
-
 /* =========================================================
    FIN COURSE
 ========================================================= */
