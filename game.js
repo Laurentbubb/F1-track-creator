@@ -3291,10 +3291,11 @@ function finishRace() {
     cancelAnimationFrame(gameAnimation);
     gameAnimation = null;
   }
-
+console.log("AVANT GET POSITION");
   const position = getPosition();
-
-  const rewards = {
+console.log("APRES GET POSITION", position);
+  
+   const rewards = {
     1: 100,
     2: 50,
     3: 25,
