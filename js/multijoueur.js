@@ -1,4 +1,3 @@
-```js
 /* =========================================================
    MULTIJOUEUR.JS
    Turbo Racers — Gestion du mode multijoueur
@@ -25,6 +24,7 @@
 
   Cette version prépare donc toute l'architecture.
 */
+
 
 /* =========================================================
    ÉTAT MULTIJOUEUR
@@ -77,6 +77,7 @@ const multiplayer = {
   syncTimer: null,
 
   socket: null
+
 };
 
 
@@ -120,7 +121,7 @@ function multiplayerLog(...args) {
 function generateLocalPlayerId() {
 
   if (
-    crypto &&
+    typeof crypto !== "undefined" &&
     typeof crypto.randomUUID === "function"
   ) {
 
@@ -236,11 +237,26 @@ function disableMultiplayer() {
   multiplayer.connected =
     false;
 
+  multiplayer.reconnecting =
+    false;
+
   multiplayer.raceStarted =
     false;
 
   multiplayer.raceFinished =
     false;
+
+  multiplayer.countdownActive =
+    false;
+
+  multiplayer.finalRanking =
+    [];
+
+  multiplayer.track =
+    null;
+
+  multiplayer.trackVersion =
+    0;
 
 }
 
@@ -250,63 +266,6 @@ function disableMultiplayer() {
 ========================================================= */
 
 async function createMultiplayerRoom(track) {
-
-  enableMultiplayer();
-
-  if (!track || track.length < 5) {
-    throw new Error("Circuit invalide.");
-  }
-
-  const {
-    data: roomId,
-    error
-  } = await supabaseClient.rpc("create_room");
-
-  if (error) {
-    multiplayerLog(
-      "Erreur création salon :",
-      error
-    );
-
-    throw error;
-  }
-
-  if (!roomId) {
-    throw new Error(
-      "Supabase n'a pas retourné l'identifiant du salon."
-    );
-  }
-
-  /*
-    Pour l'instant, l'identifiant Supabase
-    devient l'identifiant du salon côté client.
-  */
-
-  multiplayer.roomCode =
-    String(roomId);
-
-  multiplayer.hostId =
-    multiplayer.playerId;
-
-  multiplayer.isHost =
-    true;
-
-  multiplayer.track =
-    cloneMultiplayerTrack(track);
-
-  multiplayer.trackVersion++;
-
-  addLocalPlayer();
-
-  onMultiplayerConnected();
-
-  multiplayerLog(
-    "Salon créé :",
-    roomId
-  );
-
-  return roomId;
-}
 
   enableMultiplayer();
 
@@ -321,20 +280,51 @@ async function createMultiplayerRoom(track) {
 
   }
 
-  /*
-    Pour l'instant le serveur n'est pas
-    encore branché.
+  if (
+    typeof supabaseClient ===
+    "undefined"
+  ) {
 
-    La prochaine étape Supabase remplacera
-    cette partie par une vraie création
-    de salon sécurisée.
+    throw new Error(
+      "Supabase n'est pas initialisé."
+    );
+
+  }
+
+  const {
+    data: roomId,
+    error
+  } =
+    await supabaseClient.rpc(
+      "create_room"
+    );
+
+  if (error) {
+
+    multiplayerLog(
+      "Erreur création salon :",
+      error
+    );
+
+    throw error;
+
+  }
+
+  if (!roomId) {
+
+    throw new Error(
+      "Supabase n'a pas retourné l'identifiant du salon."
+    );
+
+  }
+
+  /*
+    L'identifiant retourné par Supabase
+    devient l'identifiant du salon côté client.
   */
 
-  const roomCode =
-    generateRoomCode();
-
   multiplayer.roomCode =
-    roomCode;
+    String(roomId);
 
   multiplayer.hostId =
     multiplayer.playerId;
@@ -351,30 +341,30 @@ async function createMultiplayerRoom(track) {
 
   addLocalPlayer();
 
+  onMultiplayerConnected();
+
   multiplayerLog(
     "Salon créé :",
-    roomCode
+    roomId
   );
 
-  return roomCode;
+  return roomId;
 
 }
 
 
 /* =========================================================
-   CODE SALON
+   CODE SALON LOCAL
 ========================================================= */
 
 function generateRoomCode() {
 
   /*
-    Génération locale provisoire.
+    Génération locale conservée pour
+    compatibilité avec l'ancienne architecture.
 
-    IMPORTANT :
-    deux salons ne pourront réellement
-    pas avoir le même code uniquement
-    lorsque Supabase imposera une contrainte
-    UNIQUE côté serveur.
+    La création réelle du salon utilise
+    maintenant Supabase.
   */
 
   const chars =
@@ -412,15 +402,36 @@ async function joinMultiplayerRoom(roomCode) {
   enableMultiplayer();
 
   if (!roomCode) {
+
     throw new Error(
       "Code du salon manquant."
     );
+
   }
 
   roomCode =
     roomCode
       .trim()
       .toLowerCase();
+
+  if (!roomCode) {
+
+    throw new Error(
+      "Code du salon invalide."
+    );
+
+  }
+
+  if (
+    typeof supabaseClient ===
+    "undefined"
+  ) {
+
+    throw new Error(
+      "Supabase n'est pas initialisé."
+    );
+
+  }
 
   multiplayerLog(
     "Tentative de connexion au salon",
@@ -429,12 +440,14 @@ async function joinMultiplayerRoom(roomCode) {
 
   const {
     error
-  } = await supabaseClient.rpc(
-    "join_room",
-    {
-      p_room_id: roomCode
-    }
-  );
+  } =
+    await supabaseClient.rpc(
+      "join_room",
+      {
+        p_room_id:
+          roomCode
+      }
+    );
 
   if (error) {
 
@@ -444,6 +457,7 @@ async function joinMultiplayerRoom(roomCode) {
     );
 
     throw error;
+
   }
 
   multiplayer.roomCode =
@@ -451,6 +465,11 @@ async function joinMultiplayerRoom(roomCode) {
 
   multiplayer.isHost =
     false;
+
+  /*
+    Le vrai host devra être récupéré
+    depuis Supabase.
+  */
 
   multiplayer.hostId =
     null;
@@ -465,52 +484,6 @@ async function joinMultiplayerRoom(roomCode) {
   );
 
   return roomCode;
-}
-
-  enableMultiplayer();
-
-  if (
-    !roomCode
-  ) {
-
-    throw new Error(
-      "Code du salon manquant."
-    );
-
-  }
-
-  roomCode =
-    roomCode
-      .trim()
-      .toUpperCase();
-
-  multiplayer.roomCode =
-    roomCode;
-
-  multiplayerLog(
-    "Tentative de connexion au salon",
-    roomCode
-  );
-
-  /*
-    Supabase sera branché ici.
-
-    Le serveur devra vérifier :
-
-    - que le salon existe ;
-    - qu'il n'est pas plein ;
-    - que le joueur peut le rejoindre ;
-    - récupérer le vrai host ;
-    - récupérer le circuit ;
-    - récupérer la version du circuit.
-  */
-
-  addLocalPlayer();
-
-  multiplayerLog(
-    "Joueur ajouté au salon",
-    roomCode
-  );
 
 }
 
@@ -577,9 +550,7 @@ function addLocalPlayer() {
    AJOUT D'UN JOUEUR DISTANT
 ========================================================= */
 
-function addRemotePlayer(
-  data
-) {
+function addRemotePlayer(data) {
 
   if (
     !data ||
@@ -595,8 +566,8 @@ function addRemotePlayer(
     on ne fait pas confiance au lap
     ou à la position reçue.
 
-    Ces valeurs seront validées par
-    le serveur dans la version Supabase.
+    Ces valeurs devront être validées
+    définitivement côté serveur.
   */
 
   const existing =
@@ -657,15 +628,10 @@ function addRemotePlayer(
   player.connected =
     data.connected !== false;
 
-  /*
-    Ces valeurs sont uniquement
-    provisoires côté client.
-
-    Le serveur devra les confirmer.
-  */
 
   if (
-    typeof data.x === "number"
+    typeof data.x ===
+    "number"
   ) {
 
     player.x =
@@ -674,7 +640,8 @@ function addRemotePlayer(
   }
 
   if (
-    typeof data.y === "number"
+    typeof data.y ===
+    "number"
   ) {
 
     player.y =
@@ -683,7 +650,8 @@ function addRemotePlayer(
   }
 
   if (
-    typeof data.angle === "number"
+    typeof data.angle ===
+    "number"
   ) {
 
     player.angle =
@@ -692,7 +660,8 @@ function addRemotePlayer(
   }
 
   if (
-    typeof data.speed === "number"
+    typeof data.speed ===
+    "number"
   ) {
 
     player.speed =
@@ -701,13 +670,15 @@ function addRemotePlayer(
   }
 
   if (
-    typeof data.progress === "number"
+    typeof data.progress ===
+    "number"
   ) {
 
     player.progress =
       data.progress;
 
   }
+
 
   /*
     Protection client supplémentaire :
@@ -726,11 +697,13 @@ function addRemotePlayer(
 
   }
 
+
   player.finished =
     data.finished === true;
 
   player.finishTime =
-    typeof data.finishTime === "number"
+    typeof data.finishTime ===
+    "number"
       ? data.finishTime
       : null;
 
@@ -749,13 +722,9 @@ function addRemotePlayer(
    SUPPRIMER UN JOUEUR
 ========================================================= */
 
-function removeRemotePlayer(
-  playerId
-) {
+function removeRemotePlayer(playerId) {
 
-  if (
-    !playerId
-  ) {
+  if (!playerId) {
 
     return;
 
@@ -788,9 +757,7 @@ function removeRemotePlayer(
    CHANGEMENT D'HÔTE
 ========================================================= */
 
-function handleHostLeaving(
-  oldHostId
-) {
+function handleHostLeaving(oldHostId) {
 
   multiplayerLog(
     "Host déconnecté :",
@@ -813,7 +780,8 @@ function handleHostLeaving(
     );
 
   if (
-    connectedPlayers.length === 0
+    connectedPlayers.length ===
+    0
   ) {
 
     multiplayer.hostId =
@@ -871,7 +839,7 @@ function isMultiplayerHost() {
   return (
     multiplayer.enabled &&
     multiplayer.hostId ===
-      multiplayer.playerId
+    multiplayer.playerId
   );
 
 }
@@ -927,16 +895,11 @@ function requestRaceStart() {
   }
 
   /*
-    Le serveur Supabase devra générer
-    un timestamp de départ commun.
+    Pour l'instant le timestamp est local.
 
-    Exemple :
-
-    startAt = serveur + 5000 ms
-
-    Tous les clients calculeront ensuite
-    le compte à rebours avec ce même
-    timestamp.
+    Dans la version serveur définitive,
+    Supabase devra générer un timestamp
+    commun à tous les clients.
   */
 
   const startAt =
@@ -954,13 +917,25 @@ function requestRaceStart() {
    RÉCEPTION DU DÉPART
 ========================================================= */
 
-function receiveRaceStart(
-  startAt
-) {
+function receiveRaceStart(startAt) {
 
   if (
     multiplayer.raceStarted
   ) {
+
+    return;
+
+  }
+
+  if (
+    typeof startAt !==
+    "number" ||
+    !Number.isFinite(startAt)
+  ) {
+
+    multiplayerLog(
+      "Timestamp de départ invalide."
+    );
 
     return;
 
@@ -988,9 +963,7 @@ function receiveRaceStart(
    COMPTE À REBOURS SYNCHRONISÉ
 ========================================================= */
 
-function startSynchronizedCountdown(
-  startAt
-) {
+function startSynchronizedCountdown(startAt) {
 
   if (
     multiplayer.countdownTimer
@@ -1071,9 +1044,7 @@ function startSynchronizedCountdown(
    AFFICHAGE DU COMPTE À REBOURS
 ========================================================= */
 
-function showCountdownText(
-  value
-) {
+function showCountdownText(value) {
 
   let element =
     document.getElementById(
@@ -1159,9 +1130,7 @@ function hideCountdownText() {
    ÉCRAN D'ATTENTE
 ========================================================= */
 
-function showMultiplayerWaiting(
-  show = true
-) {
+function showMultiplayerWaiting(show = true) {
 
   let element =
     document.getElementById(
@@ -1243,10 +1212,7 @@ function startLocalMultiplayerRace() {
 
   /*
     Le vrai démarrage de game.js
-    restera centralisé ici.
-
-    Si startRace() existe déjà,
-    on l'utilise.
+    reste centralisé ici.
   */
 
   if (
@@ -1285,29 +1251,38 @@ function sendPlayerState() {
 
   }
 
-  /*
-    On envoie uniquement l'état local.
-
-    Le serveur devra recalculer /
-    vérifier la progression.
-  */
-
   const state = {
 
     id:
       multiplayer.playerId,
 
     x:
-      Number(car?.x) || 0,
+      Number(
+        typeof car !== "undefined"
+          ? car?.x
+          : 0
+      ) || 0,
 
     y:
-      Number(car?.y) || 0,
+      Number(
+        typeof car !== "undefined"
+          ? car?.y
+          : 0
+      ) || 0,
 
     angle:
-      Number(car?.angle) || 0,
+      Number(
+        typeof car !== "undefined"
+          ? car?.angle
+          : 0
+      ) || 0,
 
     speed:
-      Number(car?.speed) || 0,
+      Number(
+        typeof car !== "undefined"
+          ? car?.speed
+          : 0
+      ) || 0,
 
     timestamp:
       Date.now()
@@ -1315,6 +1290,7 @@ function sendPlayerState() {
   };
 
   sendMultiplayerMessage({
+
     type:
       "player_state",
 
@@ -1329,9 +1305,7 @@ function sendPlayerState() {
    PROTECTION LAP CÔTÉ CLIENT
 ========================================================= */
 
-function sanitizeLap(
-  lap
-) {
+function sanitizeLap(lap) {
 
   lap =
     Number(lap);
@@ -1392,9 +1366,7 @@ function sanitizeProgress(
    RÉCEPTION ÉTAT JOUEUR
 ========================================================= */
 
-function receivePlayerState(
-  data
-) {
+function receivePlayerState(data) {
 
   if (
     !data ||
@@ -1472,24 +1444,32 @@ function setMultiplayerTrack(
     );
 
   multiplayer.trackVersion =
-    version;
+    Number(version) || 1;
 
   return true;
 
 }
 
 
-function cloneMultiplayerTrack(
-  track
-) {
+function cloneMultiplayerTrack(track) {
+
+  if (
+    !Array.isArray(track)
+  ) {
+
+    return [];
+
+  }
 
   return track.map(
     point => ({
+
       x:
         Number(point.x),
 
       y:
         Number(point.y)
+
     })
   );
 
@@ -1551,9 +1531,7 @@ function receiveTrack(
    FIN DE COURSE
 ========================================================= */
 
-function playerFinished(
-  finishTime
-) {
+function playerFinished(finishTime) {
 
   if (
     multiplayer.raceFinished
@@ -1577,7 +1555,6 @@ function playerFinished(
 
   });
 
-
 }
 
 
@@ -1585,9 +1562,7 @@ function playerFinished(
    CLASSEMENT FINAL
 ========================================================= */
 
-function receiveFinalRanking(
-  ranking
-) {
+function receiveFinalRanking(ranking) {
 
   if (
     !Array.isArray(ranking)
@@ -1654,13 +1629,6 @@ function showMultiplayerFinalRanking() {
     "Classement final :",
     ranking
   );
-
-  /*
-    Si ton UI possède déjà
-    showResults(), on pourra
-    ensuite connecter directement
-    ce classement à cette fonction.
-  */
 
   const playerIndex =
     ranking.findIndex(
@@ -1793,11 +1761,6 @@ function startReconnect() {
         );
 
         try {
-
-          /*
-            Supabase reconnect sera appelé
-            ici dans la prochaine étape.
-          */
 
           await reconnectMultiplayer();
 
@@ -1959,9 +1922,7 @@ function stopMultiplayerSync() {
    MESSAGES
 ========================================================= */
 
-function sendMultiplayerMessage(
-  message
-) {
+function sendMultiplayerMessage(message) {
 
   if (
     !message
@@ -1975,8 +1936,8 @@ function sendMultiplayerMessage(
     Cette fonction sera remplacée par
     Supabase Realtime / WebSocket.
 
-    Pour l'instant elle ne fait
-    qu'afficher le message.
+    Pour l'instant elle affiche
+    simplement le message.
   */
 
   multiplayerLog(
@@ -1991,9 +1952,7 @@ function sendMultiplayerMessage(
    RÉCEPTION MESSAGE
 ========================================================= */
 
-function receiveMultiplayerMessage(
-  message
-) {
+function receiveMultiplayerMessage(message) {
 
   if (
     !message ||
@@ -2043,6 +2002,16 @@ function receiveMultiplayerMessage(
       multiplayer.isHost =
         message.hostId ===
         multiplayer.playerId;
+
+      multiplayer.players.forEach(
+        player => {
+
+          player.isHost =
+            player.id ===
+            message.hostId;
+
+        }
+      );
 
       break;
 
@@ -2096,9 +2065,7 @@ function receiveMultiplayerMessage(
    STATUT CONNEXION
 ========================================================= */
 
-function showConnectionStatus(
-  connected
-) {
+function showConnectionStatus(connected) {
 
   let element =
     document.getElementById(
@@ -2192,10 +2159,16 @@ function leaveMultiplayerRoom() {
   multiplayer.connected =
     false;
 
+  multiplayer.reconnecting =
+    false;
+
   multiplayer.raceStarted =
     false;
 
   multiplayer.raceFinished =
+    false;
+
+  multiplayer.countdownActive =
     false;
 
 }
@@ -2306,4 +2279,3 @@ if (
   initMultiplayer();
 
 }
-```
